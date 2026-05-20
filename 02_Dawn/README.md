@@ -7,7 +7,9 @@ with VGA output via the Pimoroni Pico VGA Demo Base.
 ## Visuals & Web Demo
 
 A TypeScript/Canvas 2D reference port is included in this repository. You can run the interactive web preview directly in your browser:
-🌐 **[Run Web Preview (web_port/web/index.html)](web_port/web/index.html)**
+🌐 **[Run Web Preview on GitHub Pages](https://cpldcpu.github.io/PicoDemos/)**
+
+Local source: [web_port/web/index.html](web_port/web/index.html)
 
 ### Scene Gallery
 | DAWN Text | BY Text | AZURE Text |
