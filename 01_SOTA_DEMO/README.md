@@ -206,5 +206,5 @@ Porting SOTA to bare-metal microcontrollers presented several major challenges:
 
 *   **Original Demogroup:** **Spaceballs** (Classic Amiga release, 1992).
 *   **Modern Reimplementation:** **nfd** ([nfd/sota](https://github.com/nfd/sota) - C-port and asset extraction logic).
-*   **Microcontroller Port & Engineering:** Azure (Tim Boescke).
+*   **Microcontroller Port & Engineering:** Azure
 *   **LLM Porting Assistant:** **Claude Opus 4.7** (assisted in compiling the C port, Windows/Pico platform abstraction, unaligned memory debugging, and DMA-PWM audio plumbing).
