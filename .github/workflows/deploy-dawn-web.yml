@@ -1,5 +1,6 @@
 name: Deploy Dawn Web Demo
 
+# Publishes 02_Dawn/web_port/web to https://cpldcpu.github.io/PicoDemos/.
 on:
   push:
     branches:
