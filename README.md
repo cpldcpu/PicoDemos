@@ -12,7 +12,9 @@ I felt this platform is seriously underexplored. But as I learned while during m
 
 **Ah yes, and it is totally lame to use GenAI to make demos. It rips the essence, the soul, out of the process.**
 
-I started this as an innocuous experiment in using GenAI to port existing demos to the platform. This created a suitable substrate (context) for the agents to build on. The last two demos are completely Gen AI designed and created - I mostly provided critical feedback like "this looks lame, do better". I was especially surprised by the last demo, made by Gemini 3.5 Flash, which was almost single-shot in less than 15 mínutes. The Opus demo took took 2-3 evenings of back and forth. GPT 5.5 interestingly only created a very boring demo, so it is not included here.
+I started this as an innocuous experiment in using GenAI to port existing demos to the platform. This created a suitable substrate (context) for the agents to build on. The last two demos are completely Gen AI designed and created - I mostly provided critical feedback like "this looks lame, do better".
+
+I was especially surprised by the last demo, made by Gemini 3.5 Flash, which was almost single-shot in less than 15 minutes. The Opus demo took 2-3 evenings of back and forth and was also strangely adamant on inserting the coral logo everywhere. GPT 5.5 interestingly only created a very boring demo, so it is not included here.
 
 From here on be slop.
 
