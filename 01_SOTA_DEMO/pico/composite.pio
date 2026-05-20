@@ -1,0 +1,78 @@
+; Composite video output PIO programs. Two flavours so we don't need to
+; patch the OUT instruction at runtime:
+;   composite_video_2bit  — 2 pins (video, sync), used by composite_test
+;   composite_video_3bit  — 3 pins (videoL, videoM, sync), used by the
+;                            engine backend's 4-level luma output
+;
+; Both shift right (LSB first) and use autopull so DMA can stream pixels
+; from the framebuffer into the TX FIFO without CPU help.
+
+.program composite_video_2bit
+.wrap_target
+    out pins, 2
+.wrap
+
+.program composite_video_3bit
+.wrap_target
+    out pins, 3
+.wrap
+
+.program composite_video_4bit
+.wrap_target
+    out pins, 4
+.wrap
+
+% c-sdk {
+#include "hardware/clocks.h"
+#include "hardware/gpio.h"
+
+static inline void composite_video_2bit_init(PIO pio, uint sm, uint offset,
+                                             uint pin_base, float clkdiv) {
+    pio_sm_config c = composite_video_2bit_program_get_default_config(offset);
+    sm_config_set_out_pins(&c, pin_base, 2);
+    sm_config_set_out_shift(&c, true, true, 32);   /* 16 pixels per FIFO word */
+    sm_config_set_clkdiv(&c, clkdiv);
+
+    pio_gpio_init(pio, pin_base);
+    pio_gpio_init(pio, pin_base + 1);
+    pio_sm_set_consecutive_pindirs(pio, sm, pin_base, 2, true);
+
+    pio_sm_init(pio, sm, offset, &c);
+    pio_sm_set_enabled(pio, sm, true);
+}
+
+static inline void composite_video_3bit_init(PIO pio, uint sm, uint offset,
+                                             uint pin_base, float clkdiv) {
+    pio_sm_config c = composite_video_3bit_program_get_default_config(offset);
+    sm_config_set_out_pins(&c, pin_base, 3);
+    /* 24-bit pull threshold = 8 pixels per FIFO word (top 8 bits unused). */
+    sm_config_set_out_shift(&c, true, true, 24);
+    sm_config_set_clkdiv(&c, clkdiv);
+
+    pio_gpio_init(pio, pin_base);
+    pio_gpio_init(pio, pin_base + 1);
+    pio_gpio_init(pio, pin_base + 2);
+    pio_sm_set_consecutive_pindirs(pio, sm, pin_base, 3, true);
+
+    pio_sm_init(pio, sm, offset, &c);
+    pio_sm_set_enabled(pio, sm, true);
+}
+
+static inline void composite_video_4bit_init(PIO pio, uint sm, uint offset,
+                                             uint pin_base, float clkdiv) {
+    pio_sm_config c = composite_video_4bit_program_get_default_config(offset);
+    sm_config_set_out_pins(&c, pin_base, 4);
+    /* 32-bit pull = 8 pixels per FIFO word, no wasted bits. */
+    sm_config_set_out_shift(&c, true, true, 32);
+    sm_config_set_clkdiv(&c, clkdiv);
+
+    pio_gpio_init(pio, pin_base);
+    pio_gpio_init(pio, pin_base + 1);
+    pio_gpio_init(pio, pin_base + 2);
+    pio_gpio_init(pio, pin_base + 3);
+    pio_sm_set_consecutive_pindirs(pio, sm, pin_base, 4, true);
+
+    pio_sm_init(pio, sm, offset, &c);
+    pio_sm_set_enabled(pio, sm, true);
+}
+%}

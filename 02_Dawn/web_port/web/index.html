@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAWN - Browser Port</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Courier New', monospace;
+            color: #fff;
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        #canvas {
+            border: 2px solid #333;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            /* Scale up 4x for visibility */
+            width: 640px;
+            height: 512px;
+        }
+
+        #info {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            max-width: 640px;
+        }
+
+        #info h1 {
+            color: #fff;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        #info p {
+            margin: 5px 0;
+        }
+
+        #stats {
+            margin-top: 10px;
+            padding: 10px;
+            background: #111;
+            border: 1px solid #333;
+            font-size: 11px;
+        }
+
+        .controls {
+            margin-top: 10px;
+        }
+
+        .controls button {
+            background: #222;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 8px 16px;
+            margin: 0 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+        }
+
+        .controls button:hover {
+            background: #333;
+        }
+
+        @media (max-width: 700px) {
+            #canvas {
+                width: 320px;
+                height: 256px;
+            }
+            #info {
+                max-width: 320px;
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <canvas id="canvas" width="160" height="128"></canvas>
+
+        <div id="info">
+            <h1>DAWN</h1>
+            <p>4K Intro for Party V (1995)</p>
+            <p>Original by AZURE/ARTWORK (Tim Böscke)</p>
+            <p>Browser port - Environment mapping, voxel landscape, blur effects</p>
+            <p style="color: #aaa; font-size: 10px; margin-top: 5px;">Click the speaker icon 🔇 to enable sound</p>
+
+            <div class="controls">
+                <button id="fullscreen">Fullscreen</button>
+                <button id="pause">Pause</button>
+                <button id="mute" title="Mute/Unmute audio">🔊</button>
+                <button id="restart">Restart</button>
+            </div>
+
+            <div id="stats">
+                FPS: <span id="fps">0</span> |
+                Frame: <span id="frame">0</span> |
+                Scene: <span id="scene">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="dist/main.js"></script>
+</body>
+</html>

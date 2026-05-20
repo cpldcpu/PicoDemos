@@ -1,0 +1,17 @@
+{
+  "name": "dawn-browser",
+  "version": "1.0.0",
+  "description": "Browser port of DAWN - Amiga 1200 4K intro by AZURE/ARTWORK",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "serve": "python -m http.server 8000"
+  },
+  "keywords": ["amiga", "demo", "demoscene", "4k", "intro"],
+  "author": "Browser port based on original by Tim Böscke (AZURE/ARTWORK)",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.3.0"
+  }
+}

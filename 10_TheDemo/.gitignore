@@ -1,0 +1,45 @@
+# CMake / Pico build directory
+thedemo/build_rp2350/
+thedemo/build_*/
+
+# Host build artifacts (MSYS2 + SDL2 desktop test harness)
+thedemo/host/*.o
+thedemo/host/*.exe
+thedemo/host/screenshots/
+
+# Stray debug logs (gcc stdout/stderr captures, etc.)
+thedemo/host/*.log
+thedemo/host/err.txt
+thedemo/host/out.txt
+thedemo/host/pp.txt
+thedemo/host/pe.log
+thedemo/host/v.log
+thedemo/host/stderr.log
+thedemo/host/stdout.log
+
+# Asset packer side products (regenerable from PNGs via pack_assets.py)
+thedemo/assets/_packed/check_*.png
+
+# Tools build outputs
+thedemo/tools/*.exe
+thedemo/tools/*.o
+
+# Music pipeline intermediates (mp3 → raw → qoa). music.qoa is checked in.
+thedemo/*.raw
+
+# Alternative AI-generation pools, not used by the active build. Kept
+# locally for reference / reroll experiments; not part of the repo.
+thedemo/assets_by_codex/
+thedemo/assets_by_nanobanana/
+thedemo/thedemo_assets/
+
+# Editor / OS clutter
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Agent-environment notes kept locally; not part of the repo.
+CLAUDE.md
