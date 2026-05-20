@@ -1,0 +1,15 @@
+* text=auto
+
+*.uf2 binary
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.mp4 filter=lfs diff=lfs merge=lfs -text
+*.mp3 binary
+*.wav binary
+*.mod binary
+*.qoa binary
+*.iff binary
+*.adf binary
+*.dms binary
+*.wad binary

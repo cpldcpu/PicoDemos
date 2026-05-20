@@ -1,0 +1,76 @@
+# ==============================================================================
+# Top-level .gitignore for PicoDemos Workspace
+# ==============================================================================
+
+# CMake / Pico microcontroller build directories
+**/build/
+**/build_*/
+
+# Compiled binaries, objects, and firmware assets
+**/*.exe
+**/*.o
+**/*.a
+**/*.elf
+**/*.hex
+**/*.uf2
+!01_SOTA_DEMO/*.uf2
+!02_Dawn/*.uf2
+!10_TheDemo/*.uf2
+!11_FlashDemo/*.uf2
+**/*.bin
+!10_TheDemo/thedemo/assets/_packed/*.bin
+!11_FlashDemo/thedemo/assets/_packed/*.bin
+**/*.map
+**/*.mem
+**/*.wad
+
+# Large raw video captures and recordings (not suitable for Git repository size limits)
+01_SOTA_DEMO/PXL_*.mp4
+01_SOTA_DEMO/WIN_*.mp4
+01_SOTA_DEMO/WIN_*.jpg
+
+# Submodule-specific downloaded assets and extracted caches
+01_SOTA_DEMO/sota/Spaceballs-StateOfTheArt.adf
+01_SOTA_DEMO/sota/Spaceballs-StateOfTheArt.dms
+01_SOTA_DEMO/sota/native/data/*
+01_SOTA_DEMO/sota/native/sota
+01_SOTA_DEMO/sota/native/pebble-watchface/resources/
+01_SOTA_DEMO/sota/native/pebble-watchface/squash/
+01_SOTA_DEMO/sota/native/pebble-watchface/tmp/
+01_SOTA_DEMO/sota/frames/
+
+# Host desktop simulator preview artifacts & screenshots
+**/host/screenshots/
+**/host/*.mp4
+**/host/*.log
+**/host/err.txt
+**/host/out.txt
+**/host/pp.txt
+**/host/pe.log
+**/host/v.log
+**/host/stderr.log
+**/host/stdout.log
+
+# Music pipeline intermediate raw PCM streams
+**/thedemo/*.raw
+**/*.raw
+
+# Alternative/backup AI asset generation directories
+**/assets_by_codex/
+**/assets_by_nanobanana/
+**/thedemo_assets/
+
+# Python caching
+**/__pycache__/
+
+# OS & IDE Clutter
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+Session.vim
+
+# Agent instruction and notes files
+**/CLAUDE.md
