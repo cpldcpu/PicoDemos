@@ -36,15 +36,15 @@ USB drive.
 
 ## Build (Windows / MSYS2 UCRT64)
 
-Toolchain assumed at `D:\msys64\ucrt64`, SDK at `D:\Pico\pico-sdk`,
-pico-extras at `D:\Pico\pico-extras`.
+Toolchain assumed at `XXX:\msys64\ucrt64`, SDK at `XXX:\Pico\pico-sdk`,
+pico-extras at `XXX:\Pico\pico-extras`.
 
 ```powershell
-$env:PICO_SDK_PATH='D:\Pico\pico-sdk'
-$env:PICO_EXTRAS_PATH='D:\Pico\pico-extras'
-$env:PATH = 'D:\msys64\ucrt64\bin;' + $env:PATH
+$env:PICO_SDK_PATH='XXX:\Pico\pico-sdk'
+$env:PICO_EXTRAS_PATH='XXX:\Pico\pico-extras'
+$env:PATH = 'XXX:\msys64\ucrt64\bin;' + $env:PATH
 
-cd d:\Toyprojects\PicoDemos\02_Dawn\pico
+cd \PicoDemos\02_Dawn\pico
 mkdir build_rp2040
 cd build_rp2040
 cmake -G "MinGW Makefiles" ..
