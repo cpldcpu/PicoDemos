@@ -13,7 +13,7 @@ To see this port running in real-time on real bare-metal hardware, check out the
 Direct video files:
 
 - [SOTA_on_tft_screen.mp4](SOTA_on_tft_screen.mp4) — ST7789 SPI TFT capture
-- [SOTA_composite.mp4](SOTA_composite.mp4) — full-length composite PAL capture
+- [SOTA_composite.mp4](SOTA_composite.mp4) — Composite PAL capture
 
 ### 🎬 High-Fidelity Capture Videos & Screenshots
 
@@ -35,7 +35,7 @@ Direct video files:
   <tr>
     <td align="center" colspan="2">
       <video src="SOTA_composite.mp4" width="100%" controls></video><br/>
-      <sub><em>Full-length Composite Capture Video</em></sub>
+      <sub><em> Composite Capture Video</em></sub>
     </td>
   </tr>
 </table>
