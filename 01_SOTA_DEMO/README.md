@@ -1,6 +1,6 @@
 # State Of The Art (SOTA) — Multi-Platform Port (Windows & RP2040/RP2350)
 
-This directory contains a highly optimized, multi-platform port of the legendary Amiga demo **State Of The Art**, originally released by **Spaceballs** at *The Party 1992* (where it won 1st place, see [pouët.net](https://www.pouet.net/prod.php?which=122)).
+This directory contains a highly optimized, multi-platform port of the legendary Amiga demo **State Of The Art**, originally released by **Spaceballs** at *The Party 1992* (where it won 1st place, see [pouët.net](https://www.pouet.net/prod.php?which=99)).
 
 Our port is built upon the excellent modern C-reimplementation [nfd/sota](https://github.com/nfd/sota) and adapted to compile and run smoothly on both **Windows (desktop simulator)** and **Raspberry Pi Pico microcontrollers (RP2040 and RP2350)** using VGA, SPI TFT, and PAL composite outputs.
 
