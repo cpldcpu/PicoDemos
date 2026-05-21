@@ -186,5 +186,5 @@ To compile any of the microcontroller binaries in this workspace, ensure your de
 * **LLM Engineering Squad:**
   - **Claude Opus 4.7** (Silhouette vector ports and structural foundations for SLOP / Project 10).
   - **Gemini 3.5 Flash / Antigravity** (Complete storyboard design, raymarching, fractal solvers, and optimizations for VOLTAGE / Project 11).
-* **Audio Compression Codec:** Dominic Szablewski (MIT QOA).
+* **Audio Compression Codec:** [Quite OK Audio (QOA)](https://qoaformat.org/) by Dominic Szablewski (MIT QOA).
 * **Microcontroller Infrastructure:** Raspberry Pi & Pico SDK Contributors.
