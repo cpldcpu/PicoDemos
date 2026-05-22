@@ -33,6 +33,7 @@ From here on be slop.
 | **02** | **[Dawn](02_Dawn)** | Classic Port | [RP2040](https://en.wikipedia.org/wiki/RP2040) | VGA (16-bit RGB-565) | **Claude Opus 4.7** *(Web: 4.1)* |
 | **10** | **[SLOP (TheDemo)](10_TheDemo)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (Multi-mode raster splits) | **Claude Opus 4.7** |
 | **11** | **[VOLTAGE (FlashDemo)](11_FlashDemo)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (Multi-mode & Beam-raced) | **Gemini 3.5 Flash** *(Antigravity)* |
+| **12** | **[DIRTY MINDSET (12_DIRTY_MINDSET)](12_DIRTY_MINDSET)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (Multi-mode splits & CRT beam) | **Gemini 3.5 Flash** *(Antigravity)* |
 
 ---
 
@@ -60,11 +61,17 @@ PicoDemos/
 │   ├── slop_vga_rp2350.uf2      # Checked-in release firmware image
 │   └── README.md                # Memory budgets, librosa beat-mapping, Suno 4.5 audio
 │
-└── 11_FlashDemo/                # VOLTAGE: An original cyber-neon high-voltage RP2350 VGA demo
-    ├── thedemo/                 # Fluid solvers, Cortex-M33 FPU raymarching, Julia set fractal
-    ├── PLANNING.md              # Technical architecture, dual-core sync, storyboard
-    ├── voltage_vga_rp2350.uf2   # Checked-in release firmware image
-    └── README.md                # Render mode details and credits
+├── 11_FlashDemo/                # VOLTAGE: An original cyber-neon high-voltage RP2350 VGA demo
+│   ├── thedemo/                 # Fluid solvers, Cortex-M33 FPU raymarching, Julia set fractal
+│   ├── PLANNING.md              # Technical architecture, dual-core sync, storyboard
+│   ├── voltage_vga_rp2350.uf2   # Checked-in release firmware image
+│   └── README.md                # Render mode details and credits
+│
+└── 12_DIRTY_MINDSET/            # DIRTY MINDSET: Original RP2350 VGA demo dedicated to Optimus
+    ├── thedemo/                 # Retro room renderer, CRT screen collapse, synthwave grid
+    ├── dirty_mindset_vga_rp2350.uf2 # Checked-in release firmware image
+    ├── walkthrough.md           # Refinement logs and progression details
+    └── README.md                # Video links, timing, and credentials
 ```
 
 ---
@@ -156,6 +163,27 @@ PicoDemos/
     </tr>
   </table>
 
+### 5. 12_DIRTY_MINDSET (DIRTY MINDSET)
+* An original, highly stylized retro-modern hybrid demoscene production designed specifically for the **Pico 2 (RP2350)** and dedicated to **Optimus** (Dirty Minds group).
+* **Generator:** **Gemini 3.5 Flash** *(Antigravity)*, from an initial creative storyboard and architectural concept by **Claude Opus 4.6**.
+* **Target Outputs:** Waveshare RP2350-Plus + Pimoroni VGA Demo Base. Runs a beat-synced layout matched with a high-fidelity 22050 Hz Mono QOA soundtrack (`Green-Phosphor Prayer.mp3`, generated with Suno 4.5).
+* **Prebuilt Firmware:** [dirty_mindset_vga_rp2350.uf2](12_DIRTY_MINDSET/dirty_mindset_vga_rp2350.uf2).
+* **Aesthetic:** "Retro-Modern Amstrad CPC Mode 0 to High-Performance 16-bit Synthwave Evolution".
+* **Visual Highlights:** High-fidelity retro CPC room boot sequence, vertical CRT electron-beam screen collapse transition, CPC palette plasma, matrix scroller, Neon 3D perspective grid with starfield and spinning Tesseract wireframe, organic petri-dish cell growth Gray-Scott reaction-diffusion grids, Mandelbrot seahorse valley zoom-dive, liquid metaballs greetings scroller, and 3D rotozooming credits outro.
+* **Screenshots Showcase (Retro-Modern Shader Arena):**
+  <table>
+    <tr>
+      <td><img src="12_DIRTY_MINDSET/media/01_cpc_boot.png" width="220" alt="CPC Boot"/></td>
+      <td><img src="12_DIRTY_MINDSET/media/04_dirty_logo.png" width="220" alt="Synthwave Hypercube"/></td>
+      <td><img src="12_DIRTY_MINDSET/media/05_reaction_mind.png" width="220" alt="Reaction Diffusion"/></td>
+    </tr>
+    <tr>
+      <td><img src="12_DIRTY_MINDSET/media/06_fractal_zoom.png" width="220" alt="Mandelbrot Zoom"/></td>
+      <td><img src="12_DIRTY_MINDSET/media/07_greetings.png" width="220" alt="Greetings Split"/></td>
+      <td><img src="12_DIRTY_MINDSET/media/08_outro.png" width="220" alt="Rotozoom Credits"/></td>
+    </tr>
+  </table>
+
 ---
 
 ## Global Build & Environment Prerequisites
@@ -182,9 +210,9 @@ To compile any of the microcontroller binaries in this workspace, ensure your de
   - **Spaceballs** (Original Amiga release of *State Of The Art*, 1992 - [pouët.net](https://www.pouet.net/prod.php?which=122)).
   - **nfd** (Modern C desktop/SDL reimplementation of SOTA - [nfd/sota](https://github.com/nfd/sota)).
   - **AZURE/ARTWORK** (Original Amiga 4k intro *Dawn*, 1995 - [pouët.net](https://www.pouet.net/prod.php?which=1460)).
-* **Human Engineering & Direction:** Azure
+* **Human Engineering & Direction:** Azure (Critic, coordinator)
 * **LLM Engineering Squad:**
-  - **Claude Opus 4.7** (Silhouette vector ports and structural foundations for SLOP / Project 10).
-  - **Gemini 3.5 Flash / Antigravity** (Complete storyboard design, raymarching, fractal solvers, and optimizations for VOLTAGE / Project 11).
+  - **Claude Opus 4.6 & 4.7** (Concept design, storyboard design, vector ports, and engine architecture for SLOP / Project 10 and DIRTY MINDSET / Project 12).
+  - **Gemini 3.5 Flash / Antigravity** (Storyboard implementation, raymarching, Gray-Scott solvers, CRT transitions, and assembly/VGA timing optimizations for VOLTAGE / Project 11 and DIRTY MINDSET / Project 12).
 * **Audio Compression Codec:** Dominic Szablewski (MIT QOA).
 * **Microcontroller Infrastructure:** Raspberry Pi & Pico SDK Contributors.
