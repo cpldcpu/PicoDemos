@@ -203,16 +203,15 @@ To compile any of the microcontroller binaries in this workspace, ensure your de
 
 ---
 
-
 ## Credits & Acknowledgements
 
 * **Original Retro Hardware & Software Creators:**
   - **Spaceballs** (Original Amiga release of *State Of The Art*, 1992 - [pouët.net](https://www.pouet.net/prod.php?which=99)).
   - **nfd** (Modern C desktop/SDL reimplementation of SOTA - [nfd/sota](https://github.com/nfd/sota)).
-  - **AZURE/ARTWORK** (Original Amiga 4k intro *Dawn*, 1995 - [pouët.net](https://www.pouet.net/prod.php?which=1460)).
-* **Human Engineering & Direction:** Azure
+  - **AZURE/ARTWORK** (Original Amiga 4k intro *Dawn*, 1995 - [pouët.net](https://www.pouet.net/prod.php?which=9213)).
+* **Human Engineering & Direction:** Azure (Critic, coordinator)
 * **LLM Engineering Squad:**
-  - **Claude Opus 4.7** (Silhouette vector ports and structural foundations for SLOP / Project 10).
-  - **Gemini 3.5 Flash / Antigravity** (Complete storyboard design, raymarching, fractal solvers, and optimizations for VOLTAGE / Project 11).
-* **Audio Compression Codec:** Dominic Szablewski (MIT QOA).
+  - **Claude Opus 4.6 & 4.7** (Concept design, storyboard design, vector ports, and engine architecture for SLOP / Project 10 and DIRTY MINDSET / Project 12).
+  - **Gemini 3.5 Flash / Antigravity** (Storyboard implementation, raymarching, Gray-Scott solvers, CRT transitions, and assembly/VGA timing optimizations for VOLTAGE / Project 11 and DIRTY MINDSET / Project 12).
+* **Audio Compression Codec:** [Quite OK Audio (QOA)](https://qoaformat.org/) by Dominic Szablewski (MIT QOA).
 * **Microcontroller Infrastructure:** Raspberry Pi & Pico SDK Contributors.
