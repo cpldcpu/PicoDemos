@@ -12,9 +12,9 @@ I felt this platform is seriously underexplored. But as I learned while during m
 
 **Ah yes, and it is totally lame to use GenAI to make demos. It rips the essence, the soul, out of the process.**
 
-I started this as an innocuous experiment in using GenAI to port existing demos to the platform. This created a suitable substrate (context) for the agents to build on. The last two demos are completely Gen AI designed and created - I mostly provided critical feedback like "this looks lame, do better".
+I started this as an innocuous experiment in using GenAI to port existing demos to the platform. This created a suitable substrate (context) for the agents to build on. The last two demos are completely Gen AI designed and created; I mostly provided critical feedback like "this looks lame, do better".
 
-I was especially surprised by the last demo, made by Gemini 3.5 Flash, which was almost single-shot in less than 15 minutes. The Opus demo took 2-3 evenings of back and forth and was also strangely adamant on inserting the coral logo everywhere. GPT 5.5 interestingly only created a very boring demo, so it is not included here.
+I was especially surprised by the last demo, made by Gemini 3.5 Flash, which was almost single-shot in less than 15 minutes. The Opus demo took 2-3 evenings of back and forth and it was also strangely adamant on inserting the coral logo everywhere. GPT 5.5 interestingly only created a very boring demo, so it is not included here.
 
 From here on be slop.
 
@@ -79,7 +79,7 @@ PicoDemos/
 ##  The Demos
 
 ### 1. 01_SOTA_DEMO (State Of The Art)
-* A brilliant port based on the modern C-reimplementation [nfd/sota](https://github.com/nfd/sota) of the legendarily smooth **1992 Amiga demo by Spaceballs** (original release on [pouët.net](https://www.pouet.net/prod.php?which=122)).
+* A brilliant port based on the modern C-reimplementation [nfd/sota](https://github.com/nfd/sota) of the legendarily smooth **1992 Amiga demo by Spaceballs** (original release on [pouët.net](https://www.pouet.net/prod.php?which=99)).
 * **Assistive Assistant:** **Claude Opus 4.7** compiled the C port and helped adapt it to Windows, RP2040, and RP2350.
 * **Target Outputs:**
   - **VGA Output:** [sota_vga_rp2040.uf2](01_SOTA_DEMO/sota_vga_rp2040.uf2) / [sota_vga_rp2350.uf2](01_SOTA_DEMO/sota_vga_rp2350.uf2), 320×240 @ 60 Hz 32K colors with 11 kHz mono QOA-encoded audio, running on the Pimoroni VGA board.
@@ -101,7 +101,7 @@ PicoDemos/
   </table>
 
 ### 2. 02_Dawn
-* Port of the  **1995 Amiga 1200 4K intro by AZURE/ARTWORK** (original release on [pouët.net](https://www.pouet.net/prod.php?which=1460)).
+* Port of the  **1995 Amiga 1200 4K intro by AZURE/ARTWORK** (original release on [pouët.net](https://www.pouet.net/prod.php?which=9213)).
 * **Assistive Assistant:** **Claude Opus 4.7** (the initial web-harness TypeScript port in `web_port/` was completed using **Opus 4.1**).
 * **Target Outputs:** Pimoroni VGA Demo Base running at 320×240@60Hz (line-doubled from a 160×128 6bpp chunky framebuffer).
 * **Web Preview:** [Run the Dawn browser port on GitHub Pages](https://cpldcpu.github.io/PicoDemos/).
@@ -207,12 +207,12 @@ To compile any of the microcontroller binaries in this workspace, ensure your de
 ## Credits & Acknowledgements
 
 * **Original Retro Hardware & Software Creators:**
-  - **Spaceballs** (Original Amiga release of *State Of The Art*, 1992 - [pouët.net](https://www.pouet.net/prod.php?which=122)).
+  - **Spaceballs** (Original Amiga release of *State Of The Art*, 1992 - [pouët.net](https://www.pouet.net/prod.php?which=99)).
   - **nfd** (Modern C desktop/SDL reimplementation of SOTA - [nfd/sota](https://github.com/nfd/sota)).
   - **AZURE/ARTWORK** (Original Amiga 4k intro *Dawn*, 1995 - [pouët.net](https://www.pouet.net/prod.php?which=1460)).
-* **Human Engineering & Direction:** Azure (Critic, coordinator)
+* **Human Engineering & Direction:** Azure
 * **LLM Engineering Squad:**
-  - **Claude Opus 4.6 & 4.7** (Concept design, storyboard design, vector ports, and engine architecture for SLOP / Project 10 and DIRTY MINDSET / Project 12).
-  - **Gemini 3.5 Flash / Antigravity** (Storyboard implementation, raymarching, Gray-Scott solvers, CRT transitions, and assembly/VGA timing optimizations for VOLTAGE / Project 11 and DIRTY MINDSET / Project 12).
+  - **Claude Opus 4.7** (Silhouette vector ports and structural foundations for SLOP / Project 10).
+  - **Gemini 3.5 Flash / Antigravity** (Complete storyboard design, raymarching, fractal solvers, and optimizations for VOLTAGE / Project 11).
 * **Audio Compression Codec:** Dominic Szablewski (MIT QOA).
 * **Microcontroller Infrastructure:** Raspberry Pi & Pico SDK Contributors.
