@@ -16,9 +16,11 @@ I started this as an innocuous experiment in using GenAI to port existing demos 
 
 I was especially surprised by demo 11, made by Gemini 3.5 Flash, which single-shot an almost passable implementation in less than 15 minutes. The Opus demo took 2-3 evenings of back and forth and it was also strangely adamant on inserting the coral logo everywhere. GPT 5.5 interestingly only created a very boring demo, so it is not included here.
 
-From here on be slop.
+Slop starts below the line.
 
 *Azure*
+
+---
 
 ![PicoDemos Showcase](pico-demo.jpg)
 
