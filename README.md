@@ -36,6 +36,7 @@ Slop starts below the line.
 | **10** | **[SLOP (TheDemo)](10_TheDemo)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (Multi-mode raster splits) | **Claude Opus 4.7** |
 | **11** | **[VOLTAGE (FlashDemo)](11_FlashDemo)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (Multi-mode & Beam-raced) | **Gemini 3.5 Flash** *(Antigravity)* |
 | **12** | **[DIRTY MINDSET (12_DIRTY_MINDSET)](12_DIRTY_MINDSET)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (Multi-mode splits & CRT beam) | **Gemini 3.5 Flash** *(Antigravity)* |
+| **13** | **[SINGULARITY](13_Singularity)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 truecolor) | **Claude Opus 4.8** |
 
 ---
 
@@ -69,11 +70,18 @@ PicoDemos/
 │   ├── voltage_vga_rp2350.uf2   # Checked-in release firmware image
 │   └── README.md                # Render mode details and credits
 │
-└── 12_DIRTY_MINDSET/            # DIRTY MINDSET: Original RP2350 VGA demo dedicated to Optimus
-    ├── thedemo/                 # Retro room renderer, CRT screen collapse, synthwave grid
-    ├── dirty_mindset_vga_rp2350.uf2 # Checked-in release firmware image
-    ├── walkthrough.md           # Refinement logs and progression details
-    └── README.md                # Video links, timing, and credentials
+├── 12_DIRTY_MINDSET/            # DIRTY MINDSET: Original RP2350 VGA demo dedicated to Optimus
+│   ├── thedemo/                 # Retro room renderer, CRT screen collapse, synthwave grid
+│   ├── dirty_mindset_vga_rp2350.uf2 # Checked-in release firmware image
+│   ├── walkthrough.md           # Refinement logs and progression details
+│   └── README.md                # Video links, timing, and credentials
+│
+└── 13_Singularity/              # SINGULARITY: relativistic black-hole journey, full 320×240 truecolor
+    ├── singularity/             # Engine sources, 8 scene effects, tools (geodesic LUT baker), SDL host
+    ├── media/                   # Per-scene screenshots + 60fps demo video
+    ├── IMPLEMENTATION.md        # Full design doc: memory budget, asset + Suno 4.5 prompts
+    ├── singularity_vga_rp2350.uf2  # Checked-in release firmware image
+    └── README.md                # Arc, MODE_HIRES truecolor engine, build, credits
 ```
 
 ---
@@ -186,6 +194,28 @@ PicoDemos/
     </tr>
   </table>
 
+### 6. 13_Singularity (SINGULARITY)
+* An original, physics-grounded production designed specifically for the **Pico 2 (RP2350)** — a relativistic journey into a black hole, rendered in **full 320×240 truecolor** end-to-end.
+* **Generator:** **Claude Opus 4.8**.
+* **Target Outputs:** Waveshare RP2350-Plus + Pimoroni VGA Demo Base, beat-synced to a 5:30 Suno 4.5 soundtrack (*"Graviton Choir"*).
+* **Prebuilt Firmware:** [singularity_vga_rp2350.uf2](13_Singularity/singularity_vga_rp2350.uf2).
+* **Aesthetic:** "Cosmic & relativistic" — deep indigo/violet voids, accretion gold, Doppler blue→red.
+* **Visual Highlights:** curl-noise dust collapsing onto a forming star, a relativistic aberration/Doppler starfield warp, a Mode-7 accretion disk with Doppler beaming + orbiting hot-spots, a real **Schwarzschild gravitational-lensing** Einstein ring (geodesics integrated offline into a remap LUT), and a glowing wireframe **spacetime gravity-well** plunging to the singularity.
+* **Core Technical Milestone:** debuts a full **320×240 RGB565 truecolor mode** (`MODE_HIRES`) sharing the framebuffer arena with the palette modes, and bakes Schwarzschild null-geodesic photon paths into a flash LUT so the lensing climax is a ~1-pixel-cheap gather on-device.
+* **Screenshots Showcase (Relativistic Black-Hole Engine):**
+  <table>
+    <tr>
+      <td><img src="13_Singularity/media/lensing.png" width="220" alt="Gravitational Lensing"/></td>
+      <td><img src="13_Singularity/media/accretion_disk.png" width="220" alt="Doppler Accretion Disk"/></td>
+      <td><img src="13_Singularity/media/spacetime.png" width="220" alt="Spacetime Gravity Well"/></td>
+    </tr>
+    <tr>
+      <td><img src="13_Singularity/media/nebula.png" width="220" alt="Curl-noise Nebula"/></td>
+      <td><img src="13_Singularity/media/starfield.png" width="220" alt="Relativistic Warp"/></td>
+      <td><img src="13_Singularity/media/rebirth.png" width="220" alt="Rebirth Endcard"/></td>
+    </tr>
+  </table>
+
 ---
 
 ## Global Build & Environment Prerequisites
@@ -215,5 +245,6 @@ To compile any of the microcontroller binaries in this workspace, ensure your de
 * **LLM Engineering Squad:**
   - **Claude Opus 4.6 & 4.7** (Concept design, storyboard design, vector ports, and engine architecture for SLOP / Project 10 and DIRTY MINDSET / Project 12).
   - **Gemini 3.5 Flash / Antigravity** (Storyboard implementation, raymarching, Gray-Scott solvers, CRT transitions, and assembly/VGA timing optimizations for VOLTAGE / Project 11 and DIRTY MINDSET / Project 12).
+  - **Claude Opus 4.8** (Relativistic black-hole journey, offline geodesic lensing, and the full 320×240 truecolor engine for SINGULARITY / Project 13).
 * **Audio Compression Codec:** [Quite OK Audio (QOA)](https://qoaformat.org/) by Dominic Szablewski (MIT QOA).
 * **Microcontroller Infrastructure:** Raspberry Pi & Pico SDK Contributors.

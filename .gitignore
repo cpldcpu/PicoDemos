@@ -18,10 +18,12 @@
 !10_TheDemo/*.uf2
 !11_FlashDemo/*.uf2
 !12_DIRTY_MINDSET/*.uf2
+!13_Singularity/*.uf2
 **/*.bin
 !10_TheDemo/thedemo/assets/_packed/*.bin
 !11_FlashDemo/thedemo/assets/_packed/*.bin
 !12_DIRTY_MINDSET/thedemo/assets/_packed/*.bin
+!13_Singularity/singularity/assets/_packed/*.bin
 **/*.map
 **/*.mem
 **/*.wad
@@ -41,8 +43,13 @@
 01_SOTA_DEMO/sota/native/pebble-watchface/tmp/
 01_SOTA_DEMO/sota/frames/
 
+# GPU driver shader/GL cache dropped into the working dir when the SDL host runs
+**/NVIDIA Corporation/
+**/GLCache/
+
 # Host desktop simulator preview artifacts & screenshots
 **/host/screenshots/
+**/host/_shots/
 **/host/*.mp4
 **/host/*.log
 **/host/err.txt
