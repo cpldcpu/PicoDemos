@@ -37,6 +37,7 @@ Slop starts below the line.
 | **11** | **[VOLTAGE (FlashDemo)](11_FlashDemo)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (Multi-mode & Beam-raced) | **Gemini 3.5 Flash** *(Antigravity)* |
 | **12** | **[DIRTY MINDSET (12_DIRTY_MINDSET)](12_DIRTY_MINDSET)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (Multi-mode splits & CRT beam) | **Gemini 3.5 Flash** *(Antigravity)* |
 | **13** | **[SINGULARITY](13_Singularity)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 truecolor) | **Claude Opus 4.8** |
+| **14** | **[ORIGAMI](14_Origami)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 truecolor, antialiased filled polygons) | **Claude Opus 4.8** |
 
 ---
 
@@ -76,12 +77,19 @@ PicoDemos/
 │   ├── walkthrough.md           # Refinement logs and progression details
 │   └── README.md                # Video links, timing, and credentials
 │
-└── 13_Singularity/              # SINGULARITY: relativistic black-hole journey, full 320×240 truecolor
+├── 13_Singularity/              # SINGULARITY: relativistic black-hole journey, full 320×240 truecolor
     ├── singularity/             # Engine sources, 8 scene effects, tools (geodesic LUT baker), SDL host
     ├── media/                   # Per-scene screenshots + 60fps demo video
     ├── IMPLEMENTATION.md        # Full design doc: memory budget, asset + Suno 4.5 prompts
     ├── singularity_vga_rp2350.uf2  # Checked-in release firmware image
     └── README.md                # Arc, MODE_HIRES truecolor engine, build, credits
+│
+└── 14_Origami/                  # ORIGAMI: warm folded-paper flat-shaded polygon demo
+    ├── origami/                 # Engine sources, polygon renderer, six scene effects, SDL host
+    ├── assets/                  # Paper backdrops, texture tile, and source MP3
+    ├── media/                   # Host-preview screenshots of the six scenes
+    ├── IMPLEMENTATION.md        # Design/build notes and beat-synced timeline
+    └── origami_vga_rp2350.uf2   # Checked-in release firmware image
 ```
 
 ---
@@ -216,6 +224,29 @@ PicoDemos/
     </tr>
   </table>
 
+### 7. 14_Origami (ORIGAMI)
+* A warm, tactile folded-paper production designed specifically for the **Pico 2 (RP2350)** — the deliberate opposite of SINGULARITY.
+* **Generator:** **Claude Opus 4.8**.
+* **Target Outputs:** Waveshare RP2350-Plus + Pimoroni VGA Demo Base, beat-synced to *"Marimba Seedbox"* (Suno 4.5, prompted by Claude; 117.5 BPM, 2:15).
+* **Prebuilt Firmware:** [origami_vga_rp2350.uf2](14_Origami/origami_vga_rp2350.uf2).
+* **Demo Video:** 📺 [14_Origami/media/origami.mp4](14_Origami/media/origami.mp4) (full 2:15 @ 60 fps with soundtrack).
+* **Aesthetic:** soft paper whites, cream, sky blue, coral, sage, and mustard, with hand-made soft drop shadows.
+* **Visual Highlights:** a folded title sheet, paper-plane flight, crane fold/unfold morph, pop-up book skyline, Miura-ori tessellation wave, and confetti credits.
+* **Core Technical Milestone:** this repo's first real-time **flat-shaded filled-polygon 3D engine** ([poly3d.c](14_Origami/origami/effects/poly3d.c)) — Rodrigues crease folding, perspective projection, back-face cull, painter's-algorithm depth sorting, per-face Lambert shading, **antialiased** coverage span fill, and soft alpha-darkened paper shadows, all in 320×240 RGB565 truecolor at 60 fps.
+* **Screenshots Showcase (Flat-Shaded Paper Engine):**
+  <table>
+    <tr>
+      <td><img src="14_Origami/media/title.png" width="220" alt="Title"/></td>
+      <td><img src="14_Origami/media/plane.png" width="220" alt="Paper Plane"/></td>
+      <td><img src="14_Origami/media/crane.png" width="220" alt="Crane Fold"/></td>
+    </tr>
+    <tr>
+      <td><img src="14_Origami/media/city.png" width="220" alt="Pop-up Paper City"/></td>
+      <td><img src="14_Origami/media/miura.png" width="220" alt="Miura Wave"/></td>
+      <td><img src="14_Origami/media/credits.png" width="220" alt="Confetti Credits"/></td>
+    </tr>
+  </table>
+
 ---
 
 ## Global Build & Environment Prerequisites
@@ -245,6 +276,6 @@ To compile any of the microcontroller binaries in this workspace, ensure your de
 * **LLM Engineering Squad:**
   - **Claude Opus 4.6 & 4.7** (Concept design, storyboard design, vector ports, and engine architecture for SLOP / Project 10 and DIRTY MINDSET / Project 12).
   - **Gemini 3.5 Flash / Antigravity** (Storyboard implementation, raymarching, Gray-Scott solvers, CRT transitions, and assembly/VGA timing optimizations for VOLTAGE / Project 11 and DIRTY MINDSET / Project 12).
-  - **Claude Opus 4.8** (Relativistic black-hole journey, offline geodesic lensing, and the full 320×240 truecolor engine for SINGULARITY / Project 13).
+  - **Claude Opus 4.8** (Relativistic black-hole journey, offline geodesic lensing, and the full 320×240 truecolor engine for SINGULARITY / Project 13; and the flat-shaded filled-polygon 3D engine, crease folding, and folded-paper world of ORIGAMI / Project 14).
 * **Audio Compression Codec:** [Quite OK Audio (QOA)](https://qoaformat.org/) by Dominic Szablewski (MIT QOA).
 * **Microcontroller Infrastructure:** Raspberry Pi & Pico SDK Contributors.
