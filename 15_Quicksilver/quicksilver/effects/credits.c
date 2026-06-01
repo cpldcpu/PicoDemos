@@ -147,13 +147,10 @@ static void credits_frame(uint32_t t_ms, uint32_t t_global)
     }
     y += 70;                                        /* gap before the final card */
     if (y > -QS_LOGO_H && y < VGA_HIRES_H) qs_logo_blit(0, y, sweepx);
-    y += QS_LOGO_H + 14;
-    /* demoscene end card: production (wordmark above) + group + year */
-    if (y > -16 && y < VGA_HIRES_H) {
-        const char *m = "LATENT"; int w = qs_text_w(m, 2);   /* the group */
-        qs_text_chrome(m, (VGA_HIRES_W - w) / 2, y, 2, 60);
-    }
-    y += 16 + 12;
+    y += QS_LOGO_H + 12;
+    /* demoscene end card: production (wordmark above) + group logo + year */
+    if (y > -ASSET_LATENT_LOGO_H && y < VGA_HIRES_H) qs_latent_blit(y);
+    y += ASSET_LATENT_LOGO_H + 8;
     if (y > -10 && y < VGA_HIRES_H) {
         const char *m = "2026"; int w = qs_text_w(m, 1);
         qs_text_chrome(m, (VGA_HIRES_W - w) / 2, y, 1, 50);

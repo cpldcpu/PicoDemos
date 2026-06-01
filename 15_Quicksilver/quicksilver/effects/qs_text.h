@@ -70,26 +70,36 @@ static inline void qs_text_chrome(const char *s, int x0, int y0, int scale, int 
     }
 }
 
-/* Blit the delivered chrome wordmark image (asset_title_logo, 320x80) with its
- * top-left at (x0,y0), black-keyed (the artwork is the wordmark on black, so we
- * skip near-black pixels and let the chrome + amber rim glow composite over the
- * backdrop). `sweepx` is unused now that the chrome is baked into the art. */
-static inline void qs_logo_blit(int x0, int y0, int sweepx)
+/* Blit a delivered chrome image (artwork on black) at (x0,y0), black-keyed —
+ * skip near-black pixels so the chrome + glow composite over the backdrop. */
+static inline void qs_img_keyed(const uint16_t *img, int iw, int ih, int x0, int y0)
 {
-    (void)sweepx;
     uint16_t *fb = vga_hires_back_buffer();
-    const uint16_t *logo = (const uint16_t *)asset_title_logo_data;
-    for (int ly = 0; ly < ASSET_TITLE_LOGO_H; ly++) {
+    for (int ly = 0; ly < ih; ly++) {
         int sy = y0 + ly; if ((unsigned)sy >= VGA_HIRES_H) continue;
-        const uint16_t *lrow = logo + ly * ASSET_TITLE_LOGO_W;
+        const uint16_t *r = img + ly * iw;
         uint16_t *frow = fb + sy * VGA_HIRES_W;
-        for (int lx = 0; lx < ASSET_TITLE_LOGO_W; lx++) {
+        for (int lx = 0; lx < iw; lx++) {
             int sx = x0 + lx; if ((unsigned)sx >= VGA_HIRES_W) continue;
-            uint16_t c = lrow[lx];
+            uint16_t c = r[lx];
             if (rgb565_r8(c) + rgb565_g8(c) + rgb565_b8(c) < 30) continue;  /* black key */
             frow[sx] = c;
         }
     }
+}
+
+/* The QUICKSILVER wordmark (320x80). `sweepx` is unused (chrome is baked in). */
+static inline void qs_logo_blit(int x0, int y0, int sweepx)
+{
+    (void)sweepx;
+    qs_img_keyed((const uint16_t *)asset_title_logo_data, ASSET_TITLE_LOGO_W, ASSET_TITLE_LOGO_H, x0, y0);
+}
+
+/* The LATENT group logo (256x48), horizontally centred. */
+static inline void qs_latent_blit(int y0)
+{
+    qs_img_keyed((const uint16_t *)asset_latent_logo_data, ASSET_LATENT_LOGO_W, ASSET_LATENT_LOGO_H,
+                 (VGA_HIRES_W - ASSET_LATENT_LOGO_W) / 2, y0);
 }
 
 #endif

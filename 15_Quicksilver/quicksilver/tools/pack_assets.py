@@ -178,7 +178,19 @@ def main():
             if not png.exists():
                 print(f"  SKIP {name}: {src} missing")
                 continue
-            img = Image.open(png).resize((w, h), Image.LANCZOS)
+            img = Image.open(png).convert("RGB")
+            # Logos are wordmarks on black inside a square frame; crop to the
+            # content's bounding box (+margin) before the strip resize so they
+            # aren't squashed thin.
+            if name.endswith("_logo"):
+                gray = img.convert("L")
+                bbox = gray.point(lambda v: 255 if v > 24 else 0).getbbox()
+                if bbox:
+                    m = 8
+                    bbox = (max(0, bbox[0]-m), max(0, bbox[1]-m),
+                            min(img.width, bbox[2]+m), min(img.height, bbox[3]+m))
+                    img = img.crop(bbox)
+            img = img.resize((w, h), Image.LANCZOS)
 
         # Pack to target format.
         if fmt == "8bpp":
