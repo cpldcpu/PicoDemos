@@ -15,6 +15,15 @@
 
 #include <math.h>
 
+#ifdef PICO_BUILD
+#include "pico/platform.h"
+#define QS_FAST(n) __not_in_flash_func(n)
+#else
+#define QS_FAST(n) n
+#endif
+
+static int s_bilinear = 0;   /* set per render from params; bilinear vs point */
+
 #define MAXV 2048                  /* covers the largest object (TORUS 1920) */
 #define MAXT 4096                  /* covers the most triangles (TORUS 3840) */
 #define ENV_BYTES (256 * 256 * 2)
@@ -36,10 +45,11 @@ void qs_env_default(qs_env_params *p)
     p->focal = 280.f;
     p->env = NULL; p->envW = 256; p->envH = 256;
     p->log2bpp = 1; p->log2w = 8; p->log2h = 8;
+    p->bilinear = 0;
 }
 
 /* fill one triangle (screen ints + 16.16 matcap UVs) via the interpolator. */
-static void fill_tri(const uint8_t *env, int texw,
+static void QS_FAST(fill_tri)(const uint8_t *env, int texw,
                      int ax,int ay,int32_t au,int32_t av,
                      int bx,int by,int32_t bu,int32_t bv,
                      int cx,int cy,int32_t cu,int32_t cv)
@@ -84,16 +94,23 @@ static void fill_tri(const uint8_t *env, int texw,
         interp_set_accumulator(interp0, 1, (uint32_t)(int32_t)v);
         qs_texmap_step(interp0, (uint32_t)(int32_t)du, (uint32_t)(int32_t)dv);
 
-        uint32_t bytemask = (uint32_t)(texw * texw * 2 - 1);   /* square matcap */
         uint16_t *row = fb + y * VGA_HIRES_W;
-        for (int x = cxl; x < cxr; x++)
-            row[x] = qs_tap_bilerp(interp0, env, texw, bytemask);  /* SRAM bilinear */
+        if (s_bilinear) {
+            uint32_t bytemask = (uint32_t)(texw * texw * 2 - 1);   /* square matcap */
+            for (int x = cxl; x < cxr; x++)
+                row[x] = qs_tap_bilerp(interp0, env, texw, bytemask);
+        } else {
+            (void)texw;
+            for (int x = cxl; x < cxr; x++)
+                row[x] = qs_tap_point(interp0, env);   /* 1 tap — high-poly objects */
+        }
     }
 }
 
 void qs_envmap_render(const qs_mesh *m, const qs_env_params *p)
 {
     qs_texmap_setup(interp0, p->log2bpp, p->log2w, p->log2h);
+    s_bilinear = p->bilinear;
     const uint8_t *env = p->env;
 
     /* rotation matrix (yaw=Y, pitch=X, roll=Z) */

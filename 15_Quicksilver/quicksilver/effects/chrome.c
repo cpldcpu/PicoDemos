@@ -87,6 +87,9 @@ static void chrome_frame(uint32_t t_ms, uint32_t t_global)
     p.env = (const uint8_t *)s_env;            /* 128x128 matcap in SRAM */
     p.envW = ENV128; p.envH = ENV128;
     p.log2bpp = 1; p.log2w = 7; p.log2h = 7;
+    p.bilinear = (slot == 5);   /* bilinear only for the cube (flat faces show
+                                 * the matcap blockiness; the curved objects
+                                 * don't, so they point-sample for speed). */
     p.yaw   = t * (reprise ? 1.0f : 0.6f);
     p.pitch = 0.5f * sinf(t * 0.37f);
     p.roll  = (reprise ? 0.5f : 0.2f) * sinf(t * 0.23f);

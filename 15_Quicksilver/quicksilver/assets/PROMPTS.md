@@ -68,9 +68,24 @@ this, drop it in as `assets/title_logo.png` and I'll blit it over the backdrop
 - **Pack as:** add `("title_logo", "title_logo.png", "rgb565", 320, 80, False, None)`
   to `tools/pack_assets.py`.
 
-> **Open requests to the artist (Gemini / Nano Banana):** only #6 above is
-> outstanding and purely optional — every other asset has been delivered and
-> looks great. The current font title is perfectly legible if you'd rather skip it.
+> **Open requests to the artist (Gemini / Nano Banana):** #6 (wordmark, optional)
+> and #7 below (tunnel wall — would noticeably improve the finale).
+
+#### 7. Tunnel Wall *(requested — would improve the end scene)*
+The credits finale is a chrome tunnel; it currently borrows the rotozoom
+filigree, which is a *centered mandala* and reads busy/low-res when wrapped onto
+a tunnel. A texture authored to **tile seamlessly in BOTH axes** (wraps left↔right
+= around the tube, and top↔bottom = depth) would look far better.
+> **Prompt:**
+> Seamless tileable texture of polished liquid-chrome vertical flutes / fluted
+> metal pipes with soft cyan-white highlights and deep shadows between the
+> flutes, smooth gradients (NOT busy), tiles perfectly on all four edges, no
+> seams, no text, no border, high contrast. Square.
+
+- **Source File:** `assets/tunnel.png`
+- **Output Target:** `assets/_packed/tunnel.bin` (rgb565, 256×256)
+- The end scene downsamples it to a 128×128 SRAM copy. Until delivered it falls
+  back to the roto texture.
 
 ---
 

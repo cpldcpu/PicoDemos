@@ -29,6 +29,7 @@ typedef struct {
     const uint8_t *env;       /* matcap texture, RGB565 PIO-native    */
     int   envW, envH;         /* power-of-two dims (256)              */
     int   log2bpp, log2w, log2h;
+    int   bilinear;           /* 1 = bilinear matcap (smooth, 4 taps), 0 = point */
 } qs_env_params;
 
 void qs_env_default(qs_env_params *p);

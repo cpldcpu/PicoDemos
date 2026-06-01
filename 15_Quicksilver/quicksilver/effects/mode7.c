@@ -36,16 +36,10 @@ static volatile float g_cosH, g_sinH, g_camX, g_camY;
 static volatile int   g_scroll;
 static volatile int   g_white;          /* chrome-glint transition amount */
 
-/* one-time config on the scanout core: interp0 affine (POP) + interp1 CLAMP. */
+/* one-time config on the scanout core: interp0 affine (POP). */
 static void m7_setup(void)
 {
     qs_texmap_setup(interp0, 1, 8, 8);
-    interp_config c = interp_default_config();
-    interp_config_set_clamp(&c, true);
-    interp_config_set_signed(&c, true);
-    interp_set_config(interp1, 0, &c);
-    interp_set_base(interp1, 0, 0);
-    interp_set_base(interp1, 1, 255);
 }
 
 static void QS_FAST(m7_scan)(uint16_t *dst, int y)
@@ -74,20 +68,9 @@ static void QS_FAST(m7_scan)(uint16_t *dst, int y)
     qs_texmap_step(interp0, (uint32_t)(int32_t)(stepx * 65536.0f),
                             (uint32_t)(int32_t)(stepy * 65536.0f));
 
-    interp_set_accumulator(interp1, 0, (uint32_t)(int32_t)(255 - p * 2.0f));
-    int haze = (int)interp_peek_lane_result(interp1, 0);   /* CLAMP configured in m7_setup */
-
     const uint8_t *base = (const uint8_t *)s_ground;
-    for (int x = 0; x < VGA_RACE_W; x++) {
-        uint16_t cc = qs_tap_point(interp0, base);
-        if (haze) {
-            int r = rgb565_r8(cc) + (((HAZE_R - rgb565_r8(cc)) * haze) >> 8);
-            int g = rgb565_g8(cc) + (((HAZE_G - rgb565_g8(cc)) * haze) >> 8);
-            int b = rgb565_b8(cc) + (((HAZE_B - rgb565_b8(cc)) * haze) >> 8);
-            cc = rgb565_pack(r, g, b);
-        }
-        dst[x] = cc;
-    }
+    for (int x = 0; x < VGA_RACE_W; x++)
+        dst[x] = qs_tap_point(interp0, base);   /* POP self-steps; SRAM ground */
 }
 
 static void m7_init(void)

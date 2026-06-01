@@ -45,8 +45,6 @@ static const char *lines[] = {
     "",
     "GREETINGS TO THE SCENE",
     "",
-    "MERCURY",
-    "2026",
     NULL,
 };
 
@@ -78,8 +76,9 @@ static void credits_init(void)
 static void tunnel(uint32_t t_ms)
 {
     uint16_t *fb = vga_hires_back_buffer();
-    int rot    = (int)(t_ms * 0.012f);     /* swirl       */
-    int scroll = (int)(t_ms * 0.045f);     /* fly forward */
+    int rot    = (int)(t_ms * 0.045f);     /* swirl — >=1 texel/frame so the
+                                            * point-sampled motion reads smooth */
+    int scroll = (int)(t_ms * 0.090f);     /* fly forward */
     for (int y = 0; y < VGA_HIRES_H; y++) {
         const uint16_t *lrow = &s_lut[(y >> 1) * LW];
         uint16_t *frow = fb + y * VGA_HIRES_W;
@@ -100,25 +99,35 @@ static void credits_frame(uint32_t t_ms, uint32_t t_global)
 {
     tunnel(t_ms);
 
-    /* scrolling reel: wordmark then credit lines, CLAMPED so the final card
-     * holds at centre rather than scrolling into emptiness. */
-    int scroll = (int)(t_ms * 0.0085f);
-    if (scroll > 470) scroll = 470;
-    int y = VGA_HIRES_H + 30 - scroll;
-    if (y > -QS_LOGO_H && y < VGA_HIRES_H) {
-        int sweepx = (int)(fmodf(t_ms * 0.20f, (float)(VGA_HIRES_W + 120))) - 60;
-        qs_logo_blit(0, y, sweepx);
-    }
-    y += QS_LOGO_H + 16;
+    /* The credit lines scroll up and off; after a GAP the final card
+     * (wordmark + MERCURY / 2026) slides to centre and HOLDS there — a clean,
+     * spaced end card rather than a frozen mid-scroll. */
+    int scroll = (int)(t_ms * 0.011f);
+    if (scroll > 530) scroll = 530;                /* clamp: hold the final card */
+    int sweepx = (int)(fmodf(t_ms * 0.20f, (float)(VGA_HIRES_W + 120))) - 60;
+    int y = VGA_HIRES_H + 20 - scroll;
+
     for (int i = 0; lines[i]; i++) {
         const char *s = lines[i];
         if (*s) {
             int w = qs_text_w(s, 1);
             if (y > -10 && y < VGA_HIRES_H) qs_text_chrome(s, (VGA_HIRES_W - w) / 2, y, 1, 50);
-            y += 8 + 9;
+            y += 17;
         } else {
             y += 11;
         }
+    }
+    y += 70;                                        /* gap before the final card */
+    if (y > -QS_LOGO_H && y < VGA_HIRES_H) qs_logo_blit(0, y, sweepx);
+    y += QS_LOGO_H + 16;
+    if (y > -16 && y < VGA_HIRES_H) {
+        const char *m = "MERCURY"; int w = qs_text_w(m, 2);
+        qs_text_chrome(m, (VGA_HIRES_W - w) / 2, y, 2, 60);
+    }
+    y += 16 + 12;
+    if (y > -10 && y < VGA_HIRES_H) {
+        const char *m = "2026"; int w = qs_text_w(m, 1);
+        qs_text_chrome(m, (VGA_HIRES_W - w) / 2, y, 1, 50);
     }
 
     /* fade to black over the last 5 s — a clear ending */
