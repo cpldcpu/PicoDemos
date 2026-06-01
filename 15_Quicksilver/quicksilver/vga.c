@@ -254,11 +254,13 @@ void vga_split_present(void)
 
 static void (*volatile g_race_fn)(uint16_t *dst, int y) = NULL;   /* per scanline */
 static void (*volatile g_race_setup_fn)(void)           = NULL;   /* core-1 once  */
+static volatile int     g_race_dirty                    = 0;      /* run setup()  */
 
 void vga_set_race_fn(void (*scan)(uint16_t *, int), void (*setup)(void))
 {
-    __atomic_store_n(&g_race_fn, scan, __ATOMIC_SEQ_CST);
     __atomic_store_n(&g_race_setup_fn, setup, __ATOMIC_SEQ_CST);
+    __atomic_store_n(&g_race_fn, scan, __ATOMIC_SEQ_CST);
+    __atomic_store_n(&g_race_dirty, 1, __ATOMIC_SEQ_CST);   /* core 1 reconfigures */
 }
 
 /* Beam-raced scenes copy their textures here (aliases the framebuffer arena —
@@ -291,7 +293,6 @@ static void __not_in_flash_func(core1_main)(void)
     scanvideo_timing_enable(true);
     g_scanvideo_up = true;
 
-    screen_mode_t prev = (screen_mode_t)0xff;
     static uint16_t race_line[VGA_OUT_W];
     while (true) {
         struct scanvideo_scanline_buffer *buf = scanvideo_begin_scanline_generation(true);
@@ -301,7 +302,12 @@ static void __not_in_flash_func(core1_main)(void)
         if (m == MODE_RACE) {
             void (*setup)(void) = __atomic_load_n(&g_race_setup_fn, __ATOMIC_RELAXED);
             void (*scan)(uint16_t *, int) = __atomic_load_n(&g_race_fn, __ATOMIC_RELAXED);
-            if (m != prev && setup) setup();        /* core-1 interp config, once */
+            /* run the scene's one-time interp config on THIS core after it (re)
+             * registers — covers the set-mode-before-init ordering. */
+            if (__atomic_load_n(&g_race_dirty, __ATOMIC_RELAXED)) {
+                if (setup) setup();
+                __atomic_store_n(&g_race_dirty, 0, __ATOMIC_RELAXED);
+            }
             if (scan) scan(race_line, y);
             else      for (int i = 0; i < VGA_OUT_W; i++) race_line[i] = 0;
             uint16_t *out = (uint16_t *)buf->data;
@@ -316,7 +322,6 @@ static void __not_in_flash_func(core1_main)(void)
         } else {
             render_scanline_hires640(buf, y);       /* all framebuffer scenes */
         }
-        prev = m;
         scanvideo_end_scanline_generation(buf);
     }
 }

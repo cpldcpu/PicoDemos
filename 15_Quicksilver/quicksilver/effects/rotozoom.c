@@ -35,9 +35,10 @@ static volatile float g_ca0, g_sa0, g_cu, g_cv;
 static volatile int   g_white;               /* chrome-glint transition amount */
 static float          g_flex[VGA_RACE_H];
 
+static void roto_setup(void) { qs_texmap_setup(interp0, 1, 8, 8); }  /* once, on scanout core */
+
 static void QS_FAST(roto_scan)(uint16_t *dst, int y)
 {
-    qs_texmap_setup(interp0, 1, 8, 8);       /* self-configure (ordering-safe) */
     float fl = g_flex[y];
     float ca = g_ca0 * fl, sa = g_sa0 * fl;
     float dys = (float)(y - VGA_RACE_H / 2);
@@ -64,7 +65,7 @@ static void roto_init(void)
 {
     s_tex = (uint16_t *)vga_race_sram();
     memcpy(s_tex, asset_roto_data, TBYTES);    /* flash -> SRAM (arena alias) */
-    vga_set_race_fn(roto_scan, NULL);
+    vga_set_race_fn(roto_scan, roto_setup);
 }
 
 static void roto_frame(uint32_t t_ms, uint32_t t_global)

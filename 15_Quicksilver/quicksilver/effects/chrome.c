@@ -7,11 +7,18 @@
 #include "../vga.h"
 #include "../rgb565.h"
 #include "../scene.h"
+#include "../scene_scratch.h"
 #include "assets.h"
 #include "envmap3d.h"
 #include "qs_fx.h"
 
 #include <math.h>
+
+/* 128x128 matcap copied to SRAM (g_scratch) — env mapping reads the matcap
+ * per pixel with random access; from flash (XIP) that thrashes the cache and
+ * halves the framerate, so we keep a downsampled copy in fast RAM. */
+#define ENV128 128
+static uint16_t *s_env;
 
 #define NOBJ 6
 static qs_mesh s_obj[NOBJ];
@@ -25,6 +32,13 @@ static void chrome_init(void)
     s_obj[3] = (qs_mesh){ KNOT2_v, KNOT2_n, KNOT2_t, KNOT2_NV, KNOT2_NT }; s_objscale[3] = 1.75f;
     s_obj[4] = (qs_mesh){ TORUS_v, TORUS_n, TORUS_t, TORUS_NV, TORUS_NT }; s_objscale[4] = 1.85f;
     s_obj[5] = (qs_mesh){ CUBE_v,  CUBE_n,  CUBE_t,  CUBE_NV,  CUBE_NT  }; s_objscale[5] = 1.25f;
+
+    /* downsample the 256x256 matcap to a 128x128 SRAM copy in g_scratch */
+    s_env = (uint16_t *)g_scratch.bg_cache;
+    const uint16_t *src = (const uint16_t *)asset_envmap_data;
+    for (int y = 0; y < ENV128; y++)
+        for (int x = 0; x < ENV128; x++)
+            s_env[y * ENV128 + x] = src[(y * 2) * ASSET_ENVMAP_W + x * 2];
 }
 
 /* dark steel vertical backdrop so the chrome pops */
@@ -70,8 +84,9 @@ static void chrome_frame(uint32_t t_ms, uint32_t t_global)
     float base = s_objscale[slot];
 
     qs_env_params p; qs_env_default(&p);
-    p.env = (const uint8_t *)asset_envmap_data;
-    p.envW = ASSET_ENVMAP_W; p.envH = ASSET_ENVMAP_H;
+    p.env = (const uint8_t *)s_env;            /* 128x128 matcap in SRAM */
+    p.envW = ENV128; p.envH = ENV128;
+    p.log2bpp = 1; p.log2w = 7; p.log2h = 7;
     p.yaw   = t * (reprise ? 1.0f : 0.6f);
     p.pitch = 0.5f * sinf(t * 0.37f);
     p.roll  = (reprise ? 0.5f : 0.2f) * sinf(t * 0.23f);

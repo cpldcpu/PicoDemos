@@ -84,9 +84,10 @@ static void fill_tri(const uint8_t *env, int texw,
         interp_set_accumulator(interp0, 1, (uint32_t)(int32_t)v);
         qs_texmap_step(interp0, (uint32_t)(int32_t)du, (uint32_t)(int32_t)dv);
 
+        (void)texw;
         uint16_t *row = fb + y * VGA_HIRES_W;
         for (int x = cxl; x < cxr; x++)
-            row[x] = qs_tap_bilerp(interp0, env, texw, EMASK);  /* POP self-steps */
+            row[x] = qs_tap_point(interp0, env);   /* POP self-steps; SRAM matcap */
     }
 }
 
@@ -153,15 +154,26 @@ void qs_envmap_render(const qs_mesh *m, const qs_env_params *p)
         s_key[k] = (int32_t)((rz*sc + p->oz) * 1024.f);   /* larger = farther */
     }
 
-    /* insertion sort drawn tris by key DESC (far first) */
-    for (int i = 1; i < ndraw; i++) {
-        uint16_t of = s_order[i]; int32_t ke = s_key[i]; int j = i-1;
-        while (j >= 0 && s_key[j] < ke) { s_order[j+1]=s_order[j]; s_key[j+1]=s_key[j]; j--; }
-        s_order[j+1]=of; s_key[j+1]=ke;
+    /* O(n) counting sort by depth, far-first (insertion sort was O(n^2) and
+     * tanked the high-poly objects). 512 depth buckets; intra-bucket order is
+     * arbitrary (those triangles are at ~the same depth). */
+    #define NB 512
+    static uint16_t s_order2[MAXT];
+    static int cnt[NB], off[NB];
+    int32_t kmin = 0x7fffffff, kmax = -0x7fffffff;
+    for (int k = 0; k < ndraw; k++) { if (s_key[k] < kmin) kmin = s_key[k]; if (s_key[k] > kmax) kmax = s_key[k]; }
+    int range = kmax - kmin; if (range < 1) range = 1;
+    for (int b = 0; b < NB; b++) cnt[b] = 0;
+    for (int k = 0; k < ndraw; k++) cnt[(int)(((int64_t)(s_key[k]-kmin) * (NB-1)) / range)]++;
+    int acc = 0;
+    for (int b = NB - 1; b >= 0; b--) { off[b] = acc; acc += cnt[b]; }  /* high bucket first */
+    for (int k = 0; k < ndraw; k++) {
+        int b = (int)(((int64_t)(s_key[k]-kmin) * (NB-1)) / range);
+        s_order2[off[b]++] = s_order[k];
     }
 
     for (int k = 0; k < ndraw; k++) {
-        int f = s_order[k];
+        int f = s_order2[k];
         int a = m->tri[f*3], b = m->tri[f*3+1], c = m->tri[f*3+2];
         fill_tri(env, p->envW,
                  s_x[a],s_y[a],s_u[a],s_v[a],

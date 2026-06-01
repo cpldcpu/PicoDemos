@@ -43,6 +43,18 @@ static inline uint16_t glint(uint16_t c, int gw) {
                        rgb565_b8(c) + (((255 - rgb565_b8(c)) * gw) >> 8));
 }
 
+/* one-time config on the scanout core: interp0 affine (POP) + interp1 CLAMP. */
+static void m7_setup(void)
+{
+    qs_texmap_setup(interp0, 1, 8, 8);
+    interp_config c = interp_default_config();
+    interp_config_set_clamp(&c, true);
+    interp_config_set_signed(&c, true);
+    interp_set_config(interp1, 0, &c);
+    interp_set_base(interp1, 0, 0);
+    interp_set_base(interp1, 1, 255);
+}
+
 static void QS_FAST(m7_scan)(uint16_t *dst, int y)
 {
     int gw = g_white;
@@ -54,7 +66,6 @@ static void QS_FAST(m7_scan)(uint16_t *dst, int y)
         return;
     }
     /* --- ground: interpolator affine (interp0) + CLAMP haze (interp1) --- */
-    qs_texmap_setup(interp0, 1, 8, 8);
     float p = (float)(y - HZ) + 0.75f;
     float dist = (CAMH * F640) / p;
     float cosH = g_cosH, sinH = g_sinH;
@@ -66,14 +77,8 @@ static void QS_FAST(m7_scan)(uint16_t *dst, int y)
     qs_texmap_step(interp0, (uint32_t)(int32_t)(stepx * 65536.0f),
                             (uint32_t)(int32_t)(stepy * 65536.0f));
 
-    interp_config c = interp_default_config();
-    interp_config_set_clamp(&c, true);
-    interp_config_set_signed(&c, true);
-    interp_set_config(interp1, 0, &c);
-    interp_set_base(interp1, 0, 0);
-    interp_set_base(interp1, 1, 255);
     interp_set_accumulator(interp1, 0, (uint32_t)(int32_t)(255 - p * 2.0f));
-    int haze = (int)interp_peek_lane_result(interp1, 0);
+    int haze = (int)interp_peek_lane_result(interp1, 0);   /* CLAMP configured in m7_setup */
 
     const uint8_t *base = (const uint8_t *)s_ground;
     for (int x = 0; x < VGA_RACE_W; x++) {
@@ -95,7 +100,7 @@ static void m7_init(void)
     s_sky    = (uint16_t *)(sram + GBYTES);
     memcpy(s_ground, asset_ground_data, GBYTES);
     memcpy(s_sky,    asset_sky_data,    ASSET_SKY_W * ASSET_SKY_H * 2);
-    vga_set_race_fn(m7_scan, NULL);
+    vga_set_race_fn(m7_scan, m7_setup);
 }
 
 static void m7_frame(uint32_t t_ms, uint32_t t_global)
