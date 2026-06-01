@@ -38,7 +38,9 @@ Slop starts below the line.
 | **12** | **[DIRTY MINDSET (12_DIRTY_MINDSET)](12_DIRTY_MINDSET)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (Multi-mode splits & CRT beam) | **Gemini 3.5 Flash** *(Antigravity)* |
 | **13** | **[SINGULARITY](13_Singularity)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 truecolor) | **Claude Opus 4.8** |
 | **14** | **[ORIGAMI](14_Origami)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 truecolor, antialiased filled polygons) | **Claude Opus 4.8** |
-| **15** | **[QUICKSILVER](15_Quicksilver)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 truecolor, SIO interpolator: rotozoom/Mode-7/env-mapped chrome) | **Claude Opus 4.8** |
+| **15** | **[QUICKSILVER](15_Quicksilver)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (beam-raced full-VGA rotozoom + SIO interpolator: Mode-7/env-mapped chrome/tunnel) | **Claude Opus 4.8** |
+
+> QUICKSILVER is the first production of **[LATENT](LATENT.md)** — a demoscene group for machine-made productions on bare-metal silicon (code & direction by Claude Opus; human critic: Azure).
 
 ---
 

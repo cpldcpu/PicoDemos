@@ -13,6 +13,7 @@
 #include "../vga.h"
 #include "../rgb565.h"
 #include "../scene.h"
+#include "../scene_scratch.h"
 #include "assets.h"
 #include "qs_fx.h"
 
@@ -21,13 +22,23 @@
 #define HORIZON 96
 #define F120    120.0f
 #define CAMH    55.0f
-#define GMASK   (ASSET_GROUND_W * ASSET_GROUND_H * 2 - 1)
+#define GW128   128                            /* ground tile copied to SRAM */
+#define GMASK   (GW128 * GW128 * 2 - 1)
 
 static uint16_t s_hz[VGA_HIRES_W];     /* sky colour at the horizon, per column */
+static uint16_t *s_ground;             /* 128x128 mercury tile in SRAM          */
 
 static void m7_init(void)
 {
-    qs_texmap_setup(interp0, 1, 8, 8);                 /* ground affine, POP */
+    /* Copy a 128x128 ground tile into SRAM — bilinear from XIP flash (4 taps/px)
+     * was the per-pixel cost that broke 60 fps; from RAM it's cheap. */
+    s_ground = (uint16_t *)g_scratch.bg_cache;
+    const uint16_t *src = (const uint16_t *)asset_ground_data;
+    for (int y = 0; y < GW128; y++)
+        for (int x = 0; x < GW128; x++)
+            s_ground[y * GW128 + x] = src[(y * 2) * ASSET_GROUND_W + x * 2];
+
+    qs_texmap_setup(interp0, 1, 7, 7);                 /* ground affine, POP, 128 */
     interp_config c = interp_default_config();         /* interp1 = CLAMP fog */
     interp_config_set_clamp(&c, true);
     interp_config_set_signed(&c, true);
@@ -40,7 +51,7 @@ static void m7_frame(uint32_t t_ms, uint32_t t_global)
 {
     (void)t_global;
     uint16_t *fb = vga_hires_back_buffer();
-    const uint8_t  *gbase = (const uint8_t *)asset_ground_data;
+    const uint8_t  *gbase = (const uint8_t *)s_ground;    /* SRAM 128 tile */
     const uint16_t *sky   = (const uint16_t *)asset_sky_data;
 
     float t    = t_ms * 0.001f;
@@ -79,7 +90,7 @@ static void m7_frame(uint32_t t_ms, uint32_t t_global)
 
         uint16_t *row = fb + y * VGA_HIRES_W;
         for (int x = 0; x < VGA_HIRES_W; x++) {
-            uint16_t c = qs_tap_bilerp(interp0, gbase, ASSET_GROUND_W, GMASK);
+            uint16_t c = qs_tap_bilerp(interp0, gbase, GW128, GMASK);
             if (fog) {
                 uint16_t f = s_hz[x];            /* blend toward the sky above */
                 c = rgb565_pack(rgb565_r8(c) + (((rgb565_r8(f) - rgb565_r8(c)) * fog) >> 8),

@@ -11,13 +11,14 @@ Because the SDL host has no such peripheral, Quicksilver ships a **bit-exact
 software emulator** of the interpolator, so the identical effect code previews
 on a PC and runs as raw silicon on the RP2350 — host and hardware are pixel-identical.
 
-**Full VGA, 640×480 @ 60 Hz.** The rotozoomer and Mode-7 plain render at *native*
-640×480, **beam-raced with no framebuffer** — core 1 generates each scanline
-live via the interpolator (POP self-stepping) as the beam races (a 640×480
-truecolour framebuffer is 614 KB > 520 KB SRAM, so beam-racing is the only way).
-The framebuffer scenes (title, chrome, liquid, credits) render in a 320×240
-RGB565 buffer and are 2× pixel/line-doubled at scanout. Pimoroni VGA Demo Base
-(15-bit DAC).
+**640×480 @ 60 Hz scanout.** The fullscreen **rotozoomer** renders at *native*
+640×480, **beam-raced with no framebuffer** — core 1 generates each scanline live
+via the interpolator (POP self-stepping) as the beam races (a 640×480 truecolour
+framebuffer is 614 KB > 520 KB SRAM, so beam-racing is the only way). The other
+scenes (title, **Mode-7 mercury plain**, chrome, liquid, credits) render in a
+320×240 RGB565 buffer on core 0 and are 2× pixel/line-doubled at scanout — QVGA,
+which leaves the per-pixel budget for bilinear filtering, distance fog and the
+chrome rasteriser. Pimoroni VGA Demo Base (15-bit DAC).
 
 ## The arc
 
@@ -58,7 +59,7 @@ cmake --build build_rp2350 -j
 ## Regenerating assets
 - **Textures**: nano-banana PNGs in `assets/` → `tools/pack_assets.py` (PIL; run under WSL) → `assets/_packed/*.bin`. A procedural fallback generator is `tools/make_textures.c`.
 - **3D objects**: `gcc tools/make_meshes.c -o tools/make_meshes.exe -lm && ./tools/make_meshes.exe > assets/_packed/meshes.h`.
-- **Title wordmark**: `tools/make_logo.sh` (ffmpeg drawtext → `assets/_packed/logo.bin`).
+- **Wordmark / tunnel / logos**: delivered PNGs in `assets/` (chrome wordmark, fluted tunnel wall) → `tools/pack_assets.py`. See `assets/PROMPTS.md` for the generation prompts and outstanding requests.
 - **Music**: `ffmpeg -i "assets/Quicksilver Mercy.mp3" -ac 1 -ar 22050 -f s16le music.raw && ./tools/qoaconv_s16.exe music.raw music.qoa 22050 1`.
 - **Interpolator emulator self-test**: `gcc -DHOST_BUILD=1 -I. tools/interp_selftest.c interp_emu.c -o t && ./t` (must print `ALL PASS`).
 

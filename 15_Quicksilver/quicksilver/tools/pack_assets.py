@@ -55,11 +55,13 @@ ASSETS = [
     # Chrome matcap sphere-map — sampled by view-space normals in envmap3d.c.
     ("envmap",    "envmap.png",   "rgb565", 256, 256, False,  None),
     # Equirectangular dusk sky panorama (pow2 width = free yaw wrap).
-    ("sky",       "sky_pano.png", "rgb565", 512, 128, False,  None),
+    ("sky",       "sky_pano.png", "rgb565", 1024, 128, False,  None),
     # Chrome Wordmark Logo (320x80)
     ("title_logo","title_logo.png", "rgb565", 320, 80, False,  None),
     # Seamless tunnel wall (256x256)
     ("tunnel",    "tunnel.png",   "rgb565", 256, 256, False,  None),
+    # LATENT group logo (256x48)
+    ("latent_logo","latent_logo.png","rgb565", 256, 48, False,  None),
 ]
 
 

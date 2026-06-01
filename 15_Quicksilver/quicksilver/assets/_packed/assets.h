@@ -32,12 +32,12 @@ extern const uint8_t  asset_envmap_end[];
 #define ASSET_ENVMAP_H 256
 #define ASSET_ENVMAP_SIZE 131072
 
-/* sky: rgb565 512x128 131072 bytes */
+/* sky: rgb565 1024x128 262144 bytes */
 extern const uint8_t  asset_sky_data[];
 extern const uint8_t  asset_sky_end[];
-#define ASSET_SKY_W 512
+#define ASSET_SKY_W 1024
 #define ASSET_SKY_H 128
-#define ASSET_SKY_SIZE 131072
+#define ASSET_SKY_SIZE 262144
 
 /* title_logo: rgb565 320x80 51200 bytes */
 extern const uint8_t  asset_title_logo_data[];
@@ -52,5 +52,12 @@ extern const uint8_t  asset_tunnel_end[];
 #define ASSET_TUNNEL_W 256
 #define ASSET_TUNNEL_H 256
 #define ASSET_TUNNEL_SIZE 131072
+
+/* latent_logo: rgb565 256x48 24576 bytes */
+extern const uint8_t  asset_latent_logo_data[];
+extern const uint8_t  asset_latent_logo_end[];
+#define ASSET_LATENT_LOGO_W 256
+#define ASSET_LATENT_LOGO_H 48
+#define ASSET_LATENT_LOGO_SIZE 24576
 
 #endif

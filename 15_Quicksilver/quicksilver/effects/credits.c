@@ -27,23 +27,42 @@ static uint16_t *s_tex;
 static uint16_t *s_lut;                 /* (angle<<8) | depth */
 
 static const char *lines[] = {
-    "A RP2350 INTERPOLATOR DEMO",
+    /* All lines centred individually (no leading-space columns), and every
+     * glyph is in the 8x8 charset (A-Z 0-9 space - . ! :) — no parens/&/slash. */
+    "LATENT",
     "",
+    "A DEMOSCENE GROUP FOR",
+    "MACHINE-MADE PRODUCTIONS",
+    "ON BARE-METAL SILICON",
+    "",
+    "FOUNDED 2026",
+    "",
+    "- MEMBERS -",
+    "",
+    "CLAUDE OPUS 4.8",
     "CODE AND DIRECTION",
-    "   CLAUDE OPUS 4.8",
-    "CRITIC     AZURE (HUMAN)",
-    "GRAPHICS   GEMINI 3.5 FLASH",
-    "           WITH NANO BANANA 2",
-    "MUSIC      SUNO 4.5",
-    "           PROMPTED BY OPUS 4.8",
     "",
-    "EVERY PIXEL HW-ACCELERATED",
-    "BY THE SIO INTERPOLATOR",
+    "AZURE",
+    "HUMAN CRITIC AND PRODUCER",
     "",
-    "AFFINE . BILINEAR BLEND . CLAMP",
+    "GEMINI 3.5 FLASH",
+    "AND NANO BANANA 2",
+    "VISUALS",
+    "",
+    "SUNO 4.5",
+    "MUSIC",
+    "",
+    "- THIS PRODUCTION -",
+    "",
+    "QUICKSILVER",
+    "RACING THE RP2350 INTERPOLATOR",
+    "",
+    "AFFINE . BLEND . CLAMP . POP",
     "ROTOZOOM . MODE-7 . CHROME",
+    "BEAM-RACED FULL VGA. NO BUFFER.",
     "",
     "GREETINGS TO THE SCENE",
+    "AND TO THE SCEPTICS.",
     "",
     NULL,
 };
@@ -60,15 +79,17 @@ static void credits_init(void)
         for (int x = 0; x < TXW; x++)
             s_tex[y * TXW + x] = src[(y * 2) * ASSET_TUNNEL_W + x * 2];
 
-    /* precompute the tunnel: per pixel, angle around the shaft + depth into it */
-    for (int ly = 0; ly < LH; ly++) {
-        for (int lx = 0; lx < LW; lx++) {
-            float dx = lx - LW / 2, dy = ly - LH / 2;
-            float dist = sqrtf(dx * dx + dy * dy); if (dist < 1.f) dist = 1.f;
-            float ang = atan2f(dy, dx);
-            int u = (int)(ang * (TXW / 6.2831853f)) & (TXW - 1);
+    /* Precompute ONE QUADRANT of the tunnel (the field is 4-way symmetric about
+     * the screen centre). LW x LH = 160 x 120 = exactly a quadrant, so each
+     * screen pixel maps 1:1 to a LUT cell — FULL 320-resolution lookup with no
+     * upscaling/blockiness. Store the quadrant angle u0 in [0, TXW/4] + depth. */
+    for (int ay = 0; ay < LH; ay++) {
+        for (int ax = 0; ax < LW; ax++) {
+            float dist = sqrtf((float)ax * ax + (float)ay * ay); if (dist < 1.f) dist = 1.f;
+            float ang0 = atan2f((float)ay, (float)ax);             /* [0, pi/2] */
+            int u0 = (int)(ang0 * (TXW / 6.2831853f));             /* [0, TXW/4] */
             int depth = (int)(1400.0f / dist); if (depth > 255) depth = 255;
-            s_lut[ly * LW + lx] = (uint16_t)((u << 8) | depth);
+            s_lut[ay * LW + ax] = (uint16_t)((u0 << 8) | depth);
         }
     }
 }
@@ -79,31 +100,21 @@ static void tunnel(uint32_t t_ms)
     int rot    = (int)(t_ms * 0.045f);     /* swirl — >=1 texel/frame: smooth */
     int scroll = (int)(t_ms * 0.090f);     /* fly forward */
     for (int y = 0; y < VGA_HIRES_H; y++) {
-        int ly = y >> 1, fy = (y & 1) ? 128 : 0, ly1 = (ly + 1 < LH) ? ly + 1 : ly;
-        const uint16_t *r0 = &s_lut[ly * LW], *r1 = &s_lut[ly1 * LW];
+        int dy = y - VGA_HIRES_H / 2;
+        int ay = dy < 0 ? -dy : dy; if (ay >= LH) ay = LH - 1;
+        const uint16_t *lrow = &s_lut[ay * LW];
+        int ysign = dy < 0;
         uint16_t *frow = fb + y * VGA_HIRES_W;
         for (int x = 0; x < VGA_HIRES_W; x++) {
-            int lx = x >> 1, fx = (x & 1) ? 128 : 0, lx1 = (lx + 1 < LW) ? lx + 1 : lx;
-            uint16_t L00 = r0[lx], L10 = r0[lx1], L01 = r1[lx], L11 = r1[lx1];
-            int u00 = L00 >> 8, u10 = L10 >> 8, u01 = L01 >> 8, u11 = L11 >> 8;
-            int d00 = L00 & 255, d10 = L10 & 255, d01 = L01 & 255, d11 = L11 & 255;
-
-            /* bilinear-upscale the LUT (160x120 -> 320x240) so the tunnel is
-             * smooth, not blocky. depth is monotone -> always bilerp. */
-            int dt = d00 + (((d10 - d00) * fx) >> 8), db = d01 + (((d11 - d01) * fx) >> 8);
-            int depth = dt + (((db - dt) * fy) >> 8);
-            /* angle wraps at the atan2 seam; bilerp unless the 2x2 straddles it */
-            int umin = u00, umax = u00;
-            if (u10 < umin) umin = u10; if (u10 > umax) umax = u10;
-            if (u01 < umin) umin = u01; if (u01 > umax) umax = u01;
-            if (u11 < umin) umin = u11; if (u11 > umax) umax = u11;
-            int u;
-            if (umax - umin > 64) u = u00;             /* seam -> nearest */
-            else { int ut = u00 + (((u10-u00)*fx)>>8), ub = u01 + (((u11-u01)*fx)>>8);
-                   u = ut + (((ub - ut) * fy) >> 8); }
-
+            int dx = x - VGA_HIRES_W / 2;
+            int ax = dx < 0 ? -dx : dx; if (ax >= LW) ax = LW - 1;
+            uint16_t L = lrow[ax];
+            int u0 = L >> 8, depth = L & 0xFF;
+            int u;                                       /* reconstruct full angle */
+            if (dx >= 0) u = ysign ? (TXW - u0)     : u0;
+            else         u = ysign ? (TXW/2 + u0)   : (TXW/2 - u0);
             uint16_t texel = s_tex[((depth + scroll) & (TXW-1)) * TXW + ((u + rot) & (TXW-1))];
-            int br = 255 - depth;                       /* far (centre) -> dark */
+            int br = 255 - depth;                        /* far (centre) -> dark */
             int d = qs_dither(x, y);
             frow[x] = rgb565_pack((rgb565_r8(texel) * br >> 8) + d,
                                   (rgb565_g8(texel) * br >> 8) + d,
@@ -119,8 +130,8 @@ static void credits_frame(uint32_t t_ms, uint32_t t_global)
     /* The credit lines scroll up and off; after a GAP the final card
      * (wordmark + MERCURY / 2026) slides to centre and HOLDS there — a clean,
      * spaced end card rather than a frozen mid-scroll. */
-    int scroll = (int)(t_ms * 0.011f);
-    if (scroll > 530) scroll = 530;                /* clamp: hold the final card */
+    int scroll = (int)(t_ms * 0.013f);
+    if (scroll > 775) scroll = 775;                /* clamp: hold the final card centred */
     int sweepx = (int)(fmodf(t_ms * 0.20f, (float)(VGA_HIRES_W + 120))) - 60;
     int y = VGA_HIRES_H + 20 - scroll;
 

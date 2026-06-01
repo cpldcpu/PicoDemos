@@ -48,3 +48,9 @@ asset_tunnel_data:
     .incbin "tunnel.bin"
     .global asset_tunnel_end
 asset_tunnel_end:
+
+    .global asset_latent_logo_data
+asset_latent_logo_data:
+    .incbin "latent_logo.bin"
+    .global asset_latent_logo_end
+asset_latent_logo_end:

@@ -91,6 +91,20 @@ a tunnel. A texture authored to **tile seamlessly in BOTH axes** (wraps left↔r
 - The end scene downsamples it to a 128×128 SRAM copy. Until delivered it falls
   back to the roto texture.
 
+#### 8. LATENT group logo *(requested — title & end card)*
+We founded the demo group **LATENT**. The title and end card currently render
+"LATENT" in the 8×8 font; a proper logo would sell it. Want a small, distinct
+mark — NOT another chrome wordmark like QUICKSILVER (it must read as a different
+*group* identity), e.g. a minimalist liquid-metal glyph/monogram + the word.
+> **Prompt:**
+> A minimalist demoscene group logo for "LATENT" — a single liquid-mercury
+> droplet/monogram mark beside clean condensed letters, cool silver on PURE
+> BLACK, subtle, NOT busy, lots of negative space. Wide strip. No other text.
+
+- **Source File:** `assets/latent_logo.png` (on pure black for keying)
+- **Output Target:** `assets/_packed/latent_logo.bin` (rgb565, 256×48)
+- Pack entry: `("latent_logo","latent_logo.png","rgb565",256,48,False,None)`.
+
 ---
 
 ## Music (Suno 4.5) Prompts
@@ -102,65 +116,55 @@ a tunnel. A texture authored to **tile seamlessly in BOTH axes** (wraps left↔r
 
 ---
 
-### Style Prompt (Primary)
+### The problem with the first track
+It was *too smooth* — a pleasant chrome-synthwave loop with no dynamics and no
+climax. A demo soundtrack needs **contrast**: quiet intro → build → a hard DROP
+on the centrepiece → breakdown → a bigger second drop → resolve. It should be
+**mostly instrumental** (vocals fight the visuals), with only a few sung words
+landing on the big moments. Below is a prompt and a sparse lyric authored to the
+demo's actual arc.
+
+### Demo arc to score (timestamps the music should hit)
+| time | scene | the music should… |
+|---|---|---|
+| 0:00–0:06 | title | quiet, glassy, a single chrome shimmer |
+| 0:06–0:28 | rotozoomer | start the pulse; rising arpeggio build |
+| 0:28–0:47 | mercury plain | wide, cruising, melodic — tension building |
+| **0:47–1:32** | **chrome objects** | **THE DROP** — gated drums + screaming metallic lead |
+| 1:32–1:56 | liquid metal | breakdown: strip to bass + filtered pads |
+| **1:56–2:55** | **chrome reprise** | **bigger second drop**, double-time, euphoric |
+| 2:55–end | credits tunnel | resolve, reflective, fade out |
+
+### Style Prompt (Primary, ~200 chars)
 > **Style:**  
-> Sleek liquid-chrome synthwave with a driving 4/4 pulse, ~124 BPM. Glassy FM bells, metallic arpeggios, deep analog bass, gated reverb drums, shimmering reflective pads. Builds from a calm mercury-drip intro to a euphoric chrome drop, then a reflective outro.
+> Cinematic chrome synth-metal, ~128 BPM, DYNAMIC with hard drops. Glassy intro, rising arpeggio build, then a euphoric DROP: gated reverb drums, distorted metallic lead, deep analog bass. Breakdown, bigger second drop, reflective fade. Mostly instrumental, huge contrast.
 
----
+*(If Suno still flattens it: add `[Build]`, `[Drop]`, `[Breakdown]` as their own
+generations, or use the "intensity"/exclude-style controls to force the dynamics.)*
 
-### Lyrics Field & Structure
-*(The metatags inside brackets mark structure; everything else is sung).*
+### Lyrics Field — sparse, only on the big moments
+*(Brackets are structure tags; keep most sections instrumental. The few sung
+words land on the title, the two drops, and the outro.)*
 
 ```text
-[Intro]
+[Intro – ambient pads, no drums]
+(whispered) quicksilver
 
-[Verse 1]
-Cold light running down my arm
-Liquid silver, no alarm
-I touch the glass and watch it flow
-A mirror melts, the colors go
+[Build – arpeggio rising, drums enter]
 
-[Pre-Chorus]
-Faster now, the edges bend
-Reflections of a world that never ends
+[Drop – full energy]
+Liquid chrome
+Liquid chrome
 
-[Chorus]
-Quicksilver, running through my hands
-Liquid light I'll never understand
-Pour me out and let me shine
-Chrome and mercury, forever mine
-Quicksilver, falling like the rain
-Every drop reflecting me again
+[Breakdown – bass and filtered pads only]
+(whispered) running through my hands
 
-[Verse 2]
-Spin the world to silver dust
-Polished steel, I learn to trust
-A thousand faces in the chrome
-Every one of them is home
+[Drop 2 – bigger, double-time]
+Quicksilver
+Shine
 
-[Pre-Chorus]
-Faster now, the edges bend
-Reflections of a world that never ends
-
-[Chorus]
-Quicksilver, running through my hands
-Liquid light I'll never understand
-Pour me out and let me shine
-Chrome and mercury, forever mine
-Quicksilver, falling like the rain
-Every drop reflecting me again
-
-[Bridge]
-(let it flow, let it flow)
-Molten, golden, cold and bright
-(let it flow, let it flow)
-I dissolve into the light
-
-[Drop / Instrumental]
-
-[Outro]
-Quicksilver... running through my hands
-Liquid light... I finally understand
+[Outro – fade to silence]
+(whispered) reflecting me
 ```
 
 ### Music Conversion
