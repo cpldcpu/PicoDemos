@@ -1,111 +1,91 @@
-/* rotozoom.c — fullscreen bilinear rotozoomer driven by the RP2350
- * interpolator (QUICKSILVER scene "Rubber Rotozoomer").
+/* rotozoom.c — fullscreen bilinear/point rotozoomer, now NATIVE FULL VGA
+ * (640x480) and beam-raced: no framebuffer. The scene's frame() (core 0)
+ * updates the affine basis + per-row "rubber" flex; the registered per-scanline
+ * generator (core 1 on device / the present loop on host) turns each row into
+ * 640 pixels via the interpolator in POP self-stepping mode — one pop_full per
+ * pixel returns the texel offset and advances u,v.
  *
- * The interpolator (interp0) is configured by qs_texmap_setup() as an affine
- * texture-address generator: with accum0=u, accum1=v in 16.16 fixed point,
- * interp_peek_full_result() returns the byte OFFSET of the texel in one read,
- * with free power-of-two wrap. We add the per-pixel du/dv with
- * interp_add_accumulator() — the inner loop never computes a texture address
- * in C. Bilinear weights come straight from the accumulator low bits.
- *
- * "Rubber": each scanline's affine scale is wobbled by a travelling sine, so
- * the plane flexes like a rubber sheet. Motion blur: each pixel is blended with
- * what the back buffer already holds (the frame from two flips ago).
- *
- * Identical C on host (emulator) and RP2350 (raw SIO). MODE_HIRES, 320x240.
- */
+ * Beam-racing discipline: texture copied to SRAM (vga_race_sram, aliases the
+ * framebuffer arena), generator pinned in SRAM, no transcendentals on the hot
+ * path. Identical on host (emulator) and RP2350 (raw SIO). */
 
 #include "../interp_compat.h"
 #include "../vga.h"
 #include "../rgb565.h"
 #include "../scene.h"
 #include "assets.h"
+#include "qs_fx.h"
+#include "transition.h"
 
 #include <math.h>
+#include <string.h>
 
-#define TW   ASSET_ROTO_W                  /* 256 */
-#define TH   ASSET_ROTO_H                  /* 256 */
-#define TMASK (TW * TH * 2 - 1)            /* byte-offset wrap mask (pow2) */
+#ifdef PICO_BUILD
+#include "pico/platform.h"
+#define QS_FAST(n) __not_in_flash_func(n)
+#else
+#define QS_FAST(n) n
+#endif
+
+#define TW ASSET_ROTO_W            /* 256 */
+#define TBYTES (ASSET_ROTO_W * ASSET_ROTO_H * 2)
+
+static uint16_t     *s_tex;                  /* roto in race SRAM */
+static volatile float g_ca0, g_sa0, g_cu, g_cv;
+static volatile int   g_white;               /* chrome-glint transition amount */
+static float          g_flex[VGA_RACE_H];
+
+static void QS_FAST(roto_scan)(uint16_t *dst, int y)
+{
+    qs_texmap_setup(interp0, 1, 8, 8);       /* self-configure (ordering-safe) */
+    float fl = g_flex[y];
+    float ca = g_ca0 * fl, sa = g_sa0 * fl;
+    float dys = (float)(y - VGA_RACE_H / 2);
+    float u0 = g_cu + (float)(-VGA_RACE_W / 2) * ca - dys * sa;
+    float v0 = g_cv + (float)(-VGA_RACE_W / 2) * sa + dys * ca;
+    interp_set_accumulator(interp0, 0, (uint32_t)(int32_t)(u0 * 65536.0f));
+    interp_set_accumulator(interp0, 1, (uint32_t)(int32_t)(v0 * 65536.0f));
+    qs_texmap_step(interp0, (uint32_t)(int32_t)(ca * 65536.0f),
+                            (uint32_t)(int32_t)(sa * 65536.0f));
+    const uint8_t *base = (const uint8_t *)s_tex;
+    int gw = g_white;
+    for (int x = 0; x < VGA_RACE_W; x++) {
+        uint16_t c = qs_tap_point(interp0, base);   /* POP: offset + auto-advance */
+        if (gw) {  /* chrome-white glint at scene boundaries */
+            c = rgb565_pack(rgb565_r8(c) + (((232 - rgb565_r8(c)) * gw) >> 8),
+                            rgb565_g8(c) + (((240 - rgb565_g8(c)) * gw) >> 8),
+                            rgb565_b8(c) + (((255 - rgb565_b8(c)) * gw) >> 8));
+        }
+        dst[x] = c;
+    }
+}
 
 static void roto_init(void)
 {
-    qs_texmap_setup(interp0, 1, 8, 8);     /* RGB565 (log2bpp=1), 256x256 */
-}
-
-/* bilinear tap of the roto texture at the interpolator's current (u,v). */
-/* fracs must be read by the caller BEFORE this (POP advances the accumulators) */
-static inline uint16_t roto_tap(const uint8_t *base, int uf, int vf)
-{
-    uint32_t off = interp_pop_full_result(interp0);   /* offset now, accum += du,dv */
-    uint16_t c00 = *(const uint16_t *)(base + off);
-    uint16_t c10 = *(const uint16_t *)(base + ((off + 2)       & TMASK));
-    uint16_t c01 = *(const uint16_t *)(base + ((off + TW * 2)  & TMASK));
-    uint16_t c11 = *(const uint16_t *)(base + ((off + TW * 2 + 2) & TMASK));
-
-    int r0 = rgb565_r8(c00) + (((rgb565_r8(c10) - rgb565_r8(c00)) * uf) >> 8);
-    int g0 = rgb565_g8(c00) + (((rgb565_g8(c10) - rgb565_g8(c00)) * uf) >> 8);
-    int b0 = rgb565_b8(c00) + (((rgb565_b8(c10) - rgb565_b8(c00)) * uf) >> 8);
-    int r1 = rgb565_r8(c01) + (((rgb565_r8(c11) - rgb565_r8(c01)) * uf) >> 8);
-    int g1 = rgb565_g8(c01) + (((rgb565_g8(c11) - rgb565_g8(c01)) * uf) >> 8);
-    int b1 = rgb565_b8(c01) + (((rgb565_b8(c11) - rgb565_b8(c01)) * uf) >> 8);
-    int r = r0 + (((r1 - r0) * vf) >> 8);
-    int g = g0 + (((g1 - g0) * vf) >> 8);
-    int b = b0 + (((b1 - b0) * vf) >> 8);
-    return rgb565_pack(r, g, b);
+    s_tex = (uint16_t *)vga_race_sram();
+    memcpy(s_tex, asset_roto_data, TBYTES);    /* flash -> SRAM (arena alias) */
+    vga_set_race_fn(roto_scan, NULL);
 }
 
 static void roto_frame(uint32_t t_ms, uint32_t t_global)
 {
     (void)t_global;
-    uint16_t *fb = vga_hires_back_buffer();
-    const uint8_t *base = (const uint8_t *)asset_roto_data;
-
     float t = t_ms * 0.001f;
-    float ang   = t * 0.55f;                     /* steady spin            */
-    float zoom  = 1.30f + 0.85f * sinf(t * 0.40f);/* breathing zoom         */
-    float ctu   = 128.0f + 40.0f * sinf(t * 0.23f);
-    float ctv   = 128.0f + 40.0f * cosf(t * 0.19f);
-    int   blur  = 110;                            /* 0..255 trail strength  */
+    float ang  = t * 0.55f;
+    float zoom = 1.30f + 0.85f * sinf(t * 0.40f);
+    g_ca0 = cosf(ang) * zoom;
+    g_sa0 = sinf(ang) * zoom;
+    g_cu  = 128.0f + 40.0f * sinf(t * 0.23f);
+    g_cv  = 128.0f + 40.0f * cosf(t * 0.19f);
+    for (int y = 0; y < VGA_RACE_H; y++)
+        g_flex[y] = 1.0f + 0.18f * sinf(y * 0.022f + t * 2.1f);   /* rubber */
 
-    float cosA = cosf(ang), sinA = sinf(ang);
-
-    for (int y = 0; y < VGA_HIRES_H; y++) {
-        /* rubber: travelling sine flexes this scanline's scale */
-        float flex  = 1.0f + 0.18f * sinf(y * 0.045f + t * 2.1f);
-        float scale = zoom * flex;
-        float ca = cosA * scale;
-        float sa = sinA * scale;
-
-        float dys = (float)(y - 120);
-        float u0 = ctu + (0 - 160) * ca - dys * sa;
-        float v0 = ctv + (0 - 160) * sa + dys * ca;
-
-        interp_set_accumulator(interp0, 0, (uint32_t)(int32_t)(u0 * 65536.0f));
-        interp_set_accumulator(interp0, 1, (uint32_t)(int32_t)(v0 * 65536.0f));
-        qs_texmap_step(interp0, (uint32_t)(int32_t)(ca * 65536.0f),
-                                (uint32_t)(int32_t)(sa * 65536.0f));
-
-        uint16_t *row = fb + y * VGA_HIRES_W;
-        for (int x = 0; x < VGA_HIRES_W; x++) {
-            int uf = (interp_get_accumulator(interp0, 0) >> 8) & 0xFF;
-            int vf = (interp_get_accumulator(interp0, 1) >> 8) & 0xFF;
-            uint16_t c = roto_tap(base, uf, vf);
-
-            if (blur) {
-                uint16_t o = row[x];
-                int r = rgb565_r8(c) + (((rgb565_r8(o) - rgb565_r8(c)) * blur) >> 8);
-                int g = rgb565_g8(c) + (((rgb565_g8(o) - rgb565_g8(c)) * blur) >> 8);
-                int b = rgb565_b8(c) + (((rgb565_b8(o) - rgb565_b8(c)) * blur) >> 8);
-                c = rgb565_pack(r, g, b);
-            }
-            row[x] = c;     /* roto_tap POPs: advances accum by (du,dv) */
-        }
-    }
+    g_white = qs_trans_white(t_global, scene_cur_start_ms(), scene_cur_end_ms(), 0);
 }
 
 const effect_t fx_rotozoom = {
     .name  = "rotozoom",
-    .mode  = MODE_HIRES,
+    .mode  = MODE_RACE,
     .init  = roto_init,
     .frame = roto_frame,
     .done  = NULL,

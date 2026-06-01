@@ -111,6 +111,7 @@ int main(int argc, char *argv[])
             case MODE_160:                 vga_160_present();   break;
             case MODE_HIRES:               vga_hires_present(); break;
             case MODE_SPLIT_160_OVER_320:  vga_split_present(); break;
+            case MODE_RACE:                vga_race_present();  break;
             default: break;
         }
 

@@ -33,6 +33,11 @@ typedef enum {
      * region (e.g. crisp 8bpp scroller text). The scene populates both
      * back buffers and presents both. */
     MODE_SPLIT_160_OVER_320 = 3,
+
+    /* Beam-raced full-VGA: the scene registers a per-scanline generator (via
+     * vga_set_race_fn) that core 1 runs straight into the 640-wide output line
+     * — no framebuffer. Used by the full-VGA rotozoom and Mode-7. */
+    MODE_RACE = 4,
 } screen_mode_t;
 
 typedef struct effect {

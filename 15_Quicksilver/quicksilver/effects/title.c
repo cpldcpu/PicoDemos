@@ -8,6 +8,7 @@
 #include "assets.h"
 #include "logo.h"
 #include "qs_text.h"
+#include "qs_fx.h"
 
 #include <math.h>
 
@@ -26,7 +27,8 @@ static void title_blit_bg(uint32_t t_ms)
         uint16_t *frow = fb + y * VGA_HIRES_W;
         for (int x = 0; x < VGA_HIRES_W; x++) {
             uint16_t c = pal[srow[x]];
-            frow[x] = sh ? rgb565_pack(rgb565_r8(c) + sh, rgb565_g8(c) + sh, rgb565_b8(c) + sh) : c;
+            int d = sh + qs_dither(x, y);   /* break 8bpp/5-bit banding */
+            frow[x] = rgb565_pack(rgb565_r8(c) + d, rgb565_g8(c) + d, rgb565_b8(c) + d);
         }
     }
 }

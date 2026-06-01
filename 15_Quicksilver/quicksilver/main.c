@@ -92,6 +92,7 @@ int main(void)
             case MODE_160:                 vga_160_present();   break;
             case MODE_HIRES:               vga_hires_present(); break;
             case MODE_SPLIT_160_OVER_320:  vga_split_present(); break;
+            case MODE_RACE:                /* core 1 beam-races; no present */ break;
             default: break;
         }
 

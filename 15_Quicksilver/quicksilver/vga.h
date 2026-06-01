@@ -90,6 +90,25 @@ void      vga_160_present(void);
 uint16_t *vga_hires_back_buffer(void);  /* RGB565, 320*240 */
 void      vga_hires_present(void);
 
+/* MODE_RACE — beam-raced full VGA (640x480) -------------------------------
+ *
+ * The whole demo scans out at 640x480@60; framebuffer (MODE_HIRES) scenes are
+ * 2x pixel/line-doubled, MODE_RACE scenes generate each 640-wide line live. A
+ * race scene registers its per-scanline generator `scan(dst, y)` and an
+ * optional one-time `setup()` that runs on the scanout core (to configure its
+ * interpolator). Beam-raced textures are copied into vga_race_sram() (which
+ * aliases the framebuffer arena — never live at the same time). */
+void      vga_set_race_fn(void (*scan)(uint16_t *dst, int y), void (*setup)(void));
+uint8_t  *vga_race_sram(void);
+unsigned  vga_race_sram_size(void);
+
+/* Present a MODE_RACE frame. Device: no-op (core 1 beam-races continuously).
+ * Host: runs the registered generator over all 640x480 lines into the window. */
+void      vga_race_present(void);
+
+#define VGA_RACE_W 640
+#define VGA_RACE_H 480
+
 /* MODE_SPLIT_160_OVER_320 -------------------------------------------------
  *
  * Set the display row at which scanout switches from the fb160 (RGB565,

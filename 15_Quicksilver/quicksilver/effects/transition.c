@@ -64,6 +64,16 @@ static void apply_style(int style, int a)
     }
 }
 
+int qs_trans_white(uint32_t t_global, uint32_t scene_start, uint32_t scene_end, int suppress_out)
+{
+    uint32_t into = t_global - scene_start;
+    uint32_t left = (scene_end > t_global) ? (scene_end - t_global) : 0;
+    int gi = (into < FADE_MS) ? (int)(256 - into * 256 / FADE_MS) : 0;
+    int go = (!suppress_out && left < FADE_MS) ? (int)(256 - left * 256 / FADE_MS) : 0;
+    int g = gi > go ? gi : go;
+    return g > 256 ? 256 : g;
+}
+
 void qs_transition_apply(uint32_t t_global, uint32_t scene_start, uint32_t scene_end,
                          int suppress_out, int out_style, int in_style)
 {

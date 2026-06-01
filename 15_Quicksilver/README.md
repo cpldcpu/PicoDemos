@@ -9,9 +9,15 @@ actually use the interpolator** (demo 13 reserved it but never wired it up).
 
 Because the SDL host has no such peripheral, Quicksilver ships a **bit-exact
 software emulator** of the interpolator, so the identical effect code previews
-on a PC and runs as raw silicon on the RP2350.
+on a PC and runs as raw silicon on the RP2350 — host and hardware are pixel-identical.
 
-320×240 RGB565 truecolour, 60 fps. Pimoroni VGA Demo Base (VGA 15-bit DAC).
+**Full VGA, 640×480 @ 60 Hz.** The rotozoomer and Mode-7 plain render at *native*
+640×480, **beam-raced with no framebuffer** — core 1 generates each scanline
+live via the interpolator (POP self-stepping) as the beam races (a 640×480
+truecolour framebuffer is 614 KB > 520 KB SRAM, so beam-racing is the only way).
+The framebuffer scenes (title, chrome, liquid, credits) render in a 320×240
+RGB565 buffer and are 2× pixel/line-doubled at scanout. Pimoroni VGA Demo Base
+(15-bit DAC).
 
 ## The arc
 

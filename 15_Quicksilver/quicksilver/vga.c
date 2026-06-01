@@ -241,29 +241,82 @@ void vga_split_present(void)
     vga_160_present();
 }
 
-static void __attribute__((noreturn)) core1_main(void)
+/* --- FULL VGA (640x480) -------------------------------------------------
+ *
+ * The whole demo runs on 640x480@60 scanvideo timing. Framebuffer scenes still
+ * render into the 320x240 RGB565 arena and are 2x pixel/line-doubled at scanout
+ * (render_scanline_hires640). Beam-raced scenes (MODE_RACE: rotozoom, Mode-7)
+ * register a per-scanline generator that core 1 runs straight into the 640-wide
+ * line — true full-VGA detail with no framebuffer. Both the generator and this
+ * core-1 loop are pinned in SRAM to hit the per-line deadline. */
+#define VGA_OUT_W 640
+#define VGA_OUT_H 480
+
+static void (*volatile g_race_fn)(uint16_t *dst, int y) = NULL;   /* per scanline */
+static void (*volatile g_race_setup_fn)(void)           = NULL;   /* core-1 once  */
+
+void vga_set_race_fn(void (*scan)(uint16_t *, int), void (*setup)(void))
 {
-    /* All modes share the 320x240 scanvideo timing. Mode switches just
-     * change which per-scanline renderer the dispatch picks. */
-    scanvideo_setup(&vga_mode_320x240_60);
+    __atomic_store_n(&g_race_fn, scan, __ATOMIC_SEQ_CST);
+    __atomic_store_n(&g_race_setup_fn, setup, __ATOMIC_SEQ_CST);
+}
+
+/* Beam-raced scenes copy their textures here (aliases the framebuffer arena —
+ * a race scene and a framebuffer scene are never live at the same time). */
+uint8_t *vga_race_sram(void)      { return fb_arena; }
+unsigned vga_race_sram_size(void) { return (unsigned)sizeof(fb_arena); }
+
+void vga_race_present(void) { /* device: core 1 beam-races continuously */ }
+
+/* 320x240 framebuffer -> 640x480 by 2x pixel + line doubling at scanout. */
+static void __not_in_flash_func(render_scanline_hires640)(struct scanvideo_scanline_buffer *buf, int y)
+{
+    int ys = y >> 1; if (ys >= VGA_HIRES_H) ys = VGA_HIRES_H - 1;
+    const uint16_t *front = (const uint16_t *)__atomic_load_n(&fbh_front, __ATOMIC_SEQ_CST);
+    const uint16_t *src   = front + ys * VGA_HIRES_W;
+    uint16_t *out = (uint16_t *)buf->data;
+    out[0] = COMPOSABLE_RAW_RUN;
+    out[1] = src[0];
+    out[2] = VGA_OUT_W + 1 - 3;
+    for (int k = 1; k < VGA_OUT_W; k++) out[2 + k] = src[k >> 1];
+    out[VGA_OUT_W + 2] = 0;
+    out[VGA_OUT_W + 3] = COMPOSABLE_EOL_ALIGN;
+    buf->data_used = (VGA_OUT_W + 4) / 2;
+    buf->status    = SCANLINE_OK;
+}
+
+static void __not_in_flash_func(core1_main)(void)
+{
+    scanvideo_setup(&vga_mode_640x480_60);
     scanvideo_timing_enable(true);
     g_scanvideo_up = true;
 
+    screen_mode_t prev = (screen_mode_t)0xff;
+    static uint16_t race_line[VGA_OUT_W];
     while (true) {
         struct scanvideo_scanline_buffer *buf = scanvideo_begin_scanline_generation(true);
+        int y = scanvideo_scanline_number(buf->scanline_id);
         screen_mode_t m = __atomic_load_n(&g_mode, __ATOMIC_RELAXED);
-        if (m == MODE_SPLIT_160_OVER_320) {
-            int y     = scanvideo_scanline_number(buf->scanline_id);
-            int split = __atomic_load_n(&g_split_row, __ATOMIC_RELAXED);
-            if (y < split) render_scanline_160(buf);
-            else           render_scanline_320(buf);
-        } else if (m == MODE_160) {
-            render_scanline_160(buf);
-        } else if (m == MODE_HIRES) {
-            render_scanline_hires(buf);
+
+        if (m == MODE_RACE) {
+            void (*setup)(void) = __atomic_load_n(&g_race_setup_fn, __ATOMIC_RELAXED);
+            void (*scan)(uint16_t *, int) = __atomic_load_n(&g_race_fn, __ATOMIC_RELAXED);
+            if (m != prev && setup) setup();        /* core-1 interp config, once */
+            if (scan) scan(race_line, y);
+            else      for (int i = 0; i < VGA_OUT_W; i++) race_line[i] = 0;
+            uint16_t *out = (uint16_t *)buf->data;
+            out[0] = COMPOSABLE_RAW_RUN;
+            out[1] = race_line[0];
+            out[2] = VGA_OUT_W + 1 - 3;
+            for (int x = 1; x < VGA_OUT_W; x++) out[2 + x] = race_line[x];
+            out[VGA_OUT_W + 2] = 0;
+            out[VGA_OUT_W + 3] = COMPOSABLE_EOL_ALIGN;
+            buf->data_used = (VGA_OUT_W + 4) / 2;
+            buf->status    = SCANLINE_OK;
         } else {
-            render_scanline_320(buf);
+            render_scanline_hires640(buf, y);       /* all framebuffer scenes */
         }
+        prev = m;
         scanvideo_end_scanline_generation(buf);
     }
 }

@@ -23,4 +23,9 @@ enum {
 void qs_transition_apply(uint32_t t_global, uint32_t scene_start, uint32_t scene_end,
                          int suppress_out, int out_style, int in_style);
 
+/* Scalar chrome-white glint amount (0..256) near a scene's start/end — used by
+ * beam-raced (MODE_RACE) scenes, which have no framebuffer for the pattern
+ * transitions, so they blend their generated line toward white by this. */
+int qs_trans_white(uint32_t t_global, uint32_t scene_start, uint32_t scene_end, int suppress_out);
+
 #endif
