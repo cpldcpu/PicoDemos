@@ -38,12 +38,16 @@ This document contains guidance and ready-to-use prompts for generating the 2D a
 - **Source File:** `assets/roto.png`
 - **Output Target:** `assets/_packed/roto.bin` (256x256, `rgb565`)
 
-#### 4. Sky Panorama (Equirectangular Sky)
+#### 4. Sky Panorama (Equirectangular Sky) — *needs reissue: seamless wrap*
+The current sky shows a vertical SEAM where it wraps (left and right edges don't
+match). Please reissue it **horizontally seamless** — the left and right edges
+must be identical so it tiles. Double-wide (1024) is ideal so the wrap is rarer.
 > **Prompt:**  
-> Equirectangular 360 panorama of a chrome-and-violet dusk sky over a mirror-flat liquid-metal sea, soft gradient horizon, distant glowing sun, smooth, no text, no border.
+> Equirectangular 360° panorama of a chrome-and-violet dusk sky over a mirror-flat liquid-metal sea, soft gradient horizon, distant glowing sun, smooth. SEAMLESS horizontal wrap — the left and right edges must match exactly so it tiles with no visible seam. No text, no border.
 
 - **Source File:** `assets/sky_pano.png`
-- **Output Target:** `assets/_packed/sky.bin` (512x128, `rgb565`)
+- **Output Target:** `assets/_packed/sky.bin` (**1024**x128 preferred, or 512x128, `rgb565`)
+- If you deliver 1024 wide, change the pack entry to `("sky","sky_pano.png","rgb565",1024,128,...)`; the code reads ASSET_SKY_W so it adapts.
 
 #### 5. Title/Endcard Backdrop
 > **Prompt:**  

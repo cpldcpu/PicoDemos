@@ -76,16 +76,33 @@ static void credits_init(void)
 static void tunnel(uint32_t t_ms)
 {
     uint16_t *fb = vga_hires_back_buffer();
-    int rot    = (int)(t_ms * 0.045f);     /* swirl — >=1 texel/frame so the
-                                            * point-sampled motion reads smooth */
+    int rot    = (int)(t_ms * 0.045f);     /* swirl — >=1 texel/frame: smooth */
     int scroll = (int)(t_ms * 0.090f);     /* fly forward */
     for (int y = 0; y < VGA_HIRES_H; y++) {
-        const uint16_t *lrow = &s_lut[(y >> 1) * LW];
+        int ly = y >> 1, fy = (y & 1) ? 128 : 0, ly1 = (ly + 1 < LH) ? ly + 1 : ly;
+        const uint16_t *r0 = &s_lut[ly * LW], *r1 = &s_lut[ly1 * LW];
         uint16_t *frow = fb + y * VGA_HIRES_W;
         for (int x = 0; x < VGA_HIRES_W; x++) {
-            uint16_t L = lrow[x >> 1];
-            int u = L >> 8, depth = L & 0xFF;
-            uint16_t texel = s_tex[((depth + scroll) & (TXW - 1)) * TXW + ((u + rot) & (TXW - 1))];
+            int lx = x >> 1, fx = (x & 1) ? 128 : 0, lx1 = (lx + 1 < LW) ? lx + 1 : lx;
+            uint16_t L00 = r0[lx], L10 = r0[lx1], L01 = r1[lx], L11 = r1[lx1];
+            int u00 = L00 >> 8, u10 = L10 >> 8, u01 = L01 >> 8, u11 = L11 >> 8;
+            int d00 = L00 & 255, d10 = L10 & 255, d01 = L01 & 255, d11 = L11 & 255;
+
+            /* bilinear-upscale the LUT (160x120 -> 320x240) so the tunnel is
+             * smooth, not blocky. depth is monotone -> always bilerp. */
+            int dt = d00 + (((d10 - d00) * fx) >> 8), db = d01 + (((d11 - d01) * fx) >> 8);
+            int depth = dt + (((db - dt) * fy) >> 8);
+            /* angle wraps at the atan2 seam; bilerp unless the 2x2 straddles it */
+            int umin = u00, umax = u00;
+            if (u10 < umin) umin = u10; if (u10 > umax) umax = u10;
+            if (u01 < umin) umin = u01; if (u01 > umax) umax = u01;
+            if (u11 < umin) umin = u11; if (u11 > umax) umax = u11;
+            int u;
+            if (umax - umin > 64) u = u00;             /* seam -> nearest */
+            else { int ut = u00 + (((u10-u00)*fx)>>8), ub = u01 + (((u11-u01)*fx)>>8);
+                   u = ut + (((ub - ut) * fy) >> 8); }
+
+            uint16_t texel = s_tex[((depth + scroll) & (TXW-1)) * TXW + ((u + rot) & (TXW-1))];
             int br = 255 - depth;                       /* far (centre) -> dark */
             int d = qs_dither(x, y);
             frow[x] = rgb565_pack((rgb565_r8(texel) * br >> 8) + d,
