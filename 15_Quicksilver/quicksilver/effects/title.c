@@ -40,6 +40,13 @@ static void title_frame(uint32_t t_ms, uint32_t t_global)
     float t = t_ms * 0.001f;
     int settle = t < 1.0f ? (int)((1.0f - t) * 36) : 0;
 
+    /* group banner above the wordmark — "<group> presents <production>" */
+    if (t > 0.3f) {
+        const char *g = "LATENT  PRESENTS";
+        int gw = qs_text_w(g, 1);
+        qs_text_chrome(g, (VGA_HIRES_W - gw) / 2, 56, 1, 40);
+    }
+
     /* specular glint sweeps left→right across the wordmark, repeating */
     int sweepx = (int)(fmodf(t * 220.0f, (float)(VGA_HIRES_W + 120))) - 60;
     qs_logo_blit(0, 92 + settle, sweepx);

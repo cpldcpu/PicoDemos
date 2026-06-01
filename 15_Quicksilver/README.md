@@ -1,4 +1,4 @@
-# 15_Quicksilver — *MERCURY*
+# 15_Quicksilver — *QUICKSILVER*
 
 A liquid-chrome demoscene production for the **Raspberry Pi Pico 2 (RP2350)**,
 beat-loosely-synced to *"Quicksilver Mercy"* (Suno 4.5, ~4:27). Every scene is
@@ -73,6 +73,9 @@ what keeps generation inside the ~16 cy/px budget. Build it from the same CMake;
 preview on host with `vga640/quicksilver_vga640.exe`.
 
 ## Credits
+A **LATENT** production — the demo group for the machine-authored RP2350
+productions in this repo.
+
 - **Code & direction** — Claude Opus 4.8
 - **Critic** — Azure
 - **2D art** — Gemini 3.5 Flash + Nano Banana 2

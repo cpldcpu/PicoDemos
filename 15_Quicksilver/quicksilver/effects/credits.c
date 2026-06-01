@@ -136,9 +136,10 @@ static void credits_frame(uint32_t t_ms, uint32_t t_global)
     }
     y += 70;                                        /* gap before the final card */
     if (y > -QS_LOGO_H && y < VGA_HIRES_H) qs_logo_blit(0, y, sweepx);
-    y += QS_LOGO_H + 16;
+    y += QS_LOGO_H + 14;
+    /* demoscene end card: production (wordmark above) + group + year */
     if (y > -16 && y < VGA_HIRES_H) {
-        const char *m = "MERCURY"; int w = qs_text_w(m, 2);
+        const char *m = "LATENT"; int w = qs_text_w(m, 2);   /* the group */
         qs_text_chrome(m, (VGA_HIRES_W - w) / 2, y, 2, 60);
     }
     y += 16 + 12;
