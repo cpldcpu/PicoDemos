@@ -56,6 +56,10 @@ ASSETS = [
     ("envmap",    "envmap.png",   "rgb565", 256, 256, False,  None),
     # Equirectangular dusk sky panorama (pow2 width = free yaw wrap).
     ("sky",       "sky_pano.png", "rgb565", 512, 128, False,  None),
+    # Chrome Wordmark Logo (320x80)
+    ("title_logo","title_logo.png", "rgb565", 320, 80, False,  None),
+    # Seamless tunnel wall (256x256)
+    ("tunnel",    "tunnel.png",   "rgb565", 256, 256, False,  None),
 ]
 
 

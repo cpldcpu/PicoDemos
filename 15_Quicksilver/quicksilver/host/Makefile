@@ -23,7 +23,7 @@ CFLAGS  := -std=gnu11 -O2 -g -Wall -Wno-unused-function \
            $(SDLCFLAGS) -DHOST_BUILD=1
 ASFLAGS := -I.. -I../assets/_packed
 
-ASM_OBJS = music_qoa.o assets.o logo.o
+ASM_OBJS = music_qoa.o assets.o
 
 SHARED_C = ../scene.c ../scene_scratch.c ../timeline.c \
            ../interp_emu.c \
@@ -78,8 +78,6 @@ transition.o: ../effects/transition.c
 music_qoa.o: ../music_qoa.S
 	$(CC) $(ASFLAGS) -c -o $@ $<
 assets.o: ../assets/_packed/assets.S
-	$(CC) $(ASFLAGS) -c -o $@ $<
-logo.o: ../assets/_packed/logo.S
 	$(CC) $(ASFLAGS) -c -o $@ $<
 
 clean:

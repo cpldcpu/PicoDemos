@@ -6,7 +6,6 @@
 #include "../rgb565.h"
 #include "../scene.h"
 #include "assets.h"
-#include "logo.h"
 #include "qs_text.h"
 #include "qs_fx.h"
 

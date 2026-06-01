@@ -54,11 +54,11 @@ static void credits_init(void)
     s_tex = (uint16_t *)sram;
     s_lut = (uint16_t *)(sram + TXW * TXW * 2);
 
-    /* downsample the chrome roto texture 256->128 into SRAM */
-    const uint16_t *src = (const uint16_t *)asset_roto_data;
+    /* downsample the seamless chrome tunnel-wall texture 256->128 into SRAM */
+    const uint16_t *src = (const uint16_t *)asset_tunnel_data;
     for (int y = 0; y < TXW; y++)
         for (int x = 0; x < TXW; x++)
-            s_tex[y * TXW + x] = src[(y * 2) * ASSET_ROTO_W + x * 2];
+            s_tex[y * TXW + x] = src[(y * 2) * ASSET_TUNNEL_W + x * 2];
 
     /* precompute the tunnel: per pixel, angle around the shaft + depth into it */
     for (int ly = 0; ly < LH; ly++) {

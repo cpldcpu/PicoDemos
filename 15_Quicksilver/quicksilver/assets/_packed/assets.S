@@ -13,11 +13,11 @@ asset_title_bg_end:
 asset_title_bg_pal:
     .incbin "title_bg.pal"
 
-    .global asset_envmap_data
-asset_envmap_data:
-    .incbin "envmap.bin"
-    .global asset_envmap_end
-asset_envmap_end:
+    .global asset_roto_data
+asset_roto_data:
+    .incbin "roto.bin"
+    .global asset_roto_end
+asset_roto_end:
 
     .global asset_ground_data
 asset_ground_data:
@@ -25,14 +25,26 @@ asset_ground_data:
     .global asset_ground_end
 asset_ground_end:
 
-    .global asset_roto_data
-asset_roto_data:
-    .incbin "roto.bin"
-    .global asset_roto_end
-asset_roto_end:
+    .global asset_envmap_data
+asset_envmap_data:
+    .incbin "envmap.bin"
+    .global asset_envmap_end
+asset_envmap_end:
 
     .global asset_sky_data
 asset_sky_data:
     .incbin "sky.bin"
     .global asset_sky_end
 asset_sky_end:
+
+    .global asset_title_logo_data
+asset_title_logo_data:
+    .incbin "title_logo.bin"
+    .global asset_title_logo_end
+asset_title_logo_end:
+
+    .global asset_tunnel_data
+asset_tunnel_data:
+    .incbin "tunnel.bin"
+    .global asset_tunnel_end
+asset_tunnel_end:

@@ -33,7 +33,6 @@ add_executable(quicksilver
     audio_qoa.c
     music_qoa.S
     assets/_packed/assets.S
-    assets/_packed/logo.S
 
     effects/rotozoom.c
     effects/mode7.c

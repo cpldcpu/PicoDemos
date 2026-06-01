@@ -10,9 +10,11 @@
 #include "../rgb565.h"
 #include "../font8x8.h"
 #include "assets.h"
-#include "logo.h"
 #include <math.h>
 #include <stdint.h>
+
+/* The chrome wordmark is now a delivered image (asset_title_logo, 320x80). */
+#define QS_LOGO_H ASSET_TITLE_LOGO_H
 
 static inline int qs_text_w(const char *s, int scale) { return (int)(8 * scale) * (int)__builtin_strlen(s); }
 
@@ -68,40 +70,24 @@ static inline void qs_text_chrome(const char *s, int x0, int y0, int scale, int 
     }
 }
 
-/* Blit the antialiased chrome wordmark stencil with its top-left at (x0,y0):
- * dark drop shadow then a bevelled silver gradient with a travelling specular
- * highlight at screen-x `sweepx`. Used by the title and the credits header. */
+/* Blit the delivered chrome wordmark image (asset_title_logo, 320x80) with its
+ * top-left at (x0,y0), black-keyed (the artwork is the wordmark on black, so we
+ * skip near-black pixels and let the chrome + amber rim glow composite over the
+ * backdrop). `sweepx` is unused now that the chrome is baked into the art. */
 static inline void qs_logo_blit(int x0, int y0, int sweepx)
 {
+    (void)sweepx;
     uint16_t *fb = vga_hires_back_buffer();
-    for (int ly = 0; ly < QS_LOGO_H; ly++) {        /* shadow */
-        int sy = y0 + ly + 3; if ((unsigned)sy >= VGA_HIRES_H) continue;
-        const uint8_t *mrow = &qs_logo_mask[ly * QS_LOGO_W];
-        uint16_t *frow = fb + sy * VGA_HIRES_W;
-        for (int lx = 0; lx < QS_LOGO_W - 3; lx++) {
-            int m = mrow[lx]; if (m < 8) continue;
-            int sx = x0 + lx + 3; if ((unsigned)sx >= VGA_HIRES_W) continue;
-            uint16_t o = frow[sx];
-            frow[sx] = rgb565_pack(rgb565_r8(o) * (255 - m) >> 8,
-                                   rgb565_g8(o) * (255 - m) >> 8,
-                                   rgb565_b8(o) * (255 - m) >> 8);
-        }
-    }
-    for (int ly = 0; ly < QS_LOGO_H; ly++) {        /* chrome bevel + glint */
+    const uint16_t *logo = (const uint16_t *)asset_title_logo_data;
+    for (int ly = 0; ly < ASSET_TITLE_LOGO_H; ly++) {
         int sy = y0 + ly; if ((unsigned)sy >= VGA_HIRES_H) continue;
-        int lum = 140 + (int)(105.0f * sinf((ly + 0.5f) / QS_LOGO_H * 3.14159f));
-        const uint8_t *mrow = &qs_logo_mask[ly * QS_LOGO_W];
+        const uint16_t *lrow = logo + ly * ASSET_TITLE_LOGO_W;
         uint16_t *frow = fb + sy * VGA_HIRES_W;
-        for (int lx = 0; lx < QS_LOGO_W; lx++) {
-            int m = mrow[lx]; if (m < 8) continue;
+        for (int lx = 0; lx < ASSET_TITLE_LOGO_W; lx++) {
             int sx = x0 + lx; if ((unsigned)sx >= VGA_HIRES_W) continue;
-            int d = sx - sweepx; if (d < 0) d = -d;
-            int L = lum + (d < 26 ? (26 - d) * 5 : 0);
-            int cr = L * 82 / 100, cg = L * 90 / 100, cb = L > 240 ? 255 : L + 15;
-            uint16_t o = frow[sx];
-            frow[sx] = rgb565_pack(rgb565_r8(o) + (((cr - rgb565_r8(o)) * m) >> 8),
-                                   rgb565_g8(o) + (((cg - rgb565_g8(o)) * m) >> 8),
-                                   rgb565_b8(o) + (((cb - rgb565_b8(o)) * m) >> 8));
+            uint16_t c = lrow[lx];
+            if (rgb565_r8(c) + rgb565_g8(c) + rgb565_b8(c) < 30) continue;  /* black key */
+            frow[sx] = c;
         }
     }
 }
