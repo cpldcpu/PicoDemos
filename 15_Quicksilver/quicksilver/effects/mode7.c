@@ -36,13 +36,6 @@ static volatile float g_cosH, g_sinH, g_camX, g_camY;
 static volatile int   g_scroll;
 static volatile int   g_white;          /* chrome-glint transition amount */
 
-static inline uint16_t glint(uint16_t c, int gw) {
-    if (!gw) return c;
-    return rgb565_pack(rgb565_r8(c) + (((232 - rgb565_r8(c)) * gw) >> 8),
-                       rgb565_g8(c) + (((240 - rgb565_g8(c)) * gw) >> 8),
-                       rgb565_b8(c) + (((255 - rgb565_b8(c)) * gw) >> 8));
-}
-
 /* one-time config on the scanout core: interp0 affine (POP) + interp1 CLAMP. */
 static void m7_setup(void)
 {
@@ -57,12 +50,16 @@ static void m7_setup(void)
 
 static void QS_FAST(m7_scan)(uint16_t *dst, int y)
 {
-    int gw = g_white;
+    if (g_white > 200) {                           /* cheap chrome-white flash */
+        uint16_t w = rgb565_pack(232, 240, 255);
+        for (int x = 0; x < VGA_RACE_W; x++) dst[x] = w;
+        return;
+    }
     if (y < HZ) {                                  /* --- sky panorama --- */
         int srow = y * 100 / HZ; if (srow > ASSET_SKY_H - 1) srow = ASSET_SKY_H - 1;
         const uint16_t *src = s_sky + srow * ASSET_SKY_W;
         int sc = g_scroll;
-        for (int x = 0; x < VGA_RACE_W; x++) dst[x] = glint(src[(sc + x) & (ASSET_SKY_W - 1)], gw);
+        for (int x = 0; x < VGA_RACE_W; x++) dst[x] = src[(sc + x) & (ASSET_SKY_W - 1)];
         return;
     }
     /* --- ground: interpolator affine (interp0) + CLAMP haze (interp1) --- */
@@ -89,7 +86,7 @@ static void QS_FAST(m7_scan)(uint16_t *dst, int y)
             int b = rgb565_b8(cc) + (((HAZE_B - rgb565_b8(cc)) * haze) >> 8);
             cc = rgb565_pack(r, g, b);
         }
-        dst[x] = glint(cc, gw);
+        dst[x] = cc;
     }
 }
 

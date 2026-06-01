@@ -39,6 +39,14 @@ static void roto_setup(void) { qs_texmap_setup(interp0, 1, 8, 8); }  /* once, on
 
 static void QS_FAST(roto_scan)(uint16_t *dst, int y)
 {
+    /* Cheap chrome-white flash near a boundary — a fill, NOT a per-pixel lerp
+     * (the lerp blew the 640-wide per-line budget and caused underrun exactly
+     * at scene start). */
+    if (g_white > 200) {
+        uint16_t w = rgb565_pack(232, 240, 255);
+        for (int x = 0; x < VGA_RACE_W; x++) dst[x] = w;
+        return;
+    }
     float fl = g_flex[y];
     float ca = g_ca0 * fl, sa = g_sa0 * fl;
     float dys = (float)(y - VGA_RACE_H / 2);
@@ -49,16 +57,8 @@ static void QS_FAST(roto_scan)(uint16_t *dst, int y)
     qs_texmap_step(interp0, (uint32_t)(int32_t)(ca * 65536.0f),
                             (uint32_t)(int32_t)(sa * 65536.0f));
     const uint8_t *base = (const uint8_t *)s_tex;
-    int gw = g_white;
-    for (int x = 0; x < VGA_RACE_W; x++) {
-        uint16_t c = qs_tap_point(interp0, base);   /* POP: offset + auto-advance */
-        if (gw) {  /* chrome-white glint at scene boundaries */
-            c = rgb565_pack(rgb565_r8(c) + (((232 - rgb565_r8(c)) * gw) >> 8),
-                            rgb565_g8(c) + (((240 - rgb565_g8(c)) * gw) >> 8),
-                            rgb565_b8(c) + (((255 - rgb565_b8(c)) * gw) >> 8));
-        }
-        dst[x] = c;
-    }
+    for (int x = 0; x < VGA_RACE_W; x++)
+        dst[x] = qs_tap_point(interp0, base);   /* POP: offset + auto-advance */
 }
 
 static void roto_init(void)

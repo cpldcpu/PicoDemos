@@ -84,10 +84,10 @@ static void fill_tri(const uint8_t *env, int texw,
         interp_set_accumulator(interp0, 1, (uint32_t)(int32_t)v);
         qs_texmap_step(interp0, (uint32_t)(int32_t)du, (uint32_t)(int32_t)dv);
 
-        (void)texw;
+        uint32_t bytemask = (uint32_t)(texw * texw * 2 - 1);   /* square matcap */
         uint16_t *row = fb + y * VGA_HIRES_W;
         for (int x = cxl; x < cxr; x++)
-            row[x] = qs_tap_point(interp0, env);   /* POP self-steps; SRAM matcap */
+            row[x] = qs_tap_bilerp(interp0, env, texw, bytemask);  /* SRAM bilinear */
     }
 }
 
