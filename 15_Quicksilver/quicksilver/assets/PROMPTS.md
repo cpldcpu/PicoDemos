@@ -132,9 +132,16 @@ line up with the action**. The fix is a hard reset of the brief:
    glass intro → build → bright drop → soaring second lead → filtered breakdown
    → euphoric key-up finale → reflective fade.
 
+5. **GRAVITAS.** The synth version was *better but too light* — it needs weight
+   and grandeur. Fuse the demoscene leads with **cinematic orchestral muscle**:
+   a low choir, brass swells, deep sub-bass, timpani/taiko booms and orchestral
+   hits, and a **noble minor / Dorian** tonality (not bright major). Slow,
+   monumental chords sit *under* the fast arps so the energy rides on a heavy
+   foundation. Slightly slower tempo so every hit lands hard.
+
 The demo is **re-timed to the delivered track** (scene cuts snap to its drops),
 so Suno's exact lengths don't have to match — but giving it clear sections makes
-that re-time clean. Target ~**3:00**, **~135 BPM**, major key.
+that re-time clean. Target ~**3:00**, **~128 BPM**, **noble minor/Dorian** key.
 
 ### Demo arc to score (what each scene wants from the music)
 | scene | musical job |
@@ -148,11 +155,13 @@ that re-time clean. Target ~**3:00**, **~135 BPM**, major key.
 | **credits tunnel** | OUTRO: resolve, the theme one last time on a lone glassy lead, slow filter close, reflective fade to silence |
 
 ### Style Prompt (paste into Suno's *Style* field)
-> Melodic demoscene synth, instrumental, ~135 BPM, major key. Bright glassy
-> FM-bell and supersaw leads with a strong recurring melody, fast arpeggios,
-> gated-reverb drums, deep analog bass, lush chrome pads. Huge dynamics: airy
-> intro, uplifting drop, soaring lead, filtered breakdown, euphoric key-change
-> finale. Second Reality / Purple Motion / Skaven energy. No vocals.
+> Epic cinematic demoscene synth, instrumental, ~128 BPM, noble minor/Dorian
+> key. Glassy FM-bell and supersaw leads with a strong recurring melody and
+> fast arpeggios, riding a HEAVY orchestral foundation: low choir, brass swells,
+> deep sub-bass, timpani and taiko booms, orchestral hits. Monumental and
+> reflective with huge dynamics — solemn intro, weighty drop, soaring lead,
+> filtered breakdown, euphoric key-change finale. Grand, with gravitas. Second
+> Reality / Purple Motion grandeur meets hybrid film score. No vocals.
 
 ### Structure Prompt (paste into the *Lyrics* field — tags only, NO words)
 *(Pure metatags so the track stays instrumental; the descriptions steer the
@@ -161,21 +170,21 @@ arrangement and the recurring-theme idea. Lead with `[Instrumental]`.)*
 ```text
 [Instrumental]
 
-[Intro] glassy bell arpeggio, airy pads, one soft statement of the main theme, no drums, rising anticipation
+[Intro] solemn and vast, distant low choir and a slow noble chord, one soft statement of the main theme on a lone glassy bell, deep sub drone, no drums, reverent anticipation
 
-[Build] ticking hats, rising arpeggio, filter opening, snare roll into the drop
+[Build] timpani roll and rising arpeggio over the choir, brass swell, filter opening, a heavy snare build into the drop
 
-[Drop — Main Theme] four-on-the-floor kick, punchy bass, bright supersaw lead plays the main theme in full, uplifting and catchy
+[Drop — Main Theme] thunderous four-on-the-floor kick and taiko booms, deep sub-bass, the main theme in full on a bright supersaw doubled by brass, monumental and driving
 
-[Lead — Cruising] a new soaring counter-melody over the driving groove, wide and a little melancholic
+[Lead — Cruising] a soaring minor-key counter-melody over the heavy groove, wide strings underneath, noble and a little melancholic
 
-[Hook] the catchiest synth hook, call-and-response between bell and saw leads, layered harmonies
+[Hook] the catchiest lead, call-and-response between bell and saw, stacked over orchestral hits and choir stabs
 
-[Breakdown] strip back to filtered pad and sub bass, quiet reprise of the intro theme, long reverb tails, tension
+[Breakdown] strip to filtered pad, sub-bass and lone choir, a quiet reprise of the main theme, long reverb tails, gathering tension
 
-[Drop 2 — Euphoric] double-time energy, key change UP, the main theme returns triumphant and stacked, arpeggio fireworks, biggest moment
+[Drop 2 — Euphoric] double-time, KEY CHANGE UP, the theme returns triumphant on stacked supersaw + full brass + choir, timpani and arpeggio fireworks, the biggest, weightiest moment
 
-[Outro] resolve, the main theme once more on a lone glassy lead, slow filter close, reflective fade to silence
+[Outro] resolve, the main theme once more on a lone glassy lead over a slow choir chord, deep sub, slow filter close, reflective fade to silence
 ```
 
 *(If Suno adds any vocal: regenerate with `[Instrumental]` reinforced, or render
