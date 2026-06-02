@@ -1,10 +1,12 @@
 /* timeline.c — QUICKSILVER storyboard + per-boundary transition styles.
  *
- * Boundaries snapped to "Quicksilver Through Hands" sections (analyze_music.py,
- * 129 BPM; structural edges ~19 / 38 / 68.4 / 118.9 / 153 / 189.4 s; ends 217.2 s,
- * with the biggest hit at 208 landing on the final card). The chrome scene
- * appears twice but each shows a DISJOINT set of objects (0..2 then 3..5) so no
- * 3D object ever repeats. Each boundary uses its own transition style.
+ * Boundaries snapped to "Quicksilver Reflections" sections (analyze_music.py,
+ * 129 BPM, 174.9 s). Key moments the cuts ride: first onset @20.5, the drop
+ * cluster @55-62, and the BIGGEST hit @123.69 — which we land as the
+ * liquid->chrome DROP so the second chrome burst slams in on the peak. The
+ * outro's last section edge is only ~4 s from the end, so credits open early
+ * (@149.4) to give the scroller + end card a full finale. The chrome scene
+ * appears twice with DISJOINT objects (0..2 then 3..5) so none repeats.
  */
 
 #include "scene.h"
@@ -18,13 +20,13 @@ extern const effect_t fx_liquid;
 extern const effect_t fx_credits;
 
 const timeline_entry_t timeline[] = {
-    {      0,  19000, &fx_title    },   /* intro: brand reveal -> wordmark (1st onset @19) */
-    {  19000,  38000, &fx_rotozoom },   /* build section (seg @37.99)         */
-    {  38000,  68360, &fx_mode7    },   /* drop section: mercury plain (seg @68.36) */
-    {  68360, 118910, &fx_chrome   },   /* chrome objects 0,1,2 (seg @118.91) */
-    { 118910, 153070, &fx_liquid   },   /* breakdown: liquid metal (seg @153.07) */
-    { 153070, 189380, &fx_chrome   },   /* DROP: chrome objects 3,4,5 (seg @189.38) */
-    { 189380, 217240, &fx_credits  },   /* outro: credits, hit @208 on the card; ends w/ music */
+    {      0,  20500, &fx_title    },   /* intro: brand reveal -> wordmark (1st onset @20.5) */
+    {  20500,  54870, &fx_rotozoom },   /* build: rubber rotozoomer (drop @55 ends it) */
+    {  54870,  86360, &fx_mode7    },   /* drop section: mercury plain (seg @86.36) */
+    {  86360, 108510, &fx_chrome   },   /* chrome objects 0,1,2 (seg @108.51) */
+    { 108510, 123690, &fx_liquid   },   /* breakdown: liquid metal -> the BIG hit @123.69 */
+    { 123690, 149420, &fx_chrome   },   /* DROP on the peak: chrome objects 3,4,5 (seg @149.42) */
+    { 149420, 174920, &fx_credits  },   /* outro: credits + end card; ends with the music */
 };
 
 /* transition used when LEAVING each entry (themed to the pair it joins) */

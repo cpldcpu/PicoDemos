@@ -144,8 +144,10 @@ static void credits_frame(uint32_t t_ms, uint32_t t_global)
     tunnel(t_ms);
     float t = t_ms * 0.001f;
 
-    /* PHASE 1 — the credit lines scroll up and clear the screen.            */
-    int scroll = (int)(t_ms * 0.052f);
+    /* PHASE 1 — the credit lines scroll up and clear the screen. Brisker
+     * than before: this finale is ~25.5 s (shorter track), so the scroller
+     * clears by ~11 s to leave room for a two-stage end card + fade.        */
+    int scroll = (int)(t_ms * 0.070f);
     int y = VGA_HIRES_H + 20 - scroll;
     for (int i = 0; lines[i]; i++) {
         const char *s = lines[i];
@@ -161,7 +163,7 @@ static void credits_frame(uint32_t t_ms, uint32_t t_global)
     /* PHASE 2 — end card, two spaced stages that hand off (never crowded):
      *   stage A (14..20s): QUICKSILVER wordmark + tagline, vertically centred.
      *   stage B (19.5s..) : LATENT group sting + year, vertically centred. */
-    int wa = credits_ramp(t, 14.0f, 1.0f, 20.0f, 1.0f);
+    int wa = credits_ramp(t, 11.0f, 1.0f, 15.5f, 1.0f);
     if (wa > 0) {
         int wy = 66;
         qs_logo_blit_a(0, wy, wa);
@@ -169,9 +171,10 @@ static void credits_frame(uint32_t t_ms, uint32_t t_global)
         int sw = qs_text_w(sub, 1);
         qs_text_chrome_a(sub, (VGA_HIRES_W - sw) / 2, wy + QS_LOGO_H + 12, 1, 50, wa);
     }
-    /* brief dip to the tunnel (~0.4s), then the group sting rises — the two
-     * logos hand off cleanly instead of colliding mid-screen. */
-    int ga = credits_ramp(t, 20.4f, 1.0f, 0.0f, 0.0f);   /* held; global fade ends it */
+    /* brief dip to the tunnel (~0.5s), then the group sting rises on the
+     * outro onset (~165.5 s) — the two logos hand off cleanly instead of
+     * colliding mid-screen. The global fade (last 5 s) ends it. */
+    int ga = credits_ramp(t, 16.0f, 1.0f, 0.0f, 0.0f);
     if (ga > 0) {
         int gy = 92;
         qs_latent_blit_a(gy, ga);

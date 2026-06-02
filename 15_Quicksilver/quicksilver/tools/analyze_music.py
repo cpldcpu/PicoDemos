@@ -138,14 +138,14 @@ def main():
     # proposed boundaries so the diff is easy to see. Keep these in sync with
     # timeline.c when scenes are re-cut.
     current = [
-        (  0.0,  "title"),
-        ( 19.0,  "rotozoom"),
-        ( 38.0,  "mode7"),
-        ( 68.4,  "chrome A (obj 0-2)"),
-        (118.9,  "liquid"),
-        (153.0,  "chrome B (obj 3-5)"),
-        (189.4,  "credits"),
-        (217.24, "<end>"),
+        (  0.0,   "title"),
+        ( 20.5,   "rotozoom"),
+        ( 54.87,  "mode7"),
+        ( 86.36,  "chrome A (obj 0-2)"),
+        (108.51,  "liquid"),
+        (123.69,  "chrome B (obj 3-5)"),
+        (149.42,  "credits"),
+        (174.92,  "<end>"),
     ]
     print(f"\n--- current timeline vs nearest segment boundary ---")
     seg_starts = np.array([s for s, _ in segments])
