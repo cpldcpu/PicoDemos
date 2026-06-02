@@ -116,56 +116,71 @@ mark — NOT another chrome wordmark like QUICKSILVER (it must read as a differe
 
 ---
 
-### The problem with the first track
-It was *too smooth* — a pleasant chrome-synthwave loop with no dynamics and no
-climax. A demo soundtrack needs **contrast**: quiet intro → build → a hard DROP
-on the centrepiece → breakdown → a bigger second drop → resolve. It should be
-**mostly instrumental** (vocals fight the visuals), with only a few sung words
-landing on the big moments. Below is a prompt and a sparse lyric authored to the
-demo's actual arc.
+### What the past tracks got wrong
+Three vocal-led attempts in a row were **raw, monotone, and the sections didn't
+line up with the action**. The fix is a hard reset of the brief:
 
-### Demo arc to score (timestamps the music should hit)
-| time | scene | the music should… |
-|---|---|---|
-| 0:00–0:06 | title | quiet, glassy, a single chrome shimmer |
-| 0:06–0:28 | rotozoomer | start the pulse; rising arpeggio build |
-| 0:28–0:47 | mercury plain | wide, cruising, melodic — tension building |
-| **0:47–1:32** | **chrome objects** | **THE DROP** — gated drums + screaming metallic lead |
-| 1:32–1:56 | liquid metal | breakdown: strip to bass + filtered pads |
-| **1:56–2:55** | **chrome reprise** | **bigger second drop**, double-time, euphoric |
-| 2:55–end | credits tunnel | resolve, reflective, fade out |
+1. **Fully instrumental.** Sung words flatten into a loop and fight the visuals.
+   A demo wants a *tune you remember*, carried by leads, not a voice.
+2. **A real MELODY, with a theme that recurs.** State a memorable lead motif in
+   the intro, pay it off at the drops, bring it back transformed in the finale.
+   This is what makes the track feel composed instead of "raw".
+3. **Demoscene craft, not generic synthwave.** Fast major-key arpeggios, glassy
+   FM-bell and supersaw leads, call-and-response between two leads, a key change
+   into the final drop — the Future Crew / Purple Motion / Skaven lineage.
+4. **Hard sectional contrast** so the cuts can land on real boundaries: quiet
+   glass intro → build → bright drop → soaring second lead → filtered breakdown
+   → euphoric key-up finale → reflective fade.
 
-### Style Prompt (Primary, ~200 chars)
-> **Style:**  
-> Cinematic chrome synth-metal, ~128 BPM, DYNAMIC with hard drops. Glassy intro, rising arpeggio build, then a euphoric DROP: gated reverb drums, distorted metallic lead, deep analog bass. Breakdown, bigger second drop, reflective fade. Mostly instrumental, huge contrast.
+The demo is **re-timed to the delivered track** (scene cuts snap to its drops),
+so Suno's exact lengths don't have to match — but giving it clear sections makes
+that re-time clean. Target ~**3:00**, **~135 BPM**, major key.
 
-*(If Suno still flattens it: add `[Build]`, `[Drop]`, `[Breakdown]` as their own
-generations, or use the "intensity"/exclude-style controls to force the dynamics.)*
+### Demo arc to score (what each scene wants from the music)
+| scene | musical job |
+|---|---|
+| **title** (brand reveal) | glassy intro: airy pad + a single wistful statement of the MAIN THEME on a bell lead; no drums; anticipation |
+| **rotozoomer** | DROP 1: four-on-the-floor kick, punchy bass, the main theme in full on a bright supersaw — uplifting demoscene energy |
+| **mercury plain** | a new SOARING counter-melody over the driving groove; wide, cruising, a touch of melancholy |
+| **chrome objects (A)** | the HOOK — the catchiest lead, call-and-response between bell and saw, layered harmonies |
+| **liquid metal** | BREAKDOWN: strip to filtered pad + sub bass, a quiet reprise of the intro theme, reverb tails, tension |
+| **chrome reprise (B)** | DROP 2 / PEAK: double-time, KEY CHANGE UP, the theme returns triumphant and stacked, arpeggio fireworks |
+| **credits tunnel** | OUTRO: resolve, the theme one last time on a lone glassy lead, slow filter close, reflective fade to silence |
 
-### Lyrics Field — sparse, only on the big moments
-*(Brackets are structure tags; keep most sections instrumental. The few sung
-words land on the title, the two drops, and the outro.)*
+### Style Prompt (paste into Suno's *Style* field)
+> Melodic demoscene synth, instrumental, ~135 BPM, major key. Bright glassy
+> FM-bell and supersaw leads with a strong recurring melody, fast arpeggios,
+> gated-reverb drums, deep analog bass, lush chrome pads. Huge dynamics: airy
+> intro, uplifting drop, soaring lead, filtered breakdown, euphoric key-change
+> finale. Second Reality / Purple Motion / Skaven energy. No vocals.
+
+### Structure Prompt (paste into the *Lyrics* field — tags only, NO words)
+*(Pure metatags so the track stays instrumental; the descriptions steer the
+arrangement and the recurring-theme idea. Lead with `[Instrumental]`.)*
 
 ```text
-[Intro – ambient pads, no drums]
-(whispered) quicksilver
+[Instrumental]
 
-[Build – arpeggio rising, drums enter]
+[Intro] glassy bell arpeggio, airy pads, one soft statement of the main theme, no drums, rising anticipation
 
-[Drop – full energy]
-Liquid chrome
-Liquid chrome
+[Build] ticking hats, rising arpeggio, filter opening, snare roll into the drop
 
-[Breakdown – bass and filtered pads only]
-(whispered) running through my hands
+[Drop — Main Theme] four-on-the-floor kick, punchy bass, bright supersaw lead plays the main theme in full, uplifting and catchy
 
-[Drop 2 – bigger, double-time]
-Quicksilver
-Shine
+[Lead — Cruising] a new soaring counter-melody over the driving groove, wide and a little melancholic
 
-[Outro – fade to silence]
-(whispered) reflecting me
+[Hook] the catchiest synth hook, call-and-response between bell and saw leads, layered harmonies
+
+[Breakdown] strip back to filtered pad and sub bass, quiet reprise of the intro theme, long reverb tails, tension
+
+[Drop 2 — Euphoric] double-time energy, key change UP, the main theme returns triumphant and stacked, arpeggio fireworks, biggest moment
+
+[Outro] resolve, the main theme once more on a lone glassy lead, slow filter close, reflective fade to silence
 ```
+
+*(If Suno adds any vocal: regenerate with `[Instrumental]` reinforced, or render
+the `[Drop]` / `[Breakdown]` sections separately and stitch. The "exclude styles"
+box can also be set to `vocals, lyrics, singing`.)*
 
 ### Music Conversion
 Convert the output audio using:
