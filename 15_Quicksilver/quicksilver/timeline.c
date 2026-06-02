@@ -1,12 +1,16 @@
 /* timeline.c — QUICKSILVER storyboard + per-boundary transition styles.
  *
- * Boundaries snapped to "Quicksilver Reflections" sections (analyze_music.py,
- * 129 BPM, 174.9 s). Key moments the cuts ride: first onset @20.5, the drop
- * cluster @55-62, and the BIGGEST hit @123.69 — which we land as the
- * liquid->chrome DROP so the second chrome burst slams in on the peak. The
- * outro's last section edge is only ~4 s from the end, so credits open early
- * (@149.4) to give the scroller + end card a full finale. The chrome scene
- * appears twice with DISJOINT objects (0..2 then 3..5) so none repeats.
+ * Boundaries ride the PRODUCER's own section markers (the .srt/.lrc in
+ * assets/ for "Quicksilver Reflections", 129 BPM, 174.9 s), cross-checked
+ * against analyze_music.py:
+ *   10.3 intro (whispered "quicksilver" @10.6)  -> title holds here
+ *   25.5 DROP 1 "full energy" / "liquid chrome" -> SLAM into the rotozoomer
+ *   47.2 breakdown "running through my hands"   -> (within rotozoom)
+ *   54.9 DROP 2 "bigger, double-time"           -> mercury plain enters
+ *   62.7 "shine" (long main section)            -> chrome + liquid ride it
+ *   123.7 biggest hit                           -> liquid->chrome DROP on the peak
+ *   148.4 "shine" reprise (outro)               -> credits finale
+ * The chrome scene appears twice with DISJOINT objects (0..2 then 3..5).
  */
 
 #include "scene.h"
@@ -20,13 +24,13 @@ extern const effect_t fx_liquid;
 extern const effect_t fx_credits;
 
 const timeline_entry_t timeline[] = {
-    {      0,  20500, &fx_title    },   /* intro: brand reveal -> wordmark (1st onset @20.5) */
-    {  20500,  54870, &fx_rotozoom },   /* build: rubber rotozoomer (drop @55 ends it) */
-    {  54870,  86360, &fx_mode7    },   /* drop section: mercury plain (seg @86.36) */
-    {  86360, 108510, &fx_chrome   },   /* chrome objects 0,1,2 (seg @108.51) */
-    { 108510, 123690, &fx_liquid   },   /* breakdown: liquid metal -> the BIG hit @123.69 */
-    { 123690, 149420, &fx_chrome   },   /* DROP on the peak: chrome objects 3,4,5 (seg @149.42) */
-    { 149420, 174920, &fx_credits  },   /* outro: credits + end card; ends with the music */
+    {      0,  25530, &fx_title    },   /* intro: brand -> wordmark, holds to DROP 1 @25.53 */
+    {  25530,  54940, &fx_rotozoom },   /* DROP 1 "liquid chrome" + breakdown; rotozoomer rides it */
+    {  54940,  86360, &fx_mode7    },   /* DROP 2 double-time: mercury plain */
+    {  86360, 108510, &fx_chrome   },   /* "shine": chrome objects 0,1,2 */
+    { 108510, 123690, &fx_liquid   },   /* "shine": liquid metal -> the BIG hit @123.69 */
+    { 123690, 148400, &fx_chrome   },   /* DROP on the peak: chrome objects 3,4,5 */
+    { 148400, 174920, &fx_credits  },   /* outro "shine" reprise: credits + end card; ends w/ music */
 };
 
 /* transition used when LEAVING each entry (themed to the pair it joins) */

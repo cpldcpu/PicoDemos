@@ -137,14 +137,16 @@ def main():
     # Quote the current QUICKSILVER timeline (see ../timeline.c) next to the
     # proposed boundaries so the diff is easy to see. Keep these in sync with
     # timeline.c when scenes are re-cut.
+    # NOTE: cuts ride the producer's SRT/LRC section markers (see timeline.c),
+    # cross-checked against the segments below.
     current = [
         (  0.0,   "title"),
-        ( 20.5,   "rotozoom"),
-        ( 54.87,  "mode7"),
+        ( 25.53,  "rotozoom (DROP 1)"),
+        ( 54.94,  "mode7 (DROP 2)"),
         ( 86.36,  "chrome A (obj 0-2)"),
         (108.51,  "liquid"),
-        (123.69,  "chrome B (obj 3-5)"),
-        (149.42,  "credits"),
+        (123.69,  "chrome B (obj 3-5, peak)"),
+        (148.40,  "credits (shine reprise)"),
         (174.92,  "<end>"),
     ]
     print(f"\n--- current timeline vs nearest segment boundary ---")
