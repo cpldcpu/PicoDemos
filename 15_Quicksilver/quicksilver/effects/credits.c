@@ -123,18 +123,30 @@ static void tunnel(uint32_t t_ms)
     }
 }
 
+/* fade ramp: 0 before `in`, 0..256 over `in..in+rise`, holds, then 256..0
+ * over `out-fall..out` (out<=0 = never fade out). t in seconds. */
+static int credits_ramp(float t, float in, float rise, float out, float fall)
+{
+    if (t < in) return 0;
+    int a = 256;
+    if (t < in + rise) a = (int)((t - in) / rise * 256.0f);
+    if (out > 0.0f && t > out - fall) {
+        int b = (int)((out - t) / fall * 256.0f);
+        if (b < a) a = b;
+    }
+    if (a < 0) a = 0;
+    if (a > 256) a = 256;
+    return a;
+}
+
 static void credits_frame(uint32_t t_ms, uint32_t t_global)
 {
     tunnel(t_ms);
+    float t = t_ms * 0.001f;
 
-    /* The credit lines scroll up and off; after a GAP the final card
-     * (wordmark + MERCURY / 2026) slides to centre and HOLDS there — a clean,
-     * spaced end card rather than a frozen mid-scroll. */
-    int scroll = (int)(t_ms * 0.013f);
-    if (scroll > 775) scroll = 775;                /* clamp: hold the final card centred */
-    int sweepx = (int)(fmodf(t_ms * 0.20f, (float)(VGA_HIRES_W + 120))) - 60;
+    /* PHASE 1 — the credit lines scroll up and clear the screen.            */
+    int scroll = (int)(t_ms * 0.052f);
     int y = VGA_HIRES_H + 20 - scroll;
-
     for (int i = 0; lines[i]; i++) {
         const char *s = lines[i];
         if (*s) {
@@ -145,15 +157,26 @@ static void credits_frame(uint32_t t_ms, uint32_t t_global)
             y += 11;
         }
     }
-    y += 70;                                        /* gap before the final card */
-    if (y > -QS_LOGO_H && y < VGA_HIRES_H) qs_logo_blit(0, y, sweepx);
-    y += QS_LOGO_H + 12;
-    /* demoscene end card: production (wordmark above) + group logo + year */
-    if (y > -ASSET_LATENT_LOGO_H && y < VGA_HIRES_H) qs_latent_blit(y);
-    y += ASSET_LATENT_LOGO_H + 8;
-    if (y > -10 && y < VGA_HIRES_H) {
+
+    /* PHASE 2 — end card, two spaced stages that hand off (never crowded):
+     *   stage A (14..20s): QUICKSILVER wordmark + tagline, vertically centred.
+     *   stage B (19.5s..) : LATENT group sting + year, vertically centred. */
+    int wa = credits_ramp(t, 14.0f, 1.0f, 20.0f, 1.0f);
+    if (wa > 0) {
+        int wy = 66;
+        qs_logo_blit_a(0, wy, wa);
+        const char *sub = "RACING THE RP2350 INTERPOLATOR";
+        int sw = qs_text_w(sub, 1);
+        qs_text_chrome_a(sub, (VGA_HIRES_W - sw) / 2, wy + QS_LOGO_H + 12, 1, 50, wa);
+    }
+    /* brief dip to the tunnel (~0.4s), then the group sting rises — the two
+     * logos hand off cleanly instead of colliding mid-screen. */
+    int ga = credits_ramp(t, 20.4f, 1.0f, 0.0f, 0.0f);   /* held; global fade ends it */
+    if (ga > 0) {
+        int gy = 92;
+        qs_latent_blit_a(gy, ga);
         const char *m = "2026"; int w = qs_text_w(m, 1);
-        qs_text_chrome(m, (VGA_HIRES_W - w) / 2, y, 1, 50);
+        qs_text_chrome_a(m, (VGA_HIRES_W - w) / 2, gy + ASSET_LATENT_LOGO_H + 16, 1, 40, ga);
     }
 
     /* fade to black over the last 5 s — a clear ending */

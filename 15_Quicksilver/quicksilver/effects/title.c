@@ -32,31 +32,55 @@ static void title_blit_bg(uint32_t t_ms)
     }
 }
 
+/* fade ramp: 0 before `in`, ramps 0..256 over `in`..`in+rise`, holds 256,
+ * then ramps 256..0 over `out-fall`..`out` (out<=0 means never fade out). */
+static int ramp(float t, float in, float rise, float out, float fall)
+{
+    if (t < in) return 0;
+    int a = 256;
+    if (t < in + rise) a = (int)((t - in) / rise * 256.0f);
+    if (out > 0.0f && t > out - fall) {
+        int b = (int)((out - t) / fall * 256.0f);
+        if (b < a) a = b;
+    }
+    if (a < 0) a = 0;
+    if (a > 256) a = 256;
+    return a;
+}
+
 static void title_frame(uint32_t t_ms, uint32_t t_global)
 {
     (void)t_global;
     title_blit_bg(t_ms);
 
     float t = t_ms * 0.001f;
-    int settle = t < 1.0f ? (int)((1.0f - t) * 36) : 0;
 
-    /* group logo above the wordmark — LATENT presents QUICKSILVER */
-    if (t > 0.3f) {
-        qs_latent_blit(14);
+    /* Stage 1 (0..7s): the LATENT group brand reveals, centred and alone.
+     * Stage 2 (6.5s..end): it cross-fades into the QUICKSILVER wordmark +
+     * tagline. The two logos never share the screen crowded — they hand off. */
+
+    /* --- stage 1: LATENT brand, vertically centred --- */
+    int la = ramp(t, 0.3f, 0.8f, 7.0f, 1.0f);     /* fade in, hold, fade out  */
+    if (la > 0) {
+        int ly = 86;                               /* logo (48h) + gap + text  */
+        qs_latent_blit_a(ly, la);
         const char *g = "PRESENTS";
         int gw = qs_text_w(g, 1);
-        qs_text_chrome(g, (VGA_HIRES_W - gw) / 2, 66, 1, 35);
+        qs_text_chrome_a(g, (VGA_HIRES_W - gw) / 2, ly + ASSET_LATENT_LOGO_H + 14, 1, 35, la);
     }
 
-    /* specular glint sweeps left→right across the wordmark, repeating */
-    int sweepx = (int)(fmodf(t * 220.0f, (float)(VGA_HIRES_W + 120))) - 60;
-    qs_logo_blit(0, 92 + settle, sweepx);
-
-    /* tagline sits below the wordmark */
-    if (t > 1.2f) {
+    /* --- stage 2: QUICKSILVER wordmark + tagline, vertically centred --- */
+    int wa = ramp(t, 6.5f, 1.0f, 0.0f, 0.0f);     /* fade in, then hold       */
+    if (wa > 0) {
+        int settle = t < 7.5f ? (int)((7.5f - t) * 24) : 0;
+        int wy = 72;
+        qs_logo_blit_a(0, wy + settle, wa);
         const char *sub = "RP2350 INTERPOLATOR";
         int sw = qs_text_w(sub, 1);
-        qs_text_chrome(sub, (VGA_HIRES_W - sw) / 2, 92 + QS_LOGO_H + 6, 1, 50);
+        if (t > 7.6f) {
+            int sa = ramp(t, 7.6f, 0.8f, 0.0f, 0.0f);
+            qs_text_chrome_a(sub, (VGA_HIRES_W - sw) / 2, wy + QS_LOGO_H + 10, 1, 50, sa);
+        }
     }
 }
 

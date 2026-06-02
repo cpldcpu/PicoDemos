@@ -1,9 +1,10 @@
 /* timeline.c — QUICKSILVER storyboard + per-boundary transition styles.
  *
- * Boundaries snapped to "Quicksilver Mercy" sections (analyze_music.py, 123 BPM;
- * edges ~5.8 / 45 / 91.5 / 114.7 s; ends 267 s). The chrome scene appears twice
- * but each shows a DISJOINT set of objects (0..2 then 3..5) so no 3D object ever
- * repeats. Each boundary uses its own transition style (see effects/transition.h).
+ * Boundaries snapped to "Quicksilver Through Hands" sections (analyze_music.py,
+ * 129 BPM; structural edges ~19 / 38 / 68.4 / 118.9 / 153 / 189.4 s; ends 217.2 s,
+ * with the biggest hit at 208 landing on the final card). The chrome scene
+ * appears twice but each shows a DISJOINT set of objects (0..2 then 3..5) so no
+ * 3D object ever repeats. Each boundary uses its own transition style.
  */
 
 #include "scene.h"
@@ -17,13 +18,13 @@ extern const effect_t fx_liquid;
 extern const effect_t fx_credits;
 
 const timeline_entry_t timeline[] = {
-    {      0,   6000, &fx_title    },   /* intro: wordmark                    */
-    {   6000,  28000, &fx_rotozoom },   /* verse: rubber rotozoomer           */
-    {  28000,  47000, &fx_mode7    },   /* mercury plain to the horizon       */
-    {  47000,  92000, &fx_chrome   },   /* chrome objects 0,1,2 (each once)   */
-    {  92000, 116000, &fx_liquid   },   /* breakdown: liquid metal            */
-    { 116000, 175000, &fx_chrome   },   /* DROP: chrome objects 3,4,5 (once)  */
-    { 175000, 267080, &fx_credits  },   /* outro: grand finale + credits      */
+    {      0,  19000, &fx_title    },   /* intro: brand reveal -> wordmark    */
+    {  19000,  38000, &fx_rotozoom },   /* build: rubber rotozoomer           */
+    {  38000,  68400, &fx_mode7    },   /* verse: mercury plain to horizon    */
+    {  68400, 118900, &fx_chrome   },   /* chrome objects 0,1,2 (each once)   */
+    { 118900, 153000, &fx_liquid   },   /* breakdown: liquid metal            */
+    { 153000, 189400, &fx_chrome   },   /* DROP: chrome objects 3,4,5 (once)  */
+    { 189400, 217240, &fx_credits  },   /* outro: grand finale + credits      */
 };
 
 /* transition used when LEAVING each entry (themed to the pair it joins) */

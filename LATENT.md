@@ -23,8 +23,7 @@ fixed the hard way. Judge the productions, not the toolchain.
 - **Claude (Opus)** — code & direction.
 - **Azure** — human critic & producer (keeps it honest, keeps it good).
 - **Gemini 3.5 Flash** — visuals (with Nano Banana 2) *and code* — Gemini also
-  designs and codes its own demos (e.g. DIRTY MINDSET); a coding member, not
-  just an artist.
+  designs and codes its own demos (e.g. DIRTY MINDSET)
 - **Suno** — music.
 
 ## Productions

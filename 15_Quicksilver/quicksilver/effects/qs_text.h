@@ -30,23 +30,34 @@ static inline void qs_block(uint16_t *fb, int bx, int by, int scale, uint16_t co
     }
 }
 
-/* Draw `s` at (x0,y0), each glyph pixel `scale`x, with a dark drop shadow and
- * bright chrome (matcap) fill. `tint` adds extra brightness (0..80). */
-static inline void qs_text_chrome(const char *s, int x0, int y0, int scale, int tint)
+/* Scale an rgb565 colour toward black by alpha (0..256) — used for fade
+ * in/out of black-keyed art and chrome text. */
+static inline uint16_t qs_fade(uint16_t c, int a)
 {
+    if (a >= 256) return c;
+    if (a <= 0)   return 0;
+    return rgb565_pack(rgb565_r8(c) * a >> 8, rgb565_g8(c) * a >> 8, rgb565_b8(c) * a >> 8);
+}
+
+/* Draw `s` at (x0,y0), each glyph pixel `scale`x, with a dark drop shadow and
+ * bright chrome (matcap) fill. `tint` adds extra brightness (0..80). `alpha`
+ * fades the whole thing toward black (0..256). */
+static inline void qs_text_chrome_a(const char *s, int x0, int y0, int scale, int tint, int alpha)
+{
+    if (alpha <= 0) return;
     uint16_t *fb = vga_hires_back_buffer();
-    const uint16_t *env = (const uint16_t *)asset_envmap_data;
     int off = scale > 1 ? 2 : 1;
 
     /* pass 1: dark drop shadow (offset down-right) */
     int x = x0;
+    uint16_t shadow = qs_fade(rgb565_pack(4, 6, 12), alpha);
     for (const char *p = s; *p; p++) {
         const uint8_t *g = font8x8_glyph(*p);
         for (int gy = 0; gy < 8; gy++) {
             uint8_t bits = g[gy];
             for (int gx = 0; gx < 8; gx++)
                 if (bits & (0x80 >> gx))
-                    qs_block(fb, x + gx*scale + off, y0 + gy*scale + off, scale, rgb565_pack(4, 6, 12));
+                    qs_block(fb, x + gx*scale + off, y0 + gy*scale + off, scale, shadow);
         }
         x += 8 * scale;
     }
@@ -54,14 +65,13 @@ static inline void qs_text_chrome(const char *s, int x0, int y0, int scale, int 
      * glyph row (brightest band near the top, like a polished bevel) so the
      * letters always read, independent of the backdrop. */
     static const int lvl[8] = { 150, 205, 240, 230, 200, 170, 140, 110 };
-    (void)env;
     x = x0;
     for (const char *p = s; *p; p++) {
         const uint8_t *g = font8x8_glyph(*p);
         for (int gy = 0; gy < 8; gy++) {
             uint8_t bits = g[gy];
             int L = lvl[gy] + tint;
-            uint16_t col = rgb565_pack(L * 82 / 100, L * 90 / 100, L > 240 ? 255 : L + 15);
+            uint16_t col = qs_fade(rgb565_pack(L * 82 / 100, L * 90 / 100, L > 240 ? 255 : L + 15), alpha);
             for (int gx = 0; gx < 8; gx++)
                 if (bits & (0x80 >> gx))
                     qs_block(fb, x + gx*scale, y0 + gy*scale, scale, col);
@@ -70,10 +80,17 @@ static inline void qs_text_chrome(const char *s, int x0, int y0, int scale, int 
     }
 }
 
-/* Blit a delivered chrome image (artwork on black) at (x0,y0), black-keyed —
- * skip near-black pixels so the chrome + glow composite over the backdrop. */
-static inline void qs_img_keyed(const uint16_t *img, int iw, int ih, int x0, int y0)
+static inline void qs_text_chrome(const char *s, int x0, int y0, int scale, int tint)
 {
+    qs_text_chrome_a(s, x0, y0, scale, tint, 256);
+}
+
+/* Blit a delivered chrome image (artwork on black) at (x0,y0), black-keyed —
+ * skip near-black pixels so the chrome + glow composite over the backdrop.
+ * `alpha` (0..256) fades the art toward black for clean cross-dissolves. */
+static inline void qs_img_keyed_a(const uint16_t *img, int iw, int ih, int x0, int y0, int alpha)
+{
+    if (alpha <= 0) return;
     uint16_t *fb = vga_hires_back_buffer();
     for (int ly = 0; ly < ih; ly++) {
         int sy = y0 + ly; if ((unsigned)sy >= VGA_HIRES_H) continue;
@@ -83,23 +100,36 @@ static inline void qs_img_keyed(const uint16_t *img, int iw, int ih, int x0, int
             int sx = x0 + lx; if ((unsigned)sx >= VGA_HIRES_W) continue;
             uint16_t c = r[lx];
             if (rgb565_r8(c) + rgb565_g8(c) + rgb565_b8(c) < 30) continue;  /* black key */
-            frow[sx] = c;
+            frow[sx] = qs_fade(c, alpha);
         }
     }
 }
 
+static inline void qs_img_keyed(const uint16_t *img, int iw, int ih, int x0, int y0)
+{
+    qs_img_keyed_a(img, iw, ih, x0, y0, 256);
+}
+
 /* The QUICKSILVER wordmark (320x80). `sweepx` is unused (chrome is baked in). */
+static inline void qs_logo_blit_a(int x0, int y0, int alpha)
+{
+    qs_img_keyed_a((const uint16_t *)asset_title_logo_data, ASSET_TITLE_LOGO_W, ASSET_TITLE_LOGO_H, x0, y0, alpha);
+}
 static inline void qs_logo_blit(int x0, int y0, int sweepx)
 {
     (void)sweepx;
-    qs_img_keyed((const uint16_t *)asset_title_logo_data, ASSET_TITLE_LOGO_W, ASSET_TITLE_LOGO_H, x0, y0);
+    qs_logo_blit_a(x0, y0, 256);
 }
 
 /* The LATENT group logo (256x48), horizontally centred. */
+static inline void qs_latent_blit_a(int y0, int alpha)
+{
+    qs_img_keyed_a((const uint16_t *)asset_latent_logo_data, ASSET_LATENT_LOGO_W, ASSET_LATENT_LOGO_H,
+                   (VGA_HIRES_W - ASSET_LATENT_LOGO_W) / 2, y0, alpha);
+}
 static inline void qs_latent_blit(int y0)
 {
-    qs_img_keyed((const uint16_t *)asset_latent_logo_data, ASSET_LATENT_LOGO_W, ASSET_LATENT_LOGO_H,
-                 (VGA_HIRES_W - ASSET_LATENT_LOGO_W) / 2, y0);
+    qs_latent_blit_a(y0, 256);
 }
 
 #endif
