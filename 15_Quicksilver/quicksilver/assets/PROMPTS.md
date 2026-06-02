@@ -154,42 +154,47 @@ that re-time clean. Target ~**3:00**, **~128 BPM**, **noble minor/Dorian** key.
 | **chrome reprise (B)** | DROP 2 / PEAK: double-time, KEY CHANGE UP, the theme returns triumphant and stacked, arpeggio fireworks |
 | **credits tunnel** | OUTRO: resolve, the theme one last time on a lone glassy lead, slow filter close, reflective fade to silence |
 
-### Style Prompt (paste into Suno's *Style* field)
-> Epic cinematic demoscene synth, instrumental, ~128 BPM, noble minor/Dorian
-> key. Glassy FM-bell and supersaw leads with a strong recurring melody and
-> fast arpeggios, riding a HEAVY orchestral foundation: low choir, brass swells,
-> deep sub-bass, timpani and taiko booms, orchestral hits. Monumental and
-> reflective with huge dynamics — solemn intro, weighty drop, soaring lead,
-> filtered breakdown, euphoric key-change finale. Grand, with gravitas. Second
-> Reality / Purple Motion grandeur meets hybrid film score. No vocals.
+### Two gotchas to avoid (learned the hard way)
+- **It sang the descriptions.** Suno *sings any text in the Lyrics box that is
+  not inside `[brackets]`.* So prose like "the catchiest lead" gets vocalised.
+  Fix: **turn ON Suno's "Instrumental" switch**, and keep the Lyrics box to
+  **bracket-only** section tags — the rich arrangement detail goes in the
+  **Style** field, which is never sung.
+- **It ran 8 minutes.** Too many/too-verbose sections make Suno sprawl. Keep it
+  to ~7 short tags, say the length in the Style field, and **don't hit Extend** —
+  pick the ~3-minute take. If a take still runs long, delete the `[Lead]` or
+  `[Hook]` tag and regenerate.
 
-### Structure Prompt (paste into the *Lyrics* field — tags only, NO words)
-*(Pure metatags so the track stays instrumental; the descriptions steer the
-arrangement and the recurring-theme idea. Lead with `[Instrumental]`.)*
+### Style Prompt (paste into Suno's *Style* field — carries all the detail)
+> Epic cinematic demoscene instrumental, about 3 minutes, ~128 BPM, noble
+> minor/Dorian key. Glassy FM-bell and supersaw leads with a strong recurring
+> melody and fast arpeggios, riding a HEAVY orchestral foundation: low choir,
+> brass swells, deep sub-bass, timpani and taiko booms, orchestral hits.
+> Monumental and reflective, huge dynamics — solemn intro, weighty drop on the
+> main theme, soaring minor counter-melody, filtered breakdown reprise, then a
+> double-time key-change-up finale and a slow reflective fade. Grand, with
+> gravitas; Second Reality / Purple Motion grandeur meets hybrid film score.
+> Strictly instrumental, no vocals, no vocal chops.
+
+### Structure Prompt (paste into the *Lyrics* field — bracket-only, nothing sung)
+*(Every line is a `[bracketed]` tag, so Suno reads it as a section direction and
+sings nothing. Short cues inside the brackets are safe; full prose is not.
+Belt-and-braces: also flip the **Instrumental** toggle on.)*
 
 ```text
 [Instrumental]
-
-[Intro] solemn and vast, distant low choir and a slow noble chord, one soft statement of the main theme on a lone glassy bell, deep sub drone, no drums, reverent anticipation
-
-[Build] timpani roll and rising arpeggio over the choir, brass swell, filter opening, a heavy snare build into the drop
-
-[Drop — Main Theme] thunderous four-on-the-floor kick and taiko booms, deep sub-bass, the main theme in full on a bright supersaw doubled by brass, monumental and driving
-
-[Lead — Cruising] a soaring minor-key counter-melody over the heavy groove, wide strings underneath, noble and a little melancholic
-
-[Hook] the catchiest lead, call-and-response between bell and saw, stacked over orchestral hits and choir stabs
-
-[Breakdown] strip to filtered pad, sub-bass and lone choir, a quiet reprise of the main theme, long reverb tails, gathering tension
-
-[Drop 2 — Euphoric] double-time, KEY CHANGE UP, the theme returns triumphant on stacked supersaw + full brass + choir, timpani and arpeggio fireworks, the biggest, weightiest moment
-
-[Outro] resolve, the main theme once more on a lone glassy lead over a slow choir chord, deep sub, slow filter close, reflective fade to silence
+[Intro: solemn, low choir, lone bell states the theme, deep sub, no drums]
+[Build: timpani roll, rising arpeggio, brass swell into the drop]
+[Drop: taiko + four-on-the-floor, sub-bass, theme on supersaw doubled by brass]
+[Lead: soaring minor counter-melody, wide strings underneath]
+[Hook: bell and saw call-and-response over orchestral hits and choir]
+[Breakdown: filtered pad + lone choir, quiet reprise of the theme]
+[Drop 2: double-time, key change UP, full brass + choir, biggest moment]
+[Outro: lone lead over a slow choir chord, filter close, fade to silence]
 ```
 
-*(If Suno adds any vocal: regenerate with `[Instrumental]` reinforced, or render
-the `[Drop]` / `[Breakdown]` sections separately and stitch. The "exclude styles"
-box can also be set to `vocals, lyrics, singing`.)*
+*(If a vocal still sneaks in: set the "exclude styles" box to
+`vocals, lyrics, singing, vocal chops` and regenerate.)*
 
 ### Music Conversion
 Convert the output audio using:
