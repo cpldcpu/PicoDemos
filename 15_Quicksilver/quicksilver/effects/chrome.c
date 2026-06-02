@@ -67,8 +67,10 @@ static void chrome_frame(uint32_t t_ms, uint32_t t_global)
     /* The chrome scene appears twice. Each block shows a DISJOINT set of three
      * objects, exactly once each (block duration / 3), so no object ever
      * repeats across the demo. Block A = objects 0..2, block B (the DROP) =
-     * objects 3..5, flown closer and spun faster. */
-    int reprise = (t_global > 110000u);
+     * objects 3..5, flown closer and spun faster. We key the block off the
+     * SCENE's start time (robust to the exact frame clock within the scene),
+     * not a raw t_global threshold that could fall mid-scene. */
+    int reprise = (scene_cur_start_ms() > 150000u);
     int baseidx = reprise ? 3 : 0;
 
     float dur = (scene_cur_end_ms() - scene_cur_start_ms()) * 0.001f;

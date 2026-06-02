@@ -137,17 +137,17 @@ def main():
     # Quote the current QUICKSILVER timeline (see ../timeline.c) next to the
     # proposed boundaries so the diff is easy to see. Keep these in sync with
     # timeline.c when scenes are re-cut.
-    # NOTE: cuts ride the producer's SRT/LRC section markers (see timeline.c),
-    # cross-checked against the segments below.
+    # NOTE: keep in sync with timeline.c. Cuts laid on the structural segment
+    # edges / strongest onsets of "Taiko Dorian Bells".
     current = [
         (  0.0,   "title"),
-        ( 25.53,  "rotozoom (DROP 1)"),
-        ( 54.94,  "mode7 (DROP 2)"),
-        ( 86.36,  "chrome A (obj 0-2)"),
-        (108.51,  "liquid"),
-        (123.69,  "chrome B (obj 3-5, peak)"),
-        (148.40,  "credits (shine reprise)"),
-        (174.92,  "<end>"),
+        ( 33.69,  "rotozoom (DROP 1)"),
+        ( 63.48,  "liquid (build)"),
+        (100.10,  "chrome A (obj 0-2, peak)"),
+        (126.66,  "mode7 (sustained cruise)"),
+        (180.56,  "chrome B (obj 3-5, 2nd drop)"),
+        (224.68,  "credits (outro)"),
+        (249.40,  "<end>"),
     ]
     print(f"\n--- current timeline vs nearest segment boundary ---")
     seg_starts = np.array([s for s, _ in segments])
