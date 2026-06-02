@@ -64,18 +64,20 @@ static void chrome_frame(uint32_t t_ms, uint32_t t_global)
 
     float t = t_ms * 0.001f;
 
-    /* The chrome scene appears twice. Each block shows a DISJOINT set of three
-     * objects, exactly once each (block duration / 3), so no object ever
-     * repeats across the demo. Block A = objects 0..2, block B (the DROP) =
-     * objects 3..5, flown closer and spun faster. We key the block off the
-     * SCENE's start time (robust to the exact frame clock within the scene),
-     * not a raw t_global threshold that could fall mid-scene. */
-    int reprise = (scene_cur_start_ms() > 150000u);
-    int baseidx = reprise ? 3 : 0;
+    /* The chrome scene appears THREE times — once on each musical drop — and
+     * each appearance shows a DISJOINT pair of objects (block A = 0,1; B = 2,3;
+     * C = 4,5), so all six objects are seen exactly once and nothing repeats.
+     * We key the block off the SCENE's start time (robust to the exact frame
+     * clock within the scene). Later blocks are the "drop" energy: flown closer
+     * and spun faster. */
+    uint32_t st = scene_cur_start_ms();
+    int block   = st < 60000u ? 0 : (st < 120000u ? 1 : 2);
+    int baseidx = block * 2;
+    int reprise = block > 0;
 
     float dur = (scene_cur_end_ms() - scene_cur_start_ms()) * 0.001f;
-    float PERIOD = dur / 3.0f; if (PERIOD < 1.0f) PERIOD = 1.0f;
-    int k = (int)(t / PERIOD); if (k > 2) k = 2;        /* 0..2, no wrap */
+    float PERIOD = dur / 2.0f; if (PERIOD < 1.0f) PERIOD = 1.0f;
+    int k = (int)(t / PERIOD); if (k > 1) k = 1;        /* 0..1, two objects */
     float local = t - k * PERIOD;
     float in  = local < 0.6f ? (local / 0.6f) : 1.f;
     float out = local > PERIOD - 0.6f ? ((PERIOD - local) / 0.6f) : 1.f;

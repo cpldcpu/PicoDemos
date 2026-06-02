@@ -62,14 +62,23 @@ static void liquid_frame(uint32_t t_ms, uint32_t t_global)
     (void)t_global;
     float t = t_ms * 0.001f;
 
+    /* Recurs once; the second pass flows faster on a finer scale from a new
+     * pool centre, and its sheen is palette-shifted so it reads as a different
+     * molten metal rather than a repeat. (Coarse-grid + index math; cheap.) */
+    int   v1 = scene_cur_start_ms() > 90000u;
+    float sc = v1 ? 0.55f : 0.40f;     /* spatial scale */
+    float ts = v1 ? 1.6f  : 1.0f;      /* time speed     */
+    float cx = v1 ? 5.0f  : 8.0f, cy = v1 ? 9.0f : 6.0f;   /* radial pool centre */
+    int   poff = v1 ? 128 : 0;         /* sheen/palette phase shift */
+
     /* coarse plasma field — summed travelling sines (the "liquid"). */
     for (int gy = 0; gy < GH; gy++) {
         for (int gx = 0; gx < GW; gx++) {
-            float x = gx * 0.40f, y = gy * 0.40f;
-            float f = sinf(x + t * 1.3f)
-                    + sinf(y * 1.1f - t * 0.9f)
-                    + sinf((x + y) * 0.7f + t * 1.7f)
-                    + sinf(sqrtf((x-8)*(x-8) + (y-6)*(y-6)) * 1.5f - t * 2.1f);
+            float x = gx * sc, y = gy * sc;
+            float f = sinf(x + t * 1.3f * ts)
+                    + sinf(y * 1.1f - t * 0.9f * ts)
+                    + sinf((x + y) * 0.7f + t * 1.7f * ts)
+                    + sinf(sqrtf((x-cx)*(x-cx) + (y-cy)*(y-cy)) * 1.5f - t * 2.1f * ts);
             int v = (int)((f * 0.25f + 0.5f) * 255.0f);
             s_grid[gy * GW + gx] = (uint8_t)(v < 0 ? 0 : v > 255 ? 255 : v);
         }
@@ -86,7 +95,7 @@ static void liquid_frame(uint32_t t_ms, uint32_t t_global)
             int top = hw_blend(r0[gx], r0[gx + 1], fx);     /* HW bilinear: H */
             int bot = hw_blend(r1[gx], r1[gx + 1], fx);
             int val = hw_blend(top, bot, fy);               /* HW bilinear: V */
-            uint16_t c = s_chrome[val & 0xFF];
+            uint16_t c = s_chrome[(val + poff) & 0xFF];
 
             uint16_t o = row[x];                            /* motion blur trail */
             int d = qs_dither(x, y);

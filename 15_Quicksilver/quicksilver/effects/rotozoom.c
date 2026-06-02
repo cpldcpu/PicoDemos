@@ -72,14 +72,22 @@ static void roto_frame(uint32_t t_ms, uint32_t t_global)
 {
     (void)t_global;
     float t = t_ms * 0.001f;
-    float ang  = t * 0.55f;
-    float zoom = 1.30f + 0.85f * sinf(t * 0.40f);
+
+    /* The rotozoomer recurs; the second pass spins the OTHER way, faster, more
+     * zoomed-in, with a deeper rubber warp so it doesn't read as a repeat.
+     * (All cheap core-0 setup; the beam-raced scan loop is untouched.) */
+    int   v1   = scene_cur_start_ms() > 50000u;
+    float ang  = t * (v1 ? -0.85f : 0.55f);
+    float zoom = v1 ? (1.75f + 0.55f * sinf(t * 0.55f))
+                    : (1.30f + 0.85f * sinf(t * 0.40f));
+    float amp  = v1 ? 60.0f : 40.0f;
+    float warp = v1 ? 0.30f : 0.18f;
     g_ca0 = cosf(ang) * zoom;
     g_sa0 = sinf(ang) * zoom;
-    g_cu  = 128.0f + 40.0f * sinf(t * 0.23f);
-    g_cv  = 128.0f + 40.0f * cosf(t * 0.19f);
+    g_cu  = 128.0f + amp * sinf(t * (v1 ? 0.31f : 0.23f));
+    g_cv  = 128.0f + amp * cosf(t * (v1 ? 0.27f : 0.19f));
     for (int y = 0; y < VGA_RACE_H; y++)
-        g_flex[y] = 1.0f + 0.18f * sinf(y * 0.022f + t * 2.1f);   /* rubber */
+        g_flex[y] = 1.0f + warp * sinf(y * 0.022f + t * 2.1f);   /* rubber */
 
     g_white = qs_trans_white(t_global, scene_cur_start_ms(), scene_cur_end_ms(), 0);
 }

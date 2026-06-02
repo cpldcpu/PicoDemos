@@ -54,11 +54,22 @@ static void m7_frame(uint32_t t_ms, uint32_t t_global)
     const uint8_t  *gbase = (const uint8_t *)s_ground;    /* SRAM 128 tile */
     const uint16_t *sky   = (const uint16_t *)asset_sky_data;
 
+    /* This scene recurs; give each appearance a distinct fly-over so it doesn't
+     * read as a repeat — a different slice of the sky panorama (sun/clouds in a
+     * new place), a different cruise speed and a different turn sway. Keyed off
+     * the scene start (cheap: no per-pixel cost, device-safe). */
+    uint32_t st = scene_cur_start_ms();
+    int   variant = st < 70000u ? 0 : (st < 120000u ? 1 : 2);
+    float spd     = variant == 0 ? 90.0f : variant == 1 ? 128.0f : 66.0f;
+    float swing   = variant == 0 ? 0.25f : variant == 1 ? 0.40f : 0.15f;
+    int   skyoff  = variant * (ASSET_SKY_W / 5);   /* modest yaw; stays clear of
+                                                    * the panorama wrap so no seam */
+
     float t    = t_ms * 0.001f;
-    float head = 0.25f * sinf(t * 0.13f);
+    float head = swing * sinf(t * 0.13f);
     float cosH = cosf(head), sinH = sinf(head);
-    float camX = 128.0f, camY = t * 90.0f;
-    int   scroll = (int)(head * (ASSET_SKY_W / 6.2831853f) + camY * 0.15f);
+    float camX = 128.0f, camY = t * spd;
+    int   scroll = (int)(head * (ASSET_SKY_W / 6.2831853f) + camY * 0.15f) + skyoff;
 
     /* --- sky (above the horizon); remember the horizon row as the fog target */
     for (int y = 0; y < HORIZON; y++) {

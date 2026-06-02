@@ -137,17 +137,23 @@ def main():
     # Quote the current QUICKSILVER timeline (see ../timeline.c) next to the
     # proposed boundaries so the diff is easy to see. Keep these in sync with
     # timeline.c when scenes are re-cut.
-    # NOTE: keep in sync with timeline.c. Cuts laid on the structural segment
-    # edges / strongest onsets of "Taiko Dorian Bells".
+    # NOTE: keep in sync with timeline.c. Tight 12-scene cut over the TRIMMED
+    # 3:15 "Taiko Dorian Bells" (tools/trim_music.sh). Chrome lands on all
+    # three drops with disjoint object pairs.
     current = [
         (  0.0,   "title"),
-        ( 33.69,  "rotozoom (DROP 1)"),
-        ( 63.48,  "liquid (build)"),
-        (100.10,  "chrome A (obj 0-2, peak)"),
-        (126.66,  "mode7 (sustained cruise)"),
-        (180.56,  "chrome B (obj 3-5, 2nd drop)"),
-        (224.68,  "credits (outro)"),
-        (249.40,  "<end>"),
+        ( 15.0,   "rotozoom"),
+        ( 33.69,  "chrome A (0,1) DROP 1"),
+        ( 50.67,  "mode7"),
+        ( 63.48,  "liquid"),
+        ( 76.14,  "rotozoom (revisit)"),
+        ( 85.91,  "mode7 (revisit)"),
+        (100.10,  "chrome B (2,3) BIG drop"),
+        (116.12,  "liquid (revisit)"),
+        (131.22,  "chrome C (4,5) 2nd drop"),
+        (151.23,  "mode7 (cruise)"),
+        (170.32,  "credits (outro)"),
+        (195.50,  "<end>"),
     ]
     print(f"\n--- current timeline vs nearest segment boundary ---")
     seg_starts = np.array([s for s, _ in segments])

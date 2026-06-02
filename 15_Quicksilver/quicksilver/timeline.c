@@ -1,17 +1,18 @@
 /* timeline.c — QUICKSILVER storyboard + per-boundary transition styles.
  *
- * Scored to "Taiko Dorian Bells" (instrumental, 129 BPM, 249.4 s). No lyric
- * sheet this time, so boundaries are extracted with analyze_music.py and laid
- * on its structural segment edges / strongest onsets. The track has TWO energy
- * peaks bracketing a long sustained centre, so the two chrome bursts land on
- * the peaks and the cruise/breakdown fill the rest:
- *   33.7  DROP 1 (onset 13.5)        -> SLAM into the beam-raced rotozoomer
- *   63.5  section change             -> liquid metal builds toward the peak
- *   100.1 BIGGEST drop (onsets ~14.5)-> chrome objects 0..2 on the peak
- *   126.7 long sustained centre      -> mercury plain, a cruising journey
- *   180.6 SECOND drop (onsets ~10)   -> chrome objects 3..5, the reprise
- *   224.7 outro                      -> credits finale, ends with the music
- * The chrome scene shows DISJOINT objects each time (0..2 then 3..5).
+ * Scored to "Taiko Dorian Bells", TRIMMED to 3:15 (tools/trim_music.sh cuts the
+ * saggy sustained centre; see music.qoa). Earlier cuts dragged — 7 effects over
+ * 4:09 meant ~35 s scenes. This is a TIGHT re-cut: 12 scenes, ~16 s each, laid
+ * on the trimmed track's segment edges / strong onsets (analyze_music.py).
+ *
+ * CHROME lands on all THREE drops, each with a DISJOINT object pair (A=0,1 /
+ * B=2,3 / C=4,5 — see chrome.c), so the centrepiece keeps coming back with
+ * fresh objects. The texture effects (rotozoom / mode7 / liquid) revisit at
+ * well-spaced intervals to keep the pace up between drops.
+ *   33.7  DROP 1            -> chrome A (objects 0,1)
+ *   100.1 BIGGEST drop      -> chrome B (objects 2,3)
+ *   131.2 second drop       -> chrome C (objects 4,5)
+ *   170.3 outro             -> credits, ends with the music
  */
 
 #include "scene.h"
@@ -25,24 +26,34 @@ extern const effect_t fx_liquid;
 extern const effect_t fx_credits;
 
 const timeline_entry_t timeline[] = {
-    {      0,  33690, &fx_title    },   /* intro build -> DROP 1 @33.69            */
-    {  33690,  63480, &fx_rotozoom },   /* DROP 1: beam-raced rubber rotozoomer    */
-    {  63480, 100100, &fx_liquid   },   /* build/breakdown toward the biggest drop */
-    { 100100, 126660, &fx_chrome   },   /* BIGGEST DROP: chrome objects 0,1,2      */
-    { 126660, 180560, &fx_mode7    },   /* sustained centre: mercury plain cruise  */
-    { 180560, 224680, &fx_chrome   },   /* SECOND DROP: chrome objects 3,4,5       */
-    { 224680, 249400, &fx_credits  },   /* outro: credits + end card; ends w/ music*/
+    {      0,  15000, &fx_title    },   /*  1 intro: brand -> wordmark (tight)     */
+    {  15000,  33690, &fx_rotozoom },   /*  2 build: beam-raced rotozoomer -> drop1*/
+    {  33690,  50670, &fx_chrome   },   /*  3 DROP 1: chrome A (objects 0,1)       */
+    {  50670,  63480, &fx_mode7    },   /*  4 mercury plain                        */
+    {  63480,  76140, &fx_liquid   },   /*  5 liquid metal                         */
+    {  76140,  85910, &fx_rotozoom },   /*  6 rotozoomer (revisit, short punch)    */
+    {  85910, 100100, &fx_mode7    },   /*  7 mercury plain (revisit) -> big drop  */
+    { 100100, 116120, &fx_chrome   },   /*  8 BIGGEST DROP: chrome B (objects 2,3) */
+    { 116120, 131220, &fx_liquid   },   /*  9 liquid metal (revisit)               */
+    { 131220, 151230, &fx_chrome   },   /* 10 second drop: chrome C (objects 4,5)  */
+    { 151230, 170320, &fx_mode7    },   /* 11 mercury plain (cruise to the outro)  */
+    { 170320, 195500, &fx_credits  },   /* 12 outro: credits + end card; ends w/music*/
 };
 
-/* transition used when LEAVING each entry (themed to the pair it joins) */
+/* transition used when LEAVING each entry (varied; punchy SLAM on each drop) */
 const uint8_t timeline_trans[] = {
-    QS_TR_IRIS,     /* title  -> rotozoom : iris opens on the drop      */
-    QS_TR_DISSOLVE, /* roto   -> liquid   : speckle into the plasma     */
-    QS_TR_BLINDS,   /* liquid -> chrome   : blinds SLAM on the big drop */
-    QS_TR_WIPE,     /* chrome -> mode7    : clean sweep onto the plain  */
-    QS_TR_MELT,     /* mode7  -> chrome   : plain melts into the chrome */
-    QS_TR_MELT,     /* chrome -> credits  : melt into the finale        */
-    QS_TR_MELT,     /* credits-> end      : (suppressed)                */
+    QS_TR_IRIS,     /*  1 title  -> rotozoom : iris opens                */
+    QS_TR_BLINDS,   /*  2 roto   -> chrome   : blinds SLAM on DROP 1     */
+    QS_TR_WIPE,     /*  3 chrome -> mode7    : sweep onto the plain      */
+    QS_TR_DISSOLVE, /*  4 mode7  -> liquid   : speckle into the plasma   */
+    QS_TR_MELT,     /*  5 liquid -> rotozoom : melt into the zoomer      */
+    QS_TR_WIPE,     /*  6 roto   -> mode7    : sweep onto the plain      */
+    QS_TR_BLINDS,   /*  7 mode7  -> chrome   : blinds SLAM on the big drop*/
+    QS_TR_DISSOLVE, /*  8 chrome -> liquid   : speckle into the plasma   */
+    QS_TR_BLINDS,   /*  9 liquid -> chrome   : blinds SLAM on 2nd drop   */
+    QS_TR_WIPE,     /* 10 chrome -> mode7    : sweep onto the plain      */
+    QS_TR_MELT,     /* 11 mode7  -> credits  : melt into the finale      */
+    QS_TR_MELT,     /* 12 credits-> end      : (suppressed)              */
 };
 
 const int timeline_count = (int)(sizeof(timeline) / sizeof(timeline[0]));
