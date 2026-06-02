@@ -18,13 +18,13 @@ extern const effect_t fx_liquid;
 extern const effect_t fx_credits;
 
 const timeline_entry_t timeline[] = {
-    {      0,  19000, &fx_title    },   /* intro: brand reveal -> wordmark    */
-    {  19000,  38000, &fx_rotozoom },   /* build: rubber rotozoomer           */
-    {  38000,  68400, &fx_mode7    },   /* verse: mercury plain to horizon    */
-    {  68400, 118900, &fx_chrome   },   /* chrome objects 0,1,2 (each once)   */
-    { 118900, 153000, &fx_liquid   },   /* breakdown: liquid metal            */
-    { 153000, 189400, &fx_chrome   },   /* DROP: chrome objects 3,4,5 (once)  */
-    { 189400, 217240, &fx_credits  },   /* outro: grand finale + credits      */
+    {      0,  19000, &fx_title    },   /* intro: brand reveal -> wordmark (1st onset @19) */
+    {  19000,  38000, &fx_rotozoom },   /* build section (seg @37.99)         */
+    {  38000,  68360, &fx_mode7    },   /* drop section: mercury plain (seg @68.36) */
+    {  68360, 118910, &fx_chrome   },   /* chrome objects 0,1,2 (seg @118.91) */
+    { 118910, 153070, &fx_liquid   },   /* breakdown: liquid metal (seg @153.07) */
+    { 153070, 189380, &fx_chrome   },   /* DROP: chrome objects 3,4,5 (seg @189.38) */
+    { 189380, 217240, &fx_credits  },   /* outro: credits, hit @208 on the card; ends w/ music */
 };
 
 /* transition used when LEAVING each entry (themed to the pair it joins) */

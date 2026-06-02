@@ -134,18 +134,18 @@ def main():
         print(f"  seg {i}: {fmt_mmss(s):>5} – {fmt_mmss(e):<5}  "
               f"({s:6.2f} – {e:6.2f} s, {e-s:5.2f} s)")
 
-    # Quote the current timeline next to the proposed boundaries so the
-    # diff is easy to see.
+    # Quote the current QUICKSILVER timeline (see ../timeline.c) next to the
+    # proposed boundaries so the diff is easy to see. Keep these in sync with
+    # timeline.c when scenes are re-cut.
     current = [
-        (  0.0, "title"),
-        ( 20.0, "voxel"),
-        ( 55.0, "fluid"),
-        ( 90.0, "greetz"),
-        (110.0, "spheres"),
-        (170.0, "RD"),
-        (190.0, "tunnel"),
-        (220.0, "rotozoom_credits"),
-        (275.0, "<end>"),
+        (  0.0,  "title"),
+        ( 19.0,  "rotozoom"),
+        ( 38.0,  "mode7"),
+        ( 68.4,  "chrome A (obj 0-2)"),
+        (118.9,  "liquid"),
+        (153.0,  "chrome B (obj 3-5)"),
+        (189.4,  "credits"),
+        (217.24, "<end>"),
     ]
     print(f"\n--- current timeline vs nearest segment boundary ---")
     seg_starts = np.array([s for s, _ in segments])
