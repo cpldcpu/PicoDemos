@@ -84,30 +84,7 @@ pico_enable_stdio_uart(quicksilver 0)
 
 pico_add_extra_outputs(quicksilver)
 
-# ---------------------------------------------------------------------------
-# Standalone FULL-VGA (640x480) beam-raced rotozoom — no framebuffer; core 1
-# generates each scanline live via the interpolator (POP). Separate .uf2.
-# ---------------------------------------------------------------------------
-add_executable(quicksilver_vga640
-    vga640/main_pico.c
-    vga640/race.c
-    assets/_packed/assets.S
-)
-target_include_directories(quicksilver_vga640 PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/assets/_packed
-)
-target_compile_definitions(quicksilver_vga640 PRIVATE
-    PICO_BUILD=1
-    PICO_SCANVIDEO_MAX_SCANLINE_BUFFER_WORDS=400   # 640px line + composable hdr
-    PICO_SCANVIDEO_SCANLINE_BUFFER_COUNT=16        # deep pool = slack vs underrun
-)
-target_link_libraries(quicksilver_vga640
-    pico_stdlib
-    pico_scanvideo_dpi
-    pico_multicore
-    hardware_interp
-)
-pico_enable_stdio_usb(quicksilver_vga640 1)
-pico_enable_stdio_uart(quicksilver_vga640 0)
-pico_add_extra_outputs(quicksilver_vga640)
+# (The standalone full-VGA 640x480 beam-raced rotozoom lived here as a separate
+# quicksilver_vga640 .uf2; it was a hardware test bench and is no longer built.
+# The technique now ships inside the demo's rotozoomer scene. The vga640/
+# sources remain in the tree for reference.)

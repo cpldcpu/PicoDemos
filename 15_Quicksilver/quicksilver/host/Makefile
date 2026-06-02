@@ -75,9 +75,12 @@ credits.o: ../effects/credits.c
 transition.o: ../effects/transition.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-music_qoa.o: ../music_qoa.S
+# These .S files `.incbin` data blobs, so the blob is the real input — list it
+# as a prerequisite or `make` won't rebuild when only the data changes (e.g. a
+# new music.qoa relinks stale audio into the exe).
+music_qoa.o: ../music_qoa.S ../music.qoa
 	$(CC) $(ASFLAGS) -c -o $@ $<
-assets.o: ../assets/_packed/assets.S
+assets.o: ../assets/_packed/assets.S $(wildcard ../assets/_packed/*.bin ../assets/_packed/*.pal)
 	$(CC) $(ASFLAGS) -c -o $@ $<
 
 clean:
