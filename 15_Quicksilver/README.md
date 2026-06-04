@@ -1,37 +1,71 @@
 # 15_Quicksilver — *QUICKSILVER*
 
 A liquid-chrome demoscene production for the **Raspberry Pi Pico 2 (RP2350)**,
-beat-loosely-synced to *"Quicksilver Mercy"* (Suno 4.5, ~4:27). Every scene is
-driven by the **RP2350 SIO interpolator** (INTERP0/INTERP1) — the demo's
-hardware hero — using its affine address-generation, BLEND (hardware bilinear
-lerp) and CLAMP units. It is, as far as this repo goes, the **first demo here to
-actually use the interpolator** (demo 13 reserved it but never wired it up).
+beat-synced to a **Suno 5.5** track (*"Second Key Change"*, ~140 BPM, 3:04). The
+demo's hardware hero is the **RP2350 SIO interpolator** (INTERP0/INTERP1) — its
+affine address-generation, **BLEND** (hardware bilinear lerp) and **CLAMP** units
+drive the Mode-7 plain, the liquid-metal plasma, the chrome env-mapping and the
+beam-raced rotozoom. It is the **first demo in this repo to actually use the
+interpolator** (demo 13 reserved it but never wired it up).
 
 Because the SDL host has no such peripheral, Quicksilver ships a **bit-exact
-software emulator** of the interpolator, so the identical effect code previews
-on a PC and runs as raw silicon on the RP2350 — host and hardware are pixel-identical.
+software emulator** of the interpolator, so the identical effect code previews on
+a PC and runs as raw silicon on the RP2350 — host and hardware are pixel-identical.
 
-**640×480 @ 60 Hz scanout.** The fullscreen **rotozoomer** renders at *native*
-640×480, **beam-raced with no framebuffer** — core 1 generates each scanline live
-via the interpolator (POP self-stepping) as the beam races (a 640×480 truecolour
-framebuffer is 614 KB > 520 KB SRAM, so beam-racing is the only way). The other
-scenes (title, **Mode-7 mercury plain**, chrome, liquid, credits) render in a
-320×240 RGB565 buffer on core 0 and are 2× pixel/line-doubled at scanout — QVGA,
-which leaves the per-pixel budget for bilinear filtering, distance fog and the
-chrome rasteriser. Pimoroni VGA Demo Base (15-bit DAC).
+**Author: Claude Opus 4.8** (a **LATENT** production).
+
+## Demo video
+
+Full 3:04 production at 60 fps with the soundtrack:
+📺 **[media/quicksilver.mp4](media/quicksilver.mp4)**
+
+## Prebuilt firmware
+
+[quicksilver_vga_rp2350.uf2](quicksilver_vga_rp2350.uf2). Hold **BOOTSEL** while
+plugging in the Pico 2, then drag the UF2 onto the `RPI-RP2` USB drive. 300 MHz @
+1.20 V, Pimoroni VGA Demo Base (15-bit DAC), 640×480 @ 60 Hz.
+
+### Scene gallery
+
+| Title | Rubber rotozoomer | Chrome conduit |
+|:---:|:---:|:---:|
+| ![Title](media/title.png) | ![Rotozoom](media/rotozoom.png) | ![Tunnel](media/tunnel.png) |
+
+| Mercury plain | Chrome (drop 1) | Liquid metal |
+|:---:|:---:|:---:|
+| ![Mode-7](media/mode7.png) | ![Chrome](media/chrome.png) | ![Liquid](media/liquid.png) |
+
+| Chrome climax | Victory lap | Credits |
+|:---:|:---:|:---:|
+| ![Chrome gold](media/chrome_gold.png) | ![Victory lap](media/victorylap.png) | ![Credits](media/credits.png) |
 
 ## The arc
 
-| Scene | What | Interpolator feature |
-|-------|------|----------------------|
-| **Title** | Chrome "QUICKSILVER" wordmark over molten-mercury droplets | — |
-| **Rubber Rotozoomer** | Fullscreen bilinear rotozoom of a chrome filigree, sine "rubber" flex + motion-blur | affine address-gen + bilinear |
-| **Mercury Plain** | Infinite reflective Mode-7 ground to a horizon under a chrome dusk sky | per-scanline affine + **CLAMP** haze |
-| **Chrome** *(centerpiece)* | Six high-poly solids spinning as polished chrome (sphere, trefoil & (3,5) knots, spike-ball, twisted torus, rounded cube), reflecting a matcap sphere-map | per-pixel matcap address-gen + bilinear |
-| **Liquid Metal** | Plasma field computed coarse and **BLEND-bilinear-upscaled** to full res, colourised as flowing mercury | **BLEND** (hardware lerp) |
-| **Rotozoom reprise → Credits** | Reprise, then chrome credits scrolling over a reflective mercury floor | affine address-gen |
+≈3:04, cuts snapped to onsets/structural edges (`quicksilver/tools/analyze_music.py`).
+Effects appear once each except CHROME, MODE-7 and LIQUID, which return in clearly
+distinct variants so no pass reads as a repeat.
+
+| Time | Scene | Interpolator / technique |
+|------|-------|--------------------------|
+| 0:00 | **Title** — chrome "QUICKSILVER" wordmark over molten-mercury droplets | bilinear shimmer |
+| 0:13 | **Rubber Rotozoomer** — fullscreen bilinear rotozoom of a chrome filigree, sine "rubber" flex | affine address-gen, **beam-raced native 640** (no framebuffer) |
+| 0:27 | **Chrome Conduit** — flying through a breathing chrome tube | fast raycast + interpolated UV (see below) |
+| 0:41 | **Mercury Plain** *(groove)* — infinite reflective Mode-7 ground under a chrome dusk sky | per-scanline affine + **CLAMP** haze |
+| 0:54 | **Liquid Metal** *(riser)* — fast plasma rising into the drop | **BLEND** bilinear upscale |
+| 1:08 | **Chrome** *(drop 1)* — icosphere + torus-knots + torus, polished chrome; per-object matcaps (neutral / violet / gold) | per-pixel matcap address-gen + bilinear |
+| 1:49 | **Liquid Metal** *(breakdown)* — dreamy pooling mercury, re-tensions late | **BLEND** |
+| 2:02 | **Chrome** *(climax)* — intricate spike-ball + knot in warm gold | per-pixel matcap |
+| 2:18 | **Mercury Plain** *(victory lap)* — warm copper, low & fast, banking | per-scanline affine + **CLAMP** |
+| 2:25 | **Credits** — readable scroller over a chrome flute tunnel → **LATENT** sting | raycast tunnel |
 
 Every scene boundary gets a uniform **liquid-chrome glint** crossfade.
+
+### Fast raycast tunnels
+Both tunnels (the mid-demo conduit and the credits backdrop) **raycast a breathing
+elliptical tube** the camera flies through and banks around. To hold 60 fps at full
+320×240, the costly ray-vs-ellipse intersection + `atan2` run only on a **coarse
+horizontal grid (every 4 px)**; the texture U/V and fog are **linearly interpolated
+across each span**, with a cheap point-sample per pixel. ~2 M cy/frame.
 
 ## Build
 
@@ -39,9 +73,10 @@ Every scene boundary gets a uniform **liquid-chrome glint** crossfade.
 ```sh
 cd quicksilver/host
 make
-./quicksilver.exe                                  # interactive
-./quicksilver.exe --screenshot-at 105000 --exit-after 105100   # snapshot a scene
-# or: ./cap.sh 6000 60000 105000     # build + capture PNGs of several timestamps
+./quicksilver.exe                                              # interactive
+./quicksilver.exe --start-ms 34000 --screenshot-at 36000       # snapshot a scene
+./quicksilver.exe --rawpipe | ffmpeg -f rawvideo -pixel_format bgra \
+    -video_size 640x480 -framerate 60 -i - ... quicksilver.mp4 # render the MP4
 ```
 Keys: `ESC/Q` quit · `S` screenshot · `SPACE` next scene · `LEFT` prev · `R` restart.
 
@@ -54,33 +89,27 @@ cmake -B build_rp2350 -G "MinGW Makefiles" -DPICO_BOARD=pico2 -DPICO_PLATFORM=rp
 cmake --build build_rp2350 -j
 # flash build_rp2350/quicksilver.uf2 (hold BOOTSEL, drag onto RPI-RP2)
 ```
-300 MHz @ 1.20 V. Text ~3.3 MB / 4 MB flash, BSS ~386 KB / 520 KB SRAM.
+300 MHz @ 1.20 V. **BSS ≈ 479 KB / 520 KB SRAM** (leaving ~30 KB malloc heap for
+the scanvideo scanline pool — keep big per-scene buffers in `g_scratch`, not new
+BSS). Text ≈ 3.0 MB / 4 MB flash.
 
 ## Regenerating assets
-- **Textures**: nano-banana PNGs in `assets/` → `tools/pack_assets.py` (PIL; run under WSL) → `assets/_packed/*.bin`. A procedural fallback generator is `tools/make_textures.c`.
-- **3D objects**: `gcc tools/make_meshes.c -o tools/make_meshes.exe -lm && ./tools/make_meshes.exe > assets/_packed/meshes.h`.
-- **Wordmark / tunnel / logos**: delivered PNGs in `assets/` (chrome wordmark, fluted tunnel wall) → `tools/pack_assets.py`. See `assets/PROMPTS.md` for the generation prompts and outstanding requests.
-- **Music**: `ffmpeg -i "assets/Quicksilver Mercy.mp3" -ac 1 -ar 22050 -f s16le music.raw && ./tools/qoaconv_s16.exe music.raw music.qoa 22050 1`.
+- **Textures / matcaps** (chrome conduit, mercury ground, chrome flute tunnel,
+  sky pano, two matcaps): nano-banana PNGs in `quicksilver/assets/` →
+  `tools/pack_assets.py` (PIL) → `assets/_packed/*.bin`. See
+  [assets/PROMPTS.md](quicksilver/assets/PROMPTS.md) for the generation prompts.
+- **3D objects**: `gcc tools/make_meshes.c -o make_meshes -lm && ./make_meshes > assets/_packed/meshes.h`.
+- **Music**: `ffmpeg -i "assets/Second Key Change.mp3" -ac 1 -ar 22050 -f s16le music.raw && ./tools/qoaconv_s16.exe music.raw music.qoa 22050 1`.
 - **Interpolator emulator self-test**: `gcc -DHOST_BUILD=1 -I. tools/interp_selftest.c interp_emu.c -o t && ./t` (must print `ALL PASS`).
 
-## Full VGA (640×480) — `quicksilver_vga640`
-A standalone firmware (`quicksilver_vga640.uf2`) renders a **true 640×480@60 VGA**
-rotozoom with **no framebuffer at all**: core 1 generates each scanline live via
-the interpolator in **POP self-stepping** mode (one `pop_full` per pixel returns
-the texel offset *and* advances u,v) straight into the scanvideo line buffer as
-the beam races. A 640×480 truecolor framebuffer is 614 KB > 520 KB SRAM, so
-beam-racing is the only way to do full VGA on the chip — and the interpolator is
-what keeps generation inside the ~16 cy/px budget. Build it from the same CMake;
-preview on host with `vga640/quicksilver_vga640.exe`.
-
 ## Credits
-A **LATENT** production — the demo group for the machine-authored RP2350
+A **LATENT** production — a new demo group for the machine-authored RP2350
 productions in this repo.
 
 - **Code & direction** — Claude Opus 4.8
-- **Critic** — Azure
+- **Critic / producer** — Azure
 - **2D art** — Gemini 3.5 Flash + Nano Banana 2
-- **Music** — Suno 4.5 (*"Quicksilver Mercy"*)
+- **Music** — Suno 5.5
 - **Hardware hero** — the RP2350 SIO interpolator (affine address-gen, BLEND, CLAMP, POP self-stepping)
 
 See [IMPLEMENTATION.md](quicksilver/IMPLEMENTATION.md) for the technical deep-dive

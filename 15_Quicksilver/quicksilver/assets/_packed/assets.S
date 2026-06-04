@@ -54,3 +54,27 @@ asset_latent_logo_data:
     .incbin "latent_logo.bin"
     .global asset_latent_logo_end
 asset_latent_logo_end:
+
+    .global asset_conduit_data
+asset_conduit_data:
+    .incbin "conduit.bin"
+    .global asset_conduit_end
+asset_conduit_end:
+
+    .global asset_conduit_bump_data
+asset_conduit_bump_data:
+    .incbin "conduit_bump.bin"
+    .global asset_conduit_bump_end
+asset_conduit_bump_end:
+
+    .global asset_envmap2_data
+asset_envmap2_data:
+    .incbin "envmap2.bin"
+    .global asset_envmap2_end
+asset_envmap2_end:
+
+    .global asset_envmap3_data
+asset_envmap3_data:
+    .incbin "envmap3.bin"
+    .global asset_envmap3_end
+asset_envmap3_end:

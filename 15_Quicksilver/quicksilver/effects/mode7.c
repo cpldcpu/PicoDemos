@@ -19,6 +19,13 @@
 
 #include <math.h>
 
+#ifdef PICO_BUILD
+#include "pico/platform.h"
+#define QS_FAST(n) __not_in_flash_func(n)   /* pin the hot per-pixel loop in SRAM */
+#else
+#define QS_FAST(n) n
+#endif
+
 #define HORIZON 96
 #define F120    120.0f
 #define CAMH    55.0f
@@ -27,6 +34,16 @@
 
 static uint16_t s_hz[VGA_HIRES_W];     /* sky colour at the horizon, per column */
 static uint16_t *s_ground;             /* 128x128 mercury tile in SRAM          */
+
+/* Warm copper/sunset re-grade for the second pass ("victory lap"), so it reads
+ * as a different mood instead of a repeat of the cool-silver groove cruise. */
+static inline uint16_t m7_warm(uint16_t c)
+{
+    int r = rgb565_r8(c), g = rgb565_g8(c), b = rgb565_b8(c);
+    r += (r >> 2) + 18; if (r > 255) r = 255;   /* push amber  */
+    b -= (b >> 2);      if (b < 0)   b = 0;      /* cool out of the highlights */
+    return rgb565_pack(r, g, b);
+}
 
 static void m7_init(void)
 {
@@ -47,26 +64,28 @@ static void m7_init(void)
     interp_set_base(interp1, 1, 255);
 }
 
-static void m7_frame(uint32_t t_ms, uint32_t t_global)
+static void QS_FAST(m7_frame)(uint32_t t_ms, uint32_t t_global)
 {
     (void)t_global;
     uint16_t *fb = vga_hires_back_buffer();
     const uint8_t  *gbase = (const uint8_t *)s_ground;    /* SRAM 128 tile */
     const uint16_t *sky   = (const uint16_t *)asset_sky_data;
 
-    /* This scene recurs; give each appearance a distinct fly-over so it doesn't
-     * read as a repeat — a different slice of the sky panorama (sun/clouds in a
-     * new place), a different cruise speed and a different turn sway. Keyed off
-     * the scene start (cheap: no per-pixel cost, device-safe). */
-    uint32_t st = scene_cur_start_ms();
-    int   variant = st < 70000u ? 0 : (st < 120000u ? 1 : 2);
-    float spd     = variant == 0 ? 90.0f : variant == 1 ? 128.0f : 66.0f;
-    float swing   = variant == 0 ? 0.25f : variant == 1 ? 0.40f : 0.15f;
-    int   skyoff  = variant * (ASSET_SKY_W / 5);   /* modest yaw; stays clear of
-                                                    * the panorama wrap so no seam */
+    /* Mercury-plain cruise — appears twice, but the two passes are deliberately
+     * DIFFERENT scenes, not a repeat:
+     *   v1 GROOVE       : calm silver cruise, gentle heading drift, eye-height cam.
+     *   v2 VICTORY LAP  : flown LOW and FAST with hard banking S-curves over the
+     *                     opposite face of the sky panorama, and re-graded to a
+     *                     warm copper sunset (m7_warm) — a clearly distinct mood. */
+    int   v2     = scene_cur_start_ms() > 100000u;
+    float spd    = v2 ? 158.0f : 90.0f;
+    float swing  = v2 ? 0.46f  : 0.25f;   /* banking amplitude  */
+    float swingf = v2 ? 0.34f  : 0.13f;   /* banking frequency  */
+    float camh   = v2 ? 33.0f  : CAMH;    /* lower => ground rushes by faster */
+    int   skyoff = v2 ? (ASSET_SKY_W / 2) : 0;  /* opposite face of the pano */
 
     float t    = t_ms * 0.001f;
-    float head = swing * sinf(t * 0.13f);
+    float head = swing * sinf(t * swingf);
     float cosH = cosf(head), sinH = sinf(head);
     float camX = 128.0f, camY = t * spd;
     int   scroll = (int)(head * (ASSET_SKY_W / 6.2831853f) + camY * 0.15f) + skyoff;
@@ -78,6 +97,7 @@ static void m7_frame(uint32_t t_ms, uint32_t t_global)
         uint16_t *row = fb + y * VGA_HIRES_W;
         for (int x = 0; x < VGA_HIRES_W; x++) {
             uint16_t c = src[(scroll + x) & (ASSET_SKY_W - 1)];
+            if (v2) c = m7_warm(c);
             row[x] = c;
             if (y == HORIZON - 1) s_hz[x] = c;
         }
@@ -86,7 +106,7 @@ static void m7_frame(uint32_t t_ms, uint32_t t_global)
     /* --- ground (below the horizon): affine + bilinear + fog into the sky --- */
     for (int y = HORIZON; y < VGA_HIRES_H; y++) {
         float p = (float)(y - HORIZON) + 0.75f;
-        float dist = (CAMH * F120) / p;
+        float dist = (camh * F120) / p;
         float stepx = (dist / F120) * (-sinH), stepy = (dist / F120) * cosH;
         float u0 = camX + dist * cosH + (0 - 160) * stepx;
         float v0 = camY + dist * sinH + (0 - 160) * stepy;
@@ -102,6 +122,7 @@ static void m7_frame(uint32_t t_ms, uint32_t t_global)
         uint16_t *row = fb + y * VGA_HIRES_W;
         for (int x = 0; x < VGA_HIRES_W; x++) {
             uint16_t c = qs_tap_bilerp(interp0, gbase, GW128, GMASK);
+            if (v2) c = m7_warm(c);
             if (fog) {
                 uint16_t f = s_hz[x];            /* blend toward the sky above */
                 c = rgb565_pack(rgb565_r8(c) + (((rgb565_r8(f) - rgb565_r8(c)) * fog) >> 8),

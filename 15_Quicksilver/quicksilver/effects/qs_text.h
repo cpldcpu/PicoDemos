@@ -87,7 +87,9 @@ static inline void qs_text_chrome(const char *s, int x0, int y0, int scale, int 
 
 /* Blit a delivered chrome image (artwork on black) at (x0,y0), black-keyed —
  * skip near-black pixels so the chrome + glow composite over the backdrop.
- * `alpha` (0..256) fades the art toward black for clean cross-dissolves. */
+ * `alpha` (0..256) CROSS-FADES each lit pixel with whatever is already in the
+ * framebuffer (the live backdrop), so the art dissolves in/out of the scene
+ * instead of fading to/from black — a far cleaner reveal and logo hand-off. */
 static inline void qs_img_keyed_a(const uint16_t *img, int iw, int ih, int x0, int y0, int alpha)
 {
     if (alpha <= 0) return;
@@ -100,7 +102,12 @@ static inline void qs_img_keyed_a(const uint16_t *img, int iw, int ih, int x0, i
             int sx = x0 + lx; if ((unsigned)sx >= VGA_HIRES_W) continue;
             uint16_t c = r[lx];
             if (rgb565_r8(c) + rgb565_g8(c) + rgb565_b8(c) < 30) continue;  /* black key */
-            frow[sx] = qs_fade(c, alpha);
+            if (alpha >= 256) { frow[sx] = c; continue; }
+            uint16_t bg = frow[sx];                 /* cross-fade with the live backdrop */
+            frow[sx] = rgb565_pack(
+                rgb565_r8(bg) + (((rgb565_r8(c) - rgb565_r8(bg)) * alpha) >> 8),
+                rgb565_g8(bg) + (((rgb565_g8(c) - rgb565_g8(bg)) * alpha) >> 8),
+                rgb565_b8(bg) + (((rgb565_b8(c) - rgb565_b8(bg)) * alpha) >> 8));
         }
     }
 }

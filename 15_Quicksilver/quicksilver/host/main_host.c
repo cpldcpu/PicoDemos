@@ -28,7 +28,10 @@
 /* Implemented in vga_sdl.c — invoked by --screenshot-at to capture
  * exactly the frame that produced clock = N ms. */
 void vga_screenshot(void);
+void vga_raw_begin(void);
+void vga_raw_emit(void);
 extern int g_offline;
+extern int g_rawpipe;
 
 int main(int argc, char *argv[])
 {
@@ -36,6 +39,7 @@ int main(int argc, char *argv[])
     int screenshot_at   = -1;
     int exit_after      = -1;
     int offline_mode    = 0;
+    int rawpipe         = 0;
 
     for (int i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "--start-ms") && i + 1 < argc)
@@ -46,6 +50,8 @@ int main(int argc, char *argv[])
             exit_after = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--offline"))
             offline_mode = 1;
+        else if (!strcmp(argv[i], "--rawpipe"))      /* stream raw BGRA frames to */
+            rawpipe = offline_mode = 1;              /* stdout for ffmpeg (60fps) */
         else {
             fprintf(stderr, "unknown arg: %s\n", argv[i]);
             return 1;
@@ -55,17 +61,29 @@ int main(int argc, char *argv[])
     if (offline_mode) {
         g_offline = 1;
     }
+    if (rawpipe) {
+        g_offline = 0;     /* don't also dump BMPs */
+        g_rawpipe = 1;
+        /* Redirect stdout->stderr NOW, before any init printf (vga_init's banner,
+         * audio_init, scene.c's per-scene line) can leak bytes onto the pixel
+         * pipe and shift the whole video stream. Frames go to a saved fd. */
+        vga_raw_begin();
+    }
+
+    /* In rawpipe mode stdout carries binary video, so all human logging goes to
+     * stderr to keep the stream clean. */
+    FILE *L = rawpipe ? stderr : stdout;
 
     if (SDL_Init(0) != 0) {
         fprintf(stderr, "SDL_Init: %s\n", SDL_GetError());
         return 1;
     }
 
-    printf("\n=== SLOP (host) ===\n");
-    if (start_offset_ms)   printf("  --start-ms %d\n", start_offset_ms);
-    if (screenshot_at>=0)  printf("  --screenshot-at %d\n", screenshot_at);
-    if (exit_after>=0)     printf("  --exit-after %d\n", exit_after);
-    if (offline_mode)      printf("  --offline\n");
+    fprintf(L, "\n=== SLOP (host) ===\n");
+    if (start_offset_ms)   fprintf(L, "  --start-ms %d\n", start_offset_ms);
+    if (screenshot_at>=0)  fprintf(L, "  --screenshot-at %d\n", screenshot_at);
+    if (exit_after>=0)     fprintf(L, "  --exit-after %d\n", exit_after);
+    if (offline_mode)      fprintf(L, rawpipe ? "  --rawpipe\n" : "  --offline\n");
 
     audio_init();
     vga_init();
@@ -74,7 +92,7 @@ int main(int argc, char *argv[])
         if (start_offset_ms > 0) audio_seek_ms((uint32_t)start_offset_ms);
         printf("entering main loop — ESC/Q quit, S screenshot, SPACE skip to next scene\n");
     } else {
-        printf("entering main loop (OFFLINE RENDER MODE) — generating 60fps frames...\n");
+        fprintf(L, "entering main loop (OFFLINE RENDER MODE) — generating 60fps frames...\n");
     }
 
     int shot_done = 0;
@@ -123,9 +141,9 @@ int main(int argc, char *argv[])
             }
             if (exit_after >= 0 && (int)t >= exit_after) break;
         } else {
-            vga_screenshot();
-            if (t >= 330500) {     /* full 5:30 demo length */
-                printf("Offline render finished: %u ms reached!\n", (unsigned)t);
+            if (rawpipe) vga_raw_emit(); else vga_screenshot();
+            if (t >= 330500) {     /* hard cap; the demo normally ends earlier */
+                fprintf(L, "Offline render finished: %u ms reached!\n", (unsigned)t);
                 break;
             }
         }
@@ -133,7 +151,7 @@ int main(int argc, char *argv[])
         frame++;
     }
 
-    printf("stopped after %u frames\n", (unsigned)frame);
+    fprintf(L, "stopped after %u frames\n", (unsigned)frame);
     SDL_Quit();
     return 0;
 }

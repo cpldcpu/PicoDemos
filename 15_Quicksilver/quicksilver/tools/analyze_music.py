@@ -137,23 +137,21 @@ def main():
     # Quote the current QUICKSILVER timeline (see ../timeline.c) next to the
     # proposed boundaries so the diff is easy to see. Keep these in sync with
     # timeline.c when scenes are re-cut.
-    # NOTE: keep in sync with timeline.c. Tight 12-scene cut over the TRIMMED
-    # 3:15 "Taiko Dorian Bells" (tools/trim_music.sh). Chrome lands on all
-    # three drops with disjoint object pairs.
+    # NOTE: keep in sync with timeline.c. BEAT-SYNCED 9-scene cut over "Second
+    # Key Change" (3:04, 140 BPM), tuned against video playback. rotozoom ONCE;
+    # a new TUNNEL takes the freed slot; mode7 reprises. CHROME on the two drops.
     current = [
-        (  0.0,   "title"),
-        ( 15.0,   "rotozoom"),
-        ( 33.69,  "chrome A (0,1) DROP 1"),
-        ( 50.67,  "mode7"),
-        ( 63.48,  "liquid"),
-        ( 76.14,  "rotozoom (revisit)"),
-        ( 85.91,  "mode7 (revisit)"),
-        (100.10,  "chrome B (2,3) BIG drop"),
-        (116.12,  "liquid (revisit)"),
-        (131.22,  "chrome C (4,5) 2nd drop"),
-        (151.23,  "mode7 (cruise)"),
-        (170.32,  "credits (outro)"),
-        (195.50,  "<end>"),
+        (  0.00,  "title        intro (ends 0:13 break)"),
+        ( 13.00,  "rotozoom     rise"),
+        ( 27.00,  "tunnel       conduit"),
+        ( 41.19,  "mode7        groove"),
+        ( 54.00,  "liquid       BUILD riser (0:54 break)"),
+        ( 68.00,  "chrome A     DROP 1  ICO+KNOT+TORUS"),
+        (109.23,  "liquid       breakdown"),
+        (122.42,  "chrome B     CLIMAX  SPIKE+KNOT2"),
+        (138.07,  "mode7        victory lap (short)"),
+        (145.00,  "credits      outro (slow roll ~40s)"),
+        (184.84,  "<end>"),
     ]
     print(f"\n--- current timeline vs nearest segment boundary ---")
     seg_starts = np.array([s for s, _ in segments])

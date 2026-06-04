@@ -3,10 +3,10 @@
  *
  * The tunnel is a LUT effect: at init we precompute, per screen pixel, the
  * angle around the shaft and the depth into it (one atan2/sqrt per pixel, once).
- * Each frame is then just "rotate + fly forward + sample a small chrome texture"
- * — ~2 SRAM reads per pixel, no transform/sort/flash, so it holds full
- * framerate. The 128x128 chrome texture and the 160x120 LUT both live in
- * g_scratch SRAM. */
+ * Each frame is then just "rotate + fly forward + bilinearly sample a small
+ * chrome texture", no transform/sort/flash, so it holds full framerate. Both the
+ * 128x64 wall texture and the 160x120 LUT live in g_scratch SRAM (no permanent
+ * static — see the carve note below). */
 
 #include "../vga.h"
 #include "../rgb565.h"
@@ -15,32 +15,37 @@
 #include "assets.h"
 #include "qs_text.h"
 #include "qs_fx.h"
+#include "qs_tunnel.h"
 
 #include <math.h>
 
-#define TXW 128                         /* chrome wall texture            */
-#define LW  160                         /* tunnel LUT grid (upscaled 2x)  */
-#define LH  120
+#define TUW 128                         /* tex width  = around the tube (angle)   */
+#define TVH 64                          /* tex height = depth                      */
 
-/* g_scratch carve: [0..32KB) = 128x128 chrome texture; [32KB..) = 160x120 LUT */
+/* The 128x64 chrome flute wall lives in g_scratch; the tube is the shared fast
+ * raycast renderer (qs_tunnel.h), so the finale runs full framerate with no
+ * permanent static. */
 static uint16_t *s_tex;
-static uint16_t *s_lut;                 /* (angle<<8) | depth */
 
 static const char *lines[] = {
-    /* All lines centred individually (no leading-space columns), and every
-     * glyph is in the 8x8 charset (A-Z 0-9 space - . ! :) — no parens/&/slash. */
-    "LATENT",
+    /* Demoscene order: the PRODUCTION first (what this is + the tech), then the
+     * crew, greets, and finally the GROUP sting — which hands off to the LATENT
+     * logo end card. (Leading with the group read like an ad before the content.)
+     * Every glyph is in the 8x8 charset (A-Z 0-9 space - . ! :) — no parens. */
+    "QUICKSILVER",
     "",
-    "A DEMOSCENE GROUP FOR",
-    "MACHINE-MADE PRODUCTIONS",
-    "ON BARE-METAL SILICON",
+    "AFFINE . BLEND . CLAMP . POP",
+    "ROTOZOOM . TUNNEL . MODE-7 . CHROME",
+    "BEAM-RACED FULL VGA. NO BUFFER.",
     "",
-    "FOUNDED 2026",
     "",
-    "- MEMBERS -",
+    "- CREDITS -",
     "",
     "CLAUDE OPUS 4.8",
     "CODE AND DIRECTION",
+    "",
+    "CODEX GPT-5.5",
+    "TUNNEL OPTIMIZATION",
     "",
     "AZURE",
     "HUMAN CRITIC AND PRODUCER",
@@ -49,78 +54,45 @@ static const char *lines[] = {
     "AND NANO BANANA 2",
     "VISUALS",
     "",
-    "SUNO 4.5",
+    "SUNO 5.5",
     "MUSIC",
     "",
-    "- THIS PRODUCTION -",
-    "",
-    "QUICKSILVER",
-    "RACING THE RP2350 INTERPOLATOR",
-    "",
-    "AFFINE . BLEND . CLAMP . POP",
-    "ROTOZOOM . MODE-7 . CHROME",
-    "BEAM-RACED FULL VGA. NO BUFFER.",
     "",
     "GREETINGS TO THE SCENE",
     "AND TO THE SCEPTICS.",
+    "",
+    "",
+    "A LATENT PRODUCTION",
+    "",
+    "LATENT IS A NEW GROUP FOR",
+    "MACHINE-MADE PRODUCTIONS",
+    "ON BARE-METAL SILICON",
+    "",
+    "FOUNDED 2026",
     "",
     NULL,
 };
 
 static void credits_init(void)
 {
-    uint8_t *sram = (uint8_t *)g_scratch.bg_cache;
-    s_tex = (uint16_t *)sram;
-    s_lut = (uint16_t *)(sram + TXW * TXW * 2);
-
-    /* downsample the seamless chrome tunnel-wall texture 256->128 into SRAM */
+    s_tex = (uint16_t *)g_scratch.bg_cache;
+    /* downsample the seamless chrome flute wall into the 128x64 texture */
     const uint16_t *src = (const uint16_t *)asset_tunnel_data;
-    for (int y = 0; y < TXW; y++)
-        for (int x = 0; x < TXW; x++)
-            s_tex[y * TXW + x] = src[(y * 2) * ASSET_TUNNEL_W + x * 2];
-
-    /* Precompute ONE QUADRANT of the tunnel (the field is 4-way symmetric about
-     * the screen centre). LW x LH = 160 x 120 = exactly a quadrant, so each
-     * screen pixel maps 1:1 to a LUT cell — FULL 320-resolution lookup with no
-     * upscaling/blockiness. Store the quadrant angle u0 in [0, TXW/4] + depth. */
-    for (int ay = 0; ay < LH; ay++) {
-        for (int ax = 0; ax < LW; ax++) {
-            float dist = sqrtf((float)ax * ax + (float)ay * ay); if (dist < 1.f) dist = 1.f;
-            float ang0 = atan2f((float)ay, (float)ax);             /* [0, pi/2] */
-            int u0 = (int)(ang0 * (TXW / 6.2831853f));             /* [0, TXW/4] */
-            int depth = (int)(1400.0f / dist); if (depth > 255) depth = 255;
-            s_lut[ay * LW + ax] = (uint16_t)((u0 << 8) | depth);
-        }
-    }
+    int ustep = ASSET_TUNNEL_W / TUW, vstep = ASSET_TUNNEL_W / TVH;
+    for (int v = 0; v < TVH; v++)
+        for (int u = 0; u < TUW; u++)
+            s_tex[v * TUW + u] = src[(v * vstep) * ASSET_TUNNEL_W + u * ustep];
 }
 
 static void tunnel(uint32_t t_ms)
 {
-    uint16_t *fb = vga_hires_back_buffer();
-    int rot    = (int)(t_ms * 0.045f);     /* swirl — >=1 texel/frame: smooth */
-    int scroll = (int)(t_ms * 0.090f);     /* fly forward */
-    for (int y = 0; y < VGA_HIRES_H; y++) {
-        int dy = y - VGA_HIRES_H / 2;
-        int ay = dy < 0 ? -dy : dy; if (ay >= LH) ay = LH - 1;
-        const uint16_t *lrow = &s_lut[ay * LW];
-        int ysign = dy < 0;
-        uint16_t *frow = fb + y * VGA_HIRES_W;
-        for (int x = 0; x < VGA_HIRES_W; x++) {
-            int dx = x - VGA_HIRES_W / 2;
-            int ax = dx < 0 ? -dx : dx; if (ax >= LW) ax = LW - 1;
-            uint16_t L = lrow[ax];
-            int u0 = L >> 8, depth = L & 0xFF;
-            int u;                                       /* reconstruct full angle */
-            if (dx >= 0) u = ysign ? (TXW - u0)     : u0;
-            else         u = ysign ? (TXW/2 + u0)   : (TXW/2 - u0);
-            uint16_t texel = s_tex[((depth + scroll) & (TXW-1)) * TXW + ((u + rot) & (TXW-1))];
-            int br = 255 - depth;                        /* far (centre) -> dark */
-            int d = qs_dither(x, y);
-            frow[x] = rgb565_pack((rgb565_r8(texel) * br >> 8) + d,
-                                  (rgb565_g8(texel) * br >> 8) + d,
-                                  (rgb565_b8(texel) * br >> 8) + d);
-        }
-    }
+    /* calm backdrop for the text: slow forward fly, gentle breathing, no pulse */
+    static const qs_tun_params P = {
+        .fwd = 1.4f, .ell_amp = 0.18f, .cam_k = 0.35f, .twist = 0.10f,
+        .fog_range = 6.0f, .bright = 0, .pulse_amp = 0, .pulse_hz = 0.0f,
+    };
+    float *cs = (float *)(s_tex + TUW * TVH);
+    qs_tunnel_render(s_tex, TUW, TVH, t_ms * 0.001f, &P, cs);
 }
 
 /* fade ramp: 0 before `in`, 0..256 over `in..in+rise`, holds, then 256..0
@@ -144,10 +116,11 @@ static void credits_frame(uint32_t t_ms, uint32_t t_global)
     tunnel(t_ms);
     float t = t_ms * 0.001f;
 
-    /* PHASE 1 — the credit lines scroll up and clear the screen. Brisker
-     * than before: this finale is ~25.5 s (shorter track), so the scroller
-     * clears by ~11 s to leave room for a two-stage end card + fade.        */
-    int scroll = (int)(t_ms * 0.070f);
+    /* PHASE 1 — the credit lines scroll up and clear the screen. SLOW so the roll
+     * is comfortably readable; this finale is ~40 s (it starts on the 2:25 melody
+     * now that the victory lap was shortened), so at this pace the scroller clears
+     * by ~24 s, leaving room for the two-stage end card + fade.                 */
+    int scroll = (int)(t_ms * 0.032f);
     int y = VGA_HIRES_H + 20 - scroll;
     for (int i = 0; lines[i]; i++) {
         const char *s = lines[i];
@@ -161,9 +134,9 @@ static void credits_frame(uint32_t t_ms, uint32_t t_global)
     }
 
     /* PHASE 2 — end card, two spaced stages that hand off (never crowded):
-     *   stage A (14..20s): QUICKSILVER wordmark + tagline, vertically centred.
-     *   stage B (19.5s..) : LATENT group sting + year, vertically centred. */
-    int wa = credits_ramp(t, 11.0f, 1.0f, 15.5f, 1.0f);
+     *   stage A (25..31s): QUICKSILVER wordmark + tagline, centred.
+     *   stage B (31.5s..) : LATENT group sting + year, centred. */
+    int wa = credits_ramp(t, 25.0f, 1.0f, 31.0f, 1.0f);
     if (wa > 0) {
         int wy = 66;
         qs_logo_blit_a(0, wy, wa);
@@ -171,10 +144,9 @@ static void credits_frame(uint32_t t_ms, uint32_t t_global)
         int sw = qs_text_w(sub, 1);
         qs_text_chrome_a(sub, (VGA_HIRES_W - sw) / 2, wy + QS_LOGO_H + 12, 1, 50, wa);
     }
-    /* brief dip to the tunnel (~0.5s), then the group sting rises on the
-     * outro onset (~165.5 s) — the two logos hand off cleanly instead of
-     * colliding mid-screen. The global fade (last 5 s) ends it. */
-    int ga = credits_ramp(t, 16.0f, 1.0f, 0.0f, 0.0f);
+    /* the group sting rises ~31.5 s in — the two logos hand off cleanly instead
+     * of colliding mid-screen. The global fade (last 5 s) ends it. */
+    int ga = credits_ramp(t, 31.5f, 1.0f, 0.0f, 0.0f);
     if (ga > 0) {
         int gy = 92;
         qs_latent_blit_a(gy, ga);

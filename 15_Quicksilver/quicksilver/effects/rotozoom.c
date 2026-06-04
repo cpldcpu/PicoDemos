@@ -73,21 +73,31 @@ static void roto_frame(uint32_t t_ms, uint32_t t_global)
     (void)t_global;
     float t = t_ms * 0.001f;
 
-    /* The rotozoomer recurs; the second pass spins the OTHER way, faster, more
-     * zoomed-in, with a deeper rubber warp so it doesn't read as a repeat.
-     * (All cheap core-0 setup; the beam-raced scan loop is untouched.) */
-    int   v1   = scene_cur_start_ms() > 50000u;
-    float ang  = t * (v1 ? -0.85f : 0.55f);
-    float zoom = v1 ? (1.75f + 0.55f * sinf(t * 0.55f))
-                    : (1.30f + 0.85f * sinf(t * 0.40f));
-    float amp  = v1 ? 60.0f : 40.0f;
-    float warp = v1 ? 0.30f : 0.18f;
+    /* The rotozoomer ACCELERATES over its scene (eases in, slow -> rushing) so
+     * it visibly tenses rather than spinning steadily; the white-glint takes it
+     * into the next scene. It appears twice: the first is a gentle RISE, the
+     * second the hard, fast BUILD that slams into drop 1 — opposite spin and a
+     * harder ramp so the reprise reads as a different move, not a repeat. prog
+     * is scene-relative; all cheap core-0 setup, the scan loop is untouched. */
+    float dur = (scene_cur_end_ms() - scene_cur_start_ms()) * 0.001f;
+    if (dur < 1.0f) dur = 1.0f;
+    float prog = t / dur; if (prog > 1.0f) prog = 1.0f;
+    float acc  = prog * prog;                /* ease-in: rushes at the end     */
+
+    int   build = scene_cur_start_ms() > 50000u;   /* 2nd pass = build into drop */
+    float dir   = build ? -1.0f : 1.0f;            /* opposite spin             */
+    float ang   = t * dir * (build ? (0.50f + 1.80f * acc) : (0.40f + 0.90f * acc));
+    float zoom  = (build ? 1.90f : 1.55f) - (build ? 1.25f : 0.70f) * acc
+                  + 0.10f * sinf(t * 0.8f);        /* rushes in (harder if build)*/
+    float warp  = (build ? 0.12f : 0.10f) + (build ? 0.40f : 0.22f) * acc;
+    float amp   = 30.0f + 30.0f * acc;
+    float fspd  = 2.1f + (build ? 2.4f : 1.2f) * acc;
     g_ca0 = cosf(ang) * zoom;
     g_sa0 = sinf(ang) * zoom;
-    g_cu  = 128.0f + amp * sinf(t * (v1 ? 0.31f : 0.23f));
-    g_cv  = 128.0f + amp * cosf(t * (v1 ? 0.27f : 0.19f));
+    g_cu  = 128.0f + amp * sinf(t * 0.31f);
+    g_cv  = 128.0f + amp * cosf(t * 0.27f);
     for (int y = 0; y < VGA_RACE_H; y++)
-        g_flex[y] = 1.0f + warp * sinf(y * 0.022f + t * 2.1f);   /* rubber */
+        g_flex[y] = 1.0f + warp * sinf(y * 0.022f + t * fspd);   /* rubber */
 
     g_white = qs_trans_white(t_global, scene_cur_start_ms(), scene_cur_end_ms(), 0);
 }

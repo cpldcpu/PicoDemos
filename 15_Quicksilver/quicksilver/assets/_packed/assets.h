@@ -60,4 +60,32 @@ extern const uint8_t  asset_latent_logo_end[];
 #define ASSET_LATENT_LOGO_H 48
 #define ASSET_LATENT_LOGO_SIZE 24576
 
+/* conduit: rgb565 128x128 32768 bytes */
+extern const uint8_t  asset_conduit_data[];
+extern const uint8_t  asset_conduit_end[];
+#define ASSET_CONDUIT_W 128
+#define ASSET_CONDUIT_H 128
+#define ASSET_CONDUIT_SIZE 32768
+
+/* conduit_bump: gray8 256x256 65536 bytes */
+extern const uint8_t  asset_conduit_bump_data[];
+extern const uint8_t  asset_conduit_bump_end[];
+#define ASSET_CONDUIT_BUMP_W 256
+#define ASSET_CONDUIT_BUMP_H 256
+#define ASSET_CONDUIT_BUMP_SIZE 65536
+
+/* envmap2: rgb565 128x128 32768 bytes */
+extern const uint8_t  asset_envmap2_data[];
+extern const uint8_t  asset_envmap2_end[];
+#define ASSET_ENVMAP2_W 128
+#define ASSET_ENVMAP2_H 128
+#define ASSET_ENVMAP2_SIZE 32768
+
+/* envmap3: rgb565 128x128 32768 bytes */
+extern const uint8_t  asset_envmap3_data[];
+extern const uint8_t  asset_envmap3_end[];
+#define ASSET_ENVMAP3_W 128
+#define ASSET_ENVMAP3_H 128
+#define ASSET_ENVMAP3_SIZE 32768
+
 #endif

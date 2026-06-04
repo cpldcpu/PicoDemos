@@ -20,7 +20,7 @@ SDLLIBS   := $(shell pkg-config --libs sdl2)
 
 CFLAGS  := -std=gnu11 -O2 -g -Wall -Wno-unused-function \
            -I.. -I../assets/_packed \
-           $(SDLCFLAGS) -DHOST_BUILD=1
+           $(SDLCFLAGS) -DHOST_BUILD=1 -MMD -MP
 ASFLAGS := -I.. -I../assets/_packed
 
 ASM_OBJS = music_qoa.o assets.o
@@ -32,6 +32,7 @@ SHARED_C = ../scene.c ../scene_scratch.c ../timeline.c \
            ../effects/envmap3d.c \
            ../effects/chrome.c \
            ../effects/liquid.c \
+           ../effects/tunnel.c \
            ../effects/title.c \
            ../effects/credits.c \
            ../effects/transition.c
@@ -68,6 +69,8 @@ chrome.o: ../effects/chrome.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 liquid.o: ../effects/liquid.c
 	$(CC) $(CFLAGS) -c -o $@ $<
+tunnel.o: ../effects/tunnel.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 title.o: ../effects/title.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 credits.o: ../effects/credits.c
@@ -84,6 +87,11 @@ assets.o: ../assets/_packed/assets.S $(wildcard ../assets/_packed/*.bin ../asset
 	$(CC) $(ASFLAGS) -c -o $@ $<
 
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -f $(OBJS) $(TARGET) $(C_OBJS:.o=.d)
 
 .PHONY: all clean
+
+# Auto-generated header dependencies (-MMD): rebuild a .o when any header it
+# includes changes (e.g. qs_tunnel.h). Without this, header-only edits silently
+# left tunnel.o stale and the host preview diverged from the device.
+-include $(C_OBJS:.o=.d)

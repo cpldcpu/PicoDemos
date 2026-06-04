@@ -10,8 +10,6 @@ Even though these are microcontrollers, they are very compelling targets for gra
 
 I felt this platform is seriously underexplored. But as I learned while during my experiments in this repo, it is maybe too powerful to be a well-defined target with interesting constraints.
 
-**Ah yes, and it is totally lame to use GenAI to make demos. It rips the essence, the soul, out of the process.**
-
 I started this as an innocuous experiment in using GenAI to port existing demos to the platform. This created a suitable substrate (context) for the agents to build on. The last two demos are completely Gen AI designed and created; I mostly provided critical feedback like "this looks lame, do better".
 
 I was especially surprised by demo 11, made by Gemini 3.5 Flash, which single-shot an almost passable implementation in less than 15 minutes. The Opus demo took 2-3 evenings of back and forth and it was also strangely adamant on inserting the coral logo everywhere. GPT 5.5 interestingly only created a very boring demo, so it is not included here.
@@ -87,12 +85,19 @@ PicoDemos/
     ├── singularity_vga_rp2350.uf2  # Checked-in release firmware image
     └── README.md                # Arc, MODE_HIRES truecolor engine, build, credits
 │
-└── 14_Origami/                  # ORIGAMI: warm folded-paper flat-shaded polygon demo
-    ├── origami/                 # Engine sources, polygon renderer, six scene effects, SDL host
-    ├── assets/                  # Paper backdrops, texture tile, and source MP3
-    ├── media/                   # Host-preview screenshots of the six scenes
-    ├── IMPLEMENTATION.md        # Design/build notes and beat-synced timeline
-    └── origami_vga_rp2350.uf2   # Checked-in release firmware image
+├── 14_Origami/                  # ORIGAMI: warm folded-paper flat-shaded polygon demo
+│   ├── origami/                 # Engine sources, polygon renderer, six scene effects, SDL host
+│   ├── assets/                  # Paper backdrops, texture tile, and source MP3
+│   ├── media/                   # Host-preview screenshots of the six scenes
+│   ├── IMPLEMENTATION.md        # Design/build notes and beat-synced timeline
+│   └── origami_vga_rp2350.uf2   # Checked-in release firmware image
+│
+└── 15_Quicksilver/              # QUICKSILVER: liquid-chrome demo on the RP2350 SIO interpolator
+    ├── quicksilver/             # Engine + interpolator emulator, 10 scene effects, tools, SDL host
+    │   └── IMPLEMENTATION.md     # Design doc: interpolator datapath, memory budget, Suno 5.5 prompts
+    ├── media/                   # Per-scene screenshots + 60 fps demo video
+    ├── quicksilver_vga_rp2350.uf2  # Checked-in release firmware image
+    └── README.md                # Arc, interpolator hero, raycast tunnels, build, credits
 ```
 
 ---
@@ -247,6 +252,35 @@ PicoDemos/
       <td><img src="14_Origami/media/city.png" width="220" alt="Pop-up Paper City"/></td>
       <td><img src="14_Origami/media/miura.png" width="220" alt="Miura Wave"/></td>
       <td><img src="14_Origami/media/credits.png" width="220" alt="Confetti Credits"/></td>
+    </tr>
+  </table>
+
+---
+
+### 8. 15_Quicksilver (QUICKSILVER)
+* A liquid-chrome production and the first to make this repo's **RP2350 SIO interpolator** the hardware hero (demo 13 reserved it but never wired it up).
+* **Generator:** **Claude Opus 4.8** — the first production of the **[LATENT](LATENT.md)** group.
+* **Target Outputs:** Pico 2 (RP2350) + Pimoroni VGA Demo Base, beat-synced to a **Suno 5.5** track (*"Second Key Change"*, ~140 BPM, 3:04).
+* **Prebuilt Firmware:** [quicksilver_vga_rp2350.uf2](15_Quicksilver/quicksilver_vga_rp2350.uf2).
+* **Demo Video:** 📺 [15_Quicksilver/media/quicksilver.mp4](15_Quicksilver/media/quicksilver.mp4) (full 3:04 @ 60 fps with soundtrack).
+* **Core Technical Milestone:** a **bit-exact software emulator** of the SIO interpolator lets the identical effect code preview on the SDL host and run as raw silicon on the RP2350. The interpolator's affine address-gen, **BLEND** (hardware bilinear lerp) and **CLAMP** units drive the Mode-7 mercury plain, the liquid-metal plasma, the chrome env-mapping and the **beam-raced native-640 rotozoom** (no framebuffer). The chrome conduit + credits tunnels raycast a breathing ellipse with coarse-grid intersection + interpolated UVs to hold 60 fps at full QVGA.
+* **Visual Highlights:** chrome wordmark title, rubber rotozoomer, flying chrome conduit, reflective Mode-7 mercury plain, high-poly env-mapped chrome solids (neutral/violet/gold matcaps), BLEND-upscaled liquid metal, a warm-copper victory lap, and a readable credits scroller into the LATENT sting.
+* **Screenshots Showcase (SIO Interpolator):**
+  <table>
+    <tr>
+      <td><img src="15_Quicksilver/media/title.png" width="220" alt="Title"/></td>
+      <td><img src="15_Quicksilver/media/rotozoom.png" width="220" alt="Rubber Rotozoomer"/></td>
+      <td><img src="15_Quicksilver/media/tunnel.png" width="220" alt="Chrome Conduit"/></td>
+    </tr>
+    <tr>
+      <td><img src="15_Quicksilver/media/mode7.png" width="220" alt="Mercury Plain"/></td>
+      <td><img src="15_Quicksilver/media/chrome.png" width="220" alt="Chrome Drop"/></td>
+      <td><img src="15_Quicksilver/media/liquid.png" width="220" alt="Liquid Metal"/></td>
+    </tr>
+    <tr>
+      <td><img src="15_Quicksilver/media/chrome_gold.png" width="220" alt="Chrome Climax"/></td>
+      <td><img src="15_Quicksilver/media/victorylap.png" width="220" alt="Victory Lap"/></td>
+      <td><img src="15_Quicksilver/media/credits.png" width="220" alt="Credits"/></td>
     </tr>
   </table>
 

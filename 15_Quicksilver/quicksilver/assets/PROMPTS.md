@@ -73,23 +73,89 @@ this, drop it in as `assets/title_logo.png` and I'll blit it over the backdrop
   to `tools/pack_assets.py`.
 
 > **Open requests to the artist (Gemini / Nano Banana):** #6 (wordmark, optional)
-> and #7 below (tunnel wall — would noticeably improve the finale).
+> is the only one still open. #7/#8/#9/#10 all delivered.
 
-#### 7. Tunnel Wall *(requested — would improve the end scene)*
-The credits finale is a chrome tunnel; it currently borrows the rotozoom
-filigree, which is a *centered mandala* and reads busy/low-res when wrapped onto
-a tunnel. A texture authored to **tile seamlessly in BOTH axes** (wraps left↔right
-= around the tube, and top↔bottom = depth) would look far better.
+> **Authoring note for ALL textures below — deliver them PRE-DOWNSAMPLED at the
+> size the demo actually samples (128×128 for walls/matcaps, NOT 256×256).** The
+> runtime copies every wall/matcap into a 128×128 SRAM tile anyway (the 256
+> source is downsampled on the fly and otherwise wastes 3/4 of the flash). Authoring
+> at 128 makes the flash asset 1/4 the size and lets the loader do a straight copy.
+> If you deliver 128 px, set the pack entry width/height to 128 (e.g.
+> `("conduit","conduit.png","rgb565",128,128,...)`) — the code reads `ASSET_*_W`,
+> so the downsample step becomes a no-op automatically.
+
+#### 7. Credits Tunnel Wall — *delivered (`tunnel.png`, chrome flutes)*
+Used by the finale; keep as-is.
+
+#### 9. Mid-demo Conduit Wall — *DELIVERED (`conduit.png`, 128×128 chrome cell grid)*
+Scene 3 (0:27, the "Chrome Conduit" tunnel) now flies `conduit.png` (a chrome
+cell grid with cyan nodes), wired in `effects/tunnel.c` via `asset_conduit_data`.
+Replaced the old rotozoom-filigree borrow. Original request kept below for ref:
 > **Prompt:**
-> Seamless tileable texture of polished liquid-chrome vertical flutes / fluted
-> metal pipes with soft cyan-white highlights and deep shadows between the
-> flutes, smooth gradients (NOT busy), tiles perfectly on all four edges, no
-> seams, no text, no border, high contrast. Square.
+> Seamless tileable texture of a liquid-chrome HEXAGONAL honeycomb / mercury cell
+> grid, flowing molten metal in the channels, cool silver with cyan and a touch
+> of magenta iridescence, soft specular highlights, smooth (NOT busy), bold
+> medium-scale cells (about 6 across), tiles perfectly on all four edges
+> (left↔right AND top↔bottom), no seams, no text, no border, high contrast.
 
-- **Source File:** `assets/tunnel.png`
-- **Output Target:** `assets/_packed/tunnel.bin` (rgb565, 256×256)
-- The end scene downsamples it to a 128×128 SRAM copy. Until delivered it falls
-  back to the roto texture.
+- **Source File:** `assets/conduit.png`  →  **Output:** `assets/_packed/conduit.bin`
+  (rgb565, **128×128** per the authoring note above).
+- **Pack entry:** `("conduit","conduit.png","rgb565",128,128,False,None)`.
+- Once delivered, point `effects/tunnel.c` at `asset_conduit_data` /
+  `ASSET_CONDUIT_W` (it falls back to `asset_roto_data` until then).
+
+#### 11. Conduit Height / Bump Map — *REQUESTED (`conduit_bump.png`, 256×256 grayscale)*
+The tunnel is now **bump-mapped with moving light rings** (`qs_tunnel_render_lit`):
+bright lights sweep forward along the tube and the wall's surface relief catches
+them — ridges flash as a light rolls past. The relief currently derives from the
+*colour* luma, which is soft (big smooth chrome panels), so the bump reads gentle.
+A **dedicated grayscale height map** with crisp, high-frequency detail is the
+single biggest upgrade — the lights will rake across real grooves and seams.
+Target look: a classic demoscene bump-scroller backdrop — **smooth flowing grey
+liquid metal** with glossy specular highlights (NOT crumpled foil / sharp creases,
+NOT industrial panels). The shader (`qs_tunnel_render_lit`) already does the grey
+desaturation, specular gloss and emboss; it just needs a source with **large, soft,
+rounded** relief.
+> **Prompt:**
+> Seamless tileable GRAYSCALE height map of a SMOOTH FLOWING LIQUID MERCURY / molten
+> chrome surface — large soft rounded blobs, bulges and valleys like the surface of
+> liquid metal, smooth organic curves. NO sharp creases, NO fine wrinkles, NO noise,
+> NO grain. White = raised bulge, black = recessed. Medium-to-large features (about
+> 8–12 across the image), smooth high contrast, soft rounded gradients. Pure
+> grayscale height field, NO baked lighting or shadows, NO colour, no text, no
+> border. Tiles perfectly on all four edges (left↔right AND top↔bottom).
+
+> *(First attempt `conduit_bump.png` came back as crumpled foil — sharp fine creases
+> → grainy/sparkly under specular. The build-time blur in `qs_tunnel_build_grad_g8`
+> (`smooth`/`baseline`) can round it a little, but the real fix is a source with the
+> large rounded blobs above.)*
+
+- **Source File:** `assets/conduit_bump.png` (256×256 grayscale)
+  →  **Output:** `assets/_packed/conduit_bump.bin` (gray8, 256×256, 64 KB flash).
+- **Pack entry (already added):** `("conduit_bump","conduit_bump.png","gray8",256,256,False,None)`.
+- **Already wired:** `effects/tunnel.c` auto-switches to `asset_conduit_bump_data`
+  the moment `ASSET_CONDUIT_BUMP_W` is defined (point-downsampled to the 128 grid
+  by `qs_tunnel_build_grad_g8`); until then it derives the bump from colour luma.
+  So the *only* step is: drop the PNG in `assets/`, run `pack_assets.py`, rebuild.
+
+#### 10. Extra Chrome Matcaps — *DELIVERED (`envmap2.png` gold, `envmap3.png` violet)*
+The two chrome scenes now use authored matcaps instead of the old code re-grade:
+block A (drop 1) = `envmap3` (violet iridescent), block B (climax) = `envmap2`
+(warm gold), copied straight to SRAM in `effects/chrome.c` (both 128×128). The
+original neutral `envmap.png` is no longer referenced. Original request kept below:
+> **Prompt A (blue steel):** A polished liquid-chrome reflection probe, orthographic
+> sphere filling a square frame, COOL studio lighting — blue-white key, steel-grey
+> body, deep blacks, crisp specular streaks, smooth gradients, no text, no border.
+> **Prompt B (warm gold):** …same sphere, WARM lighting — amber/gold key, copper
+> rim, bronze body, one hot white highlight, deep shadows, smooth, no text, no border.
+> **Prompt C (violet iridescent):** …same sphere, IRIDESCENT oil-slick lighting —
+> magenta-to-cyan gradients across the chrome, violet rim, dark, smooth, no text, no border.
+
+- **Source Files:** `assets/envmap2.png` (gold), `assets/envmap3.png` (violet), …
+- **Output:** `assets/_packed/envmapN.bin` (rgb565, **128×128**).
+- **Pack entries:** `("envmap2","envmap2.png","rgb565",128,128,False,None)` etc.
+- Once delivered, replace the `env_cool`/`env_warm` re-grades in `effects/chrome.c`
+  with the real maps (and add a third for a per-object swap if desired).
 
 #### 8. LATENT group logo *(requested — title & end card)*
 We founded the demo group **LATENT**. The title and end card currently render
@@ -107,94 +173,125 @@ mark — NOT another chrome wordmark like QUICKSILVER (it must read as a differe
 
 ---
 
-## Music (Suno 4.5) Prompts
+## Music (Suno 5.5 Pro) Prompts
 
-### General Guidance
-- Write a **narrative, descriptive style prompt** (genre + mood + tempo/energy + core instruments + production + progression).
-- Keep the **style field concise** (~200 chars).
-- Put **structure/metatags in the lyrics field** in `[brackets]`.
+### What changed with v5.5 — and how we use it
+Researched the v5.5 / Studio 1.2 feature set (June 2026). Three things matter
+for a *synced demo soundtrack* and they change our whole approach:
 
----
+1. **Parameterised section metatags.** v5.5 honours arrangement detail placed
+   *inside* a section tag, e.g. `[Drop: taiko, sub-bass, theme on full brass]`.
+   This overrides the Style field per-section, so we can score each scene
+   individually instead of hoping one global description shapes the whole track.
+   This is the single biggest control upgrade — use it heavily.
+2. **Negative constraints are now mandatory.** v5.5 rewards 2–3 explicit `no`
+   tags (`no vocals, no reverb wash, no lo-fi`). Vague 6-word styles no longer
+   land; *modular, layered* descriptors do, and subtle descriptors finally bite.
+3. **Warp Markers + Quantize (Suno Studio 1.2) = the sync tool.** Post-generation
+   you can drag transients onto a grid (non-destructive, like Ableton Warp /
+   Logic Flex Time) and quantise to lock drops tight. It is for *subtle* timing
+   correction, **not** heavy stretching — for big timing changes, regenerate.
+   Generation itself still does **not** condition on exact second-timings.
 
-### What the past tracks got wrong
-Three vocal-led attempts in a row were **raw, monotone, and the sections didn't
-line up with the action**. The fix is a hard reset of the brief:
+**Strategic consequence — co-design, don't retrofit.** Every prior attempt
+retimed the *demo* to whatever Suno produced, which is why the cuts feel "off".
+We now do the opposite: the storyboard below fixes the section lengths, we ask
+Suno for a track with those sections, then use **Warp Markers** to nudge its
+drops onto our exact cut points (33s/…). Co-designed, not retrofitted.
 
-1. **Fully instrumental.** Sung words flatten into a loop and fight the visuals.
-   A demo wants a *tune you remember*, carried by leads, not a voice.
-2. **A real MELODY, with a theme that recurs.** State a memorable lead motif in
-   the intro, pay it off at the drops, bring it back transformed in the finale.
-   This is what makes the track feel composed instead of "raw".
-3. **Demoscene craft, not generic synthwave.** Fast major-key arpeggios, glassy
-   FM-bell and supersaw leads, call-and-response between two leads, a key change
-   into the final drop — the Future Crew / Purple Motion / Skaven lineage.
-4. **Hard sectional contrast** so the cuts can land on real boundaries: quiet
-   glass intro → build → bright drop → soaring second lead → filtered breakdown
-   → euphoric key-up finale → reflective fade.
+### Target shape
+- **~2:30** total (a fast demo; 2–3 min is the sweet spot). `[End]` hard-stops it.
+- **~140 BPM**, **minor / Dorian** key — uplifting, driving, energetic.
+- **Single pass through the effects** — each effect is seen *once*; only CHROME
+  (the centrepiece) returns, on the second drop, with fresh objects. So the
+  music needs exactly **two** big drops, not a stream of equal hits.
+- Fully **instrumental** (toggle ON + `[Instrumental]`): sung words flatten into
+  a loop and fight the visuals. A demo wants a *tune you remember* on leads.
+- A **recurring main theme**: stated solo in the intro, paid off on drop 1, and
+  returned transformed (key-up) on the final drop. This is what makes it read as
+  *composed* rather than raw/monotone — the recurring complaint.
+- **This must sound like a DEMO TUNE, not a movie.** The previous track read as
+  an *end-credits scroller* — because earlier briefs chased "gravitas" with an
+  orchestra (choir, brass, timpani, "hybrid film score"). That is the culprit.
+  Get the weight the **demoscene** way instead: stacked supersaws + hoover stabs
+  + deep sub under **fast arpeggios**, a punchy four-on-floor / breakbeat, glassy
+  FM-bell leads, and big synth drops — the Future Crew *Second Reality* / Purple
+  Motion / Skaven / Necros tracker lineage. Energetic and uplifting, **not slow,
+  not cinematic, no orchestra**.
 
-5. **GRAVITAS.** The synth version was *better but too light* — it needs weight
-   and grandeur. Fuse the demoscene leads with **cinematic orchestral muscle**:
-   a low choir, brass swells, deep sub-bass, timpani/taiko booms and orchestral
-   hits, and a **noble minor / Dorian** tonality (not bright major). Slow,
-   monumental chords sit *under* the fast arps so the energy rides on a heavy
-   foundation. Slightly slower tempo so every hit lands hard.
+### Demo arc to score — 7 scenes, single pass (~2:30)
+**Important — Suno takes no timing input.** There is no seconds field; BPM is
+approximate and section lengths are *emergent*, not specified. So the lengths
+below are **demo-side targets**, NOT something the prompt forces Suno to hit.
+What the prompt *does* control is the **count, order and character** of sections
+(the two-drop shape). The only lever that nudges length is **bar counts**, which
+the model honours far better than seconds (at ~140 BPM a 4/4 bar ≈ 1.7 s) — so
+the `bars` column is a *hint*, still approximate. **Reconcile after generation:**
+run `analyze_music.py`, then fit by retiming `timeline.c` to the real boundaries
+(± subtle Warp-Marker nudges / a small trim). Co-design just shrinks that fit.
 
-The demo is **re-timed to the delivered track** (scene cuts snap to its drops),
-so Suno's exact lengths don't have to match — but giving it clear sections makes
-that re-time clean. Target ~**3:00**, **~128 BPM**, **noble minor/Dorian** key.
+| # | scene | bars (~s) | section tag | musical job |
+|---|---|---|---|---|
+| 1 | **title** | 8 (~14s) | `[Intro]` | sparse: glassy FM bell states the MAIN THEME; soft pad + deep sub; no drums; anticipation |
+| 2 | **rotozoomer** | 12 (~21s) | `[Build]` | rising arpeggio + snare roll + filter-opening riser — tension climbing to drop 1 |
+| 3 | **chrome A** | 14 (~24s) | `[Drop]` | DROP 1: four-on-floor + punchy bass; theme on bright supersaw; hoover stabs + arp fireworks |
+| 4 | **mercury plain** | 12 (~21s) | `[Groove]` | driving breakbeat + funky bass; a SOARING second lead over fast arps |
+| 5 | **liquid metal** | 12 (~21s) | `[Breakdown]` | strip to filtered pad + lone-bell reprise of the theme; tension rebuilds late |
+| 6 | **chrome B** | 14 (~24s) | `[Final Drop]` | PEAK: KEY CHANGE UP, double-time arps, stacked saw leads + hoovers, biggest moment |
+| 7 | **credits** | 8 (~14s) | `[Outro]` | resolve: theme once more on a lone bright lead, filter close, quick fade; `[End]` |
 
-### Demo arc to score (what each scene wants from the music)
-| scene | musical job |
-|---|---|
-| **title** (brand reveal) | glassy intro: airy pad + a single wistful statement of the MAIN THEME on a bell lead; no drums; anticipation |
-| **rotozoomer** | DROP 1: four-on-the-floor kick, punchy bass, the main theme in full on a bright supersaw — uplifting demoscene energy |
-| **mercury plain** | a new SOARING counter-melody over the driving groove; wide, cruising, a touch of melancholy |
-| **chrome objects (A)** | the HOOK — the catchiest lead, call-and-response between bell and saw, layered harmonies |
-| **liquid metal** | BREAKDOWN: strip to filtered pad + sub bass, a quiet reprise of the intro theme, reverb tails, tension |
-| **chrome reprise (B)** | DROP 2 / PEAK: double-time, KEY CHANGE UP, the theme returns triumphant and stacked, arpeggio fireworks |
-| **credits tunnel** | OUTRO: resolve, the theme one last time on a lone glassy lead, slow filter close, reflective fade to silence |
+(~80 bars ≈ 2:20 at 140 BPM. Treat as aim, not contract.)
 
 ### Two gotchas to avoid (learned the hard way)
-- **It sang the descriptions.** Suno *sings any text in the Lyrics box that is
-  not inside `[brackets]`.* So prose like "the catchiest lead" gets vocalised.
-  Fix: **turn ON Suno's "Instrumental" switch**, and keep the Lyrics box to
-  **bracket-only** section tags — the rich arrangement detail goes in the
-  **Style** field, which is never sung.
-- **It ran 8 minutes.** Too many/too-verbose sections make Suno sprawl. Keep it
-  to ~7 short tags, say the length in the Style field, and **don't hit Extend** —
-  pick the ~3-minute take. If a take still runs long, delete the `[Lead]` or
-  `[Hook]` tag and regenerate.
+- **It sang the descriptions.** Suno *sings any Lyrics-box text not inside
+  `[brackets]`*. Keep the Lyrics box **bracket-only**; rich detail goes in the
+  **Style** field (never sung). Belt-and-braces: flip the **Instrumental** toggle.
+- **It ran 8 minutes.** Too many / too-verbose sections make it sprawl. Keep to
+  these **7 tags**, state the length in Style, end with `[End]`, and **don't hit
+  Extend** — pick the ~2:30 take. If a take runs long, drop a section tag and
+  regenerate.
 
 ### Style Prompt (paste into Suno's *Style* field — carries all the detail)
-> Epic cinematic demoscene instrumental, about 3 minutes, ~128 BPM, noble
-> minor/Dorian key. Glassy FM-bell and supersaw leads with a strong recurring
-> melody and fast arpeggios, riding a HEAVY orchestral foundation: low choir,
-> brass swells, deep sub-bass, timpani and taiko booms, orchestral hits.
-> Monumental and reflective, huge dynamics — solemn intro, weighty drop on the
-> main theme, soaring minor counter-melody, filtered breakdown reprise, then a
-> double-time key-change-up finale and a slow reflective fade. Grand, with
-> gravitas; Second Reality / Purple Motion grandeur meets hybrid film score.
-> Strictly instrumental, no vocals, no vocal chops.
+> Energetic oldskool demoscene anthem, instrumental, about 2 minutes 30 seconds,
+> ~140 BPM, minor/Dorian key — uplifting and driving. Bright supersaw and PWM
+> square leads, glassy FM bells carrying a strong recurring melody, fast
+> hands-in-the-air arpeggios, hoover stabs, a funky punchy bassline, four-on-the-
+> floor kick with breakbeat fills, gated reverb, chip blips. Builds from a sparse
+> intro to euphoric synth drops with arpeggio fireworks, a stripped breakdown,
+> then a key-change-up final drop. The weight comes from STACKED SAWS and deep
+> sub, not an orchestra. Future Crew Second Reality / Purple Motion / Skaven /
+> Necros tracker energy. No vocals, no orchestra, no choir, no brass, no
+> cinematic film-score, no slow ballad.
 
 ### Structure Prompt (paste into the *Lyrics* field — bracket-only, nothing sung)
 *(Every line is a `[bracketed]` tag, so Suno reads it as a section direction and
-sings nothing. Short cues inside the brackets are safe; full prose is not.
-Belt-and-braces: also flip the **Instrumental** toggle on.)*
+sings nothing. The detail inside each tag is the v5.5 per-section override —
+this is what scores each scene. Also flip the **Instrumental** toggle on.)*
+
+*(The `N bars` hints are the only lever that nudges section length — the model
+honours bars far better than seconds, though still approximately.)*
 
 ```text
 [Instrumental]
-[Intro: solemn, low choir, lone bell states the theme, deep sub, no drums]
-[Build: timpani roll, rising arpeggio, brass swell into the drop]
-[Drop: taiko + four-on-the-floor, sub-bass, theme on supersaw doubled by brass]
-[Lead: soaring minor counter-melody, wide strings underneath]
-[Hook: bell and saw call-and-response over orchestral hits and choir]
-[Breakdown: filtered pad + lone choir, quiet reprise of the theme]
-[Drop 2: double-time, key change UP, full brass + choir, biggest moment]
-[Outro: lone lead over a slow choir chord, filter close, fade to silence]
+[Intro - 8 bars: sparse, glassy FM bell states the theme, soft pad, deep sub, no drums]
+[Build - 12 bars: rising arpeggio, snare roll, riser, filter opening into the drop]
+[Drop - 14 bars: four-on-the-floor + punchy bass, theme on bright supersaw, hoover stabs, arp fireworks]
+[Groove - 12 bars: driving breakbeat, funky bassline, soaring second lead over fast arps]
+[Breakdown - 12 bars: strip to filtered pad + lone bell reprise, gentle, tension rebuilds late]
+[Final Drop - 14 bars: key change UP, double-time arps, stacked saw leads + hoovers, biggest moment]
+[Outro - 8 bars: theme once more on a lone bright lead, filter close, quick fade]
+[End]
 ```
 
 *(If a vocal still sneaks in: set the "exclude styles" box to
 `vocals, lyrics, singing, vocal chops` and regenerate.)*
+
+### After generation — lock the sync (Suno Studio)
+1. Open the take in **Studio**, auto-set **Warp Markers** on transients.
+2. Nudge the two drop transients so they land on tidy bar lines; **Quantise** to
+   tighten the groove (fixes the "monotone/drifting" feel without regenerating).
+3. Export, then run `tools/analyze_music.py` to read the real drop times and
+   snap `timeline.c` to them. Keep edits subtle — big moves = regenerate instead.
 
 ### Music Conversion
 Convert the output audio using:

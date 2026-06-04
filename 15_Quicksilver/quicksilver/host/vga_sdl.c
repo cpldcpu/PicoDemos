@@ -16,6 +16,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <direct.h>
+#include <io.h>
+#include <fcntl.h>
 
 #define OW VGA_RACE_W          /* 640 */
 #define OH VGA_RACE_H          /* 480 */
@@ -37,6 +39,7 @@ void vga_screenshot(void);    /* forward decl (defined below, called by present)
 
 static int g_quit = 0, g_skip = 0, g_shot_seq = 0;
 int g_offline = 0;
+int g_rawpipe = 0;
 int  vga_should_quit(void) { return g_quit; }
 int  vga_consume_skip_request(void) { int r = g_skip; g_skip = 0; return r; }
 
@@ -62,6 +65,32 @@ static void present_screen(void) {
             case SDLK_r:     g_skip = 2; break;
             default: break;
         }
+    }
+}
+
+/* --rawpipe video render: stream every frame as raw BGRA so ffmpeg can encode
+ * an MP4 live (no 10 GB of intermediate BMPs). g_screen is ARGB8888 in memory,
+ * i.e. B,G,R,A byte order on little-endian -> ffmpeg pixel fmt bgra.
+ *
+ * CRITICAL: the pipe must carry ONLY pixels. Many printf()s fire during a run
+ * (vga_init banner, scene.c's per-scene "scene: -> [n] name" line, etc.); any
+ * byte of those on stdout shifts the whole video stream (a rolling framebuffer
+ * offset). So we dup the real stdout to a private fd for frames, then point
+ * fd 1 at stderr — every stray printf now lands on the terminal, not the pipe. */
+static int g_vidfd = -1;
+void vga_raw_begin(void) {
+    fflush(stdout);
+    g_vidfd = _dup(_fileno(stdout));            /* the pipe to ffmpeg          */
+    _setmode(g_vidfd, _O_BINARY);               /* no 0x0A mangling on Windows */
+    _dup2(_fileno(stderr), _fileno(stdout));    /* all printf -> stderr now    */
+}
+void vga_raw_emit(void) {
+    const char *p = (const char *)g_screen;
+    int n = OW * OH * 4;
+    while (n > 0) {                             /* pipes can short-write       */
+        int w = _write(g_vidfd, p, n);
+        if (w <= 0) break;
+        p += w; n -= w;
     }
 }
 

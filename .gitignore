@@ -71,6 +71,9 @@
 **/assets_by_nanobanana/
 **/thedemo_assets/
 
+# Make auto-generated header dependency files (host build, -MMD -MP)
+**/*.d
+
 # Python caching
 **/__pycache__/
 
@@ -85,3 +88,5 @@ Session.vim
 
 # Agent instruction and notes files
 **/CLAUDE.md
+.claude/
+LATENT.md

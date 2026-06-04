@@ -62,14 +62,30 @@ static void liquid_frame(uint32_t t_ms, uint32_t t_global)
     (void)t_global;
     float t = t_ms * 0.001f;
 
-    /* Recurs once; the second pass flows faster on a finer scale from a new
-     * pool centre, and its sheen is palette-shifted so it reads as a different
-     * molten metal rather than a repeat. (Coarse-grid + index math; cheap.) */
-    int   v1 = scene_cur_start_ms() > 90000u;
-    float sc = v1 ? 0.55f : 0.40f;     /* spatial scale */
-    float ts = v1 ? 1.6f  : 1.0f;      /* time speed     */
-    float cx = v1 ? 5.0f  : 8.0f, cy = v1 ? 9.0f : 6.0f;   /* radial pool centre */
-    int   poff = v1 ? 128 : 0;         /* sheen/palette phase shift */
+    /* Liquid metal appears TWICE, in two distinct moods (keyed off the scene
+     * start, threshold 100 s, like chrome/mode7):
+     *   BUILD (0:54, the mid-groove break) — busy, fast, palette churning,
+     *     ACCELERATING the whole way: a quicksilver riser into drop 1.
+     *   BREAKDOWN (1:49) — dreamy suspended pooling that re-tensions only over
+     *     its final third into the climax (chrome B). */
+    float dur = (scene_cur_end_ms() - scene_cur_start_ms()) * 0.001f;
+    if (dur < 1.0f) dur = 1.0f;
+    float prog = t / dur; if (prog > 1.0f) prog = 1.0f;
+    int   build = scene_cur_start_ms() < 100000u;
+
+    float sc, ts, cx, cy; int poff;
+    if (build) {
+        sc   = 0.60f;                  /* finer, busier field                   */
+        ts   = 1.5f + 1.4f * prog;     /* already fast, accelerating to the drop */
+        cx   = 10.0f; cy = 8.0f;
+        poff = (int)(t * 36.0f);       /* palette churn = energy                 */
+    } else {
+        float rise = prog < 0.66f ? 0.0f : (prog - 0.66f) / 0.34f;  /* 0 -> 1 late */
+        sc   = 0.40f;                  /* dreamy, broad pools                    */
+        ts   = 1.0f + 0.7f * rise;     /* flow quickens only into the drop       */
+        cx   = 8.0f; cy = 6.0f;
+        poff = 0;
+    }
 
     /* coarse plasma field — summed travelling sines (the "liquid"). */
     for (int gy = 0; gy < GH; gy++) {

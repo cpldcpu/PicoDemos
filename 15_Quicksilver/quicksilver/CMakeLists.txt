@@ -39,6 +39,7 @@ add_executable(quicksilver
     effects/envmap3d.c
     effects/chrome.c
     effects/liquid.c
+    effects/tunnel.c
     effects/title.c
     effects/credits.c
     effects/transition.c

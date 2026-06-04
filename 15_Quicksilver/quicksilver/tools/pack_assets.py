@@ -62,6 +62,14 @@ ASSETS = [
     ("tunnel",    "tunnel.png",   "rgb565", 256, 256, False,  None),
     # LATENT group logo (256x48)
     ("latent_logo","latent_logo.png","rgb565", 256, 48, False,  None),
+    # Mid-demo conduit wall (128x128, pre-downsampled)
+    ("conduit",   "conduit.png",   "rgb565", 128, 128, False,  None),
+    # Dedicated conduit height/bump map — crisp grooves for moving-light relief.
+    # gray8, authored at 256 (point-downsampled to 128 at runtime for the tube).
+    ("conduit_bump","conduit_bump.png","gray8", 256, 256, False, None),
+    # Extra Chrome Matcaps (128x128, pre-downsampled)
+    ("envmap2",   "envmap2.png",   "rgb565", 128, 128, False,  None),
+    ("envmap3",   "envmap3.png",   "rgb565", 128, 128, False,  None),
 ]
 
 
