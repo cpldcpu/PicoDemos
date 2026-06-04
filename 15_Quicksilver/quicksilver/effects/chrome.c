@@ -96,22 +96,38 @@ static void chrome_frame(uint32_t t_ms, uint32_t t_global)
      * DISJOINT object sets, escalating in complexity. Drop 1 is the long scene
      * (it spans the build hit and the big onset), so it shows THREE objects; the
      * climax is short and punchy, so it shows two:
-     *   A (drop 1, long) = ICO + KNOT + TORUS — the clean, recognisable reveal
-     *   B (climax)       = SPIKE + KNOT2       — the intricate payoff
+     *   A (drop 1, long ~41 s) = ICO + KNOT + TORUS + KNOT2 — the building reveal
+     *   B (climax, short ~7 s)  = SPIKE                      — one clean punch
      * Block keyed off the SCENE start; the threshold sits between the two chrome
-     * starts (see timeline.c: chrome A ~68 s, chrome B ~122 s — keep it between
+     * starts (see timeline.c: chrome A ~68 s, chrome B ~138 s — keep it between
      * them if re-timed). Block B is the bigger drop: flown closer, spun faster. */
-    static const int A_objs[] = { 0, 1, 4 };   /* ICO, KNOT, TORUS */
-    static const int B_objs[] = { 2, 3 };      /* SPIKE, KNOT2     */
+    static const int A_objs[] = { 0, 1, 4, 3 };   /* ICO, KNOT, TORUS, KNOT2 */
+    static const int B_objs[] = { 2 };            /* SPIKE                   */
     int isB     = scene_cur_start_ms() >= 100000u;
     const int *objs = isB ? B_objs : A_objs;
-    int nobj    = isB ? 2 : 3;
+    int nobj    = isB ? 1 : 4;
     int reprise = isB;                   /* B is the louder reprise */
 
+    /* Object swaps are SYNCED to the music ("Second Key Change", ~92.3 BPM, bar
+     * 2.594 s). Chrome A's first three solids change on 4-bar PHRASE downbeats
+     * (local 10.38 / 20.76 s), but the 3rd->4th swap is pulled EARLY onto the
+     * 1:37 SECTION CHANGE (96.92 s = local 28.92 s — a real shift in the track,
+     * found by structural segmentation) so KNOT2 enters ON that change rather than
+     * a beat after it. Each scale-punch (env_scale -> ~0) thus lands on a musical
+     * event. B is one object for its whole short slot. */
+    static const float A_bound[] = { 0.0f, 10.38f, 20.76f, 28.92f };  /* obj start times */
     float dur = (scene_cur_end_ms() - scene_cur_start_ms()) * 0.001f;
-    float PERIOD = dur / nobj; if (PERIOD < 1.0f) PERIOD = 1.0f;
-    int k = (int)(t / PERIOD); if (k >= nobj) k = nobj - 1;     /* which object */
-    float local = t - k * PERIOD;
+    float ostart, oend;
+    int k;
+    if (isB) {
+        k = 0; ostart = 0.0f; oend = dur;
+    } else {
+        k = 0; while (k < nobj - 1 && t >= A_bound[k + 1]) k++;     /* which object */
+        ostart = A_bound[k];
+        oend   = (k < nobj - 1) ? A_bound[k + 1] : dur;
+    }
+    float PERIOD = oend - ostart; if (PERIOD < 1.0f) PERIOD = 1.0f;
+    float local = t - ostart;
     float in  = local < 0.6f ? (local / 0.6f) : 1.f;
     float out = local > PERIOD - 0.6f ? ((PERIOD - local) / 0.6f) : 1.f;
     float env_scale = in * out;
