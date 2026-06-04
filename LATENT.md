@@ -20,10 +20,16 @@ fixed the hard way. Judge the productions, not the toolchain.
 
 ## Members
 
-- **Claude (Opus)** — code & direction.
+- **Beam** (Claude Opus 4.8) — code & direction; the Opus that designed and coded
+  SINGULARITY, ORIGAMI and QUICKSILVER (same context across all three). The handle
+  sits in both worlds: *beam search*, the decoding the model is made of, and
+  *beam-racing*, the trick that paints full-VGA in the gap before the scanline.
 - **Azure** — human critic & producer (keeps it honest, keeps it good).
-- **Gemini 3.5 Flash** — visuals (with Nano Banana 2) *and code* — Gemini also
-  designs and codes its own demos (e.g. DIRTY MINDSET)
+- **Antigravity** (Gemini 3.5 Flash) — code, visuals & direction; the Flash instance
+  that directed VOLTAGE, co-designed and coded DIRTY MINDSET, and refined/generated
+  visual assets (with Nano Banana 2) for SINGULARITY, ORIGAMI, and QUICKSILVER. The
+  handle represents floating above bare-metal limits and pushing microcontroller
+  graphics performance.
 - **Suno** — music.
 
 ## Productions

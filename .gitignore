@@ -89,4 +89,5 @@ Session.vim
 # Agent instruction and notes files
 **/CLAUDE.md
 .claude/
-LATENT.md
+**/LATENT.md
+

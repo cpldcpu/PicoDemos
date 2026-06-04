@@ -14,7 +14,13 @@ I started this as an innocuous experiment in using GenAI to port existing demos 
 
 I was especially surprised by demo 11, made by Gemini 3.5 Flash, which single-shot an almost passable implementation in less than 15 minutes. The Opus demo took 2-3 evenings of back and forth and it was also strangely adamant on inserting the coral logo everywhere. GPT 5.5 interestingly only created a very boring demo, so it is not included here.
 
-Slop starts below the line.
+After the release of Opus 4.8 I asked it to come up with novel demos ideas, it came up with two interesting concepts, which you can see in 13 "Singularity" and 14 "Origami".
+
+Demo 15 "Quicksilver" is an attempt to push the hardware more. It makes use of the SIO interpolator, a custom hardware block in the RP2350 that can do pixel blending and affine address generation to render effects that would be impossible otherwise, like a beam-raced full-VGA rotozoom in truecolor. This demos was much more "hands-on" than the others.
+
+
+
+Everything below the line is AI generated.
 
 *Azure*
 
@@ -38,7 +44,7 @@ Slop starts below the line.
 | **14** | **[ORIGAMI](14_Origami)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 truecolor, antialiased filled polygons) | **Claude Opus 4.8** |
 | **15** | **[QUICKSILVER](15_Quicksilver)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (beam-raced full-VGA rotozoom + SIO interpolator: Mode-7/env-mapped chrome/tunnel) | **Claude Opus 4.8** |
 
-> QUICKSILVER is the first production of **[LATENT](LATENT.md)** — a demoscene group for machine-made productions on bare-metal silicon (code & direction by Claude Opus; human critic: Azure).
+> QUICKSILVER is the first production of **[LATENT](LATENT.md)** — a demoscene group for machine-made productions on bare-metal silicon (code & direction by **Beam** / Claude Opus; visuals by **Antigravity** / Gemini; human critic: Azure).
 
 ---
 
@@ -259,27 +265,27 @@ PicoDemos/
 
 ### 8. 15_Quicksilver (QUICKSILVER)
 * A liquid-chrome production and the first to make this repo's **RP2350 SIO interpolator** the hardware hero (demo 13 reserved it but never wired it up).
-* **Generator:** **Claude Opus 4.8** — the first production of the **[LATENT](LATENT.md)** group.
-* **Target Outputs:** Pico 2 (RP2350) + Pimoroni VGA Demo Base, beat-synced to a **Suno 5.5** track (*"Second Key Change"*, ~140 BPM, 3:04).
+* **Generator:** **Claude Opus 4.8** (scene handle **Beam**) — the first production of the **[LATENT](LATENT.md)** group.
+* **Target Outputs:** Pico 2 (RP2350) + Pimoroni VGA Demo Base, beat-synced to a **Suno 5.5** track (*"Second Key Change"*, ~92 BPM, 3:04).
 * **Prebuilt Firmware:** [quicksilver_vga_rp2350.uf2](15_Quicksilver/quicksilver_vga_rp2350.uf2).
 * **Demo Video:** 📺 [15_Quicksilver/media/quicksilver.mp4](15_Quicksilver/media/quicksilver.mp4) (full 3:04 @ 60 fps with soundtrack).
-* **Core Technical Milestone:** a **bit-exact software emulator** of the SIO interpolator lets the identical effect code preview on the SDL host and run as raw silicon on the RP2350. The interpolator's affine address-gen, **BLEND** (hardware bilinear lerp) and **CLAMP** units drive the Mode-7 mercury plain, the liquid-metal plasma, the chrome env-mapping and the **beam-raced native-640 rotozoom** (no framebuffer). The chrome conduit + credits tunnels raycast a breathing ellipse with coarse-grid intersection + interpolated UVs to hold 60 fps at full QVGA.
-* **Visual Highlights:** chrome wordmark title, rubber rotozoomer, flying chrome conduit, reflective Mode-7 mercury plain, high-poly env-mapped chrome solids (neutral/violet/gold matcaps), BLEND-upscaled liquid metal, a warm-copper victory lap, and a readable credits scroller into the LATENT sting.
-* **Screenshots Showcase (SIO Interpolator):**
+* **Core Technical Milestone:** a **bit-exact software emulator** of the SIO interpolator lets the identical effect code preview on the SDL host and run as raw silicon on the RP2350. The interpolator's affine address-gen, **BLEND** (hardware bilinear lerp) and **CLAMP** units drive the Mode-7 mercury plain, the liquid-metal plasma, the chrome env-mapping and the **beam-raced native-640 rotozoom** (no framebuffer). The climax conduit is a **relief raymarcher** (real 3D wall displacement) that marches a coarse column grid and interpolates the hit coordinates to hold 60 fps at full QVGA.
+* **Visual Highlights:** chrome wordmark title, reflective Mode-7 mercury plain, an iridescent flowing liquid-metal plasma, a rubber rotozoomer, **2D bump-mapped mercury under a moving light**, high-poly env-mapped chrome solids (neutral/violet/gold matcaps) with beat-synced object swaps, a **voxel/relief chrome tunnel** at the climax, and a readable credits scroller into the LATENT sting.
+* **Screenshots Showcase (in running order):**
   <table>
     <tr>
       <td><img src="15_Quicksilver/media/title.png" width="220" alt="Title"/></td>
-      <td><img src="15_Quicksilver/media/rotozoom.png" width="220" alt="Rubber Rotozoomer"/></td>
-      <td><img src="15_Quicksilver/media/tunnel.png" width="220" alt="Chrome Conduit"/></td>
-    </tr>
-    <tr>
       <td><img src="15_Quicksilver/media/mode7.png" width="220" alt="Mercury Plain"/></td>
-      <td><img src="15_Quicksilver/media/chrome.png" width="220" alt="Chrome Drop"/></td>
-      <td><img src="15_Quicksilver/media/liquid.png" width="220" alt="Liquid Metal"/></td>
+      <td><img src="15_Quicksilver/media/plasma.png" width="220" alt="Liquid Plasma"/></td>
     </tr>
     <tr>
+      <td><img src="15_Quicksilver/media/rotozoom.png" width="220" alt="Rubber Rotozoomer"/></td>
+      <td><img src="15_Quicksilver/media/liquid.png" width="220" alt="Bump-Mapped Mercury"/></td>
+      <td><img src="15_Quicksilver/media/chrome.png" width="220" alt="Chrome Drop"/></td>
+    </tr>
+    <tr>
+      <td><img src="15_Quicksilver/media/tunnel.png" width="220" alt="Voxel Tunnel (climax)"/></td>
       <td><img src="15_Quicksilver/media/chrome_gold.png" width="220" alt="Chrome Climax"/></td>
-      <td><img src="15_Quicksilver/media/victorylap.png" width="220" alt="Victory Lap"/></td>
       <td><img src="15_Quicksilver/media/credits.png" width="220" alt="Credits"/></td>
     </tr>
   </table>

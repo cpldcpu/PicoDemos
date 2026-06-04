@@ -1,7 +1,7 @@
 # 15_Quicksilver — *QUICKSILVER*
 
 A liquid-chrome demoscene production for the **Raspberry Pi Pico 2 (RP2350)**,
-beat-synced to a **Suno 5.5** track (*"Second Key Change"*, ~140 BPM, 3:04). The
+beat-synced to a **Suno 5.5** track (*"Second Key Change"*, ~92 BPM, 3:04). The
 demo's hardware hero is the **RP2350 SIO interpolator** (INTERP0/INTERP1) — its
 affine address-generation, **BLEND** (hardware bilinear lerp) and **CLAMP** units
 drive the Mode-7 plain, the liquid-metal plasma, the chrome env-mapping and the
@@ -27,17 +27,19 @@ plugging in the Pico 2, then drag the UF2 onto the `RPI-RP2` USB drive. 300 MHz 
 
 ### Scene gallery
 
-| Title | Rubber rotozoomer | Chrome conduit |
-|:---:|:---:|:---:|
-| ![Title](media/title.png) | ![Rotozoom](media/rotozoom.png) | ![Tunnel](media/tunnel.png) |
+*(in running order)*
 
-| Mercury plain | Chrome (drop 1) | Liquid metal |
+| Title | Mercury plain | Liquid plasma |
 |:---:|:---:|:---:|
-| ![Mode-7](media/mode7.png) | ![Chrome](media/chrome.png) | ![Liquid](media/liquid.png) |
+| ![Title](media/title.png) | ![Mode-7](media/mode7.png) | ![Plasma](media/plasma.png) |
 
-| Chrome climax | Victory lap | Credits |
+| Rubber rotozoomer | Bump-mapped mercury | Chrome (drop 1) |
 |:---:|:---:|:---:|
-| ![Chrome gold](media/chrome_gold.png) | ![Victory lap](media/victorylap.png) | ![Credits](media/credits.png) |
+| ![Rotozoom](media/rotozoom.png) | ![Liquid](media/liquid.png) | ![Chrome](media/chrome.png) |
+
+| Voxel tunnel (climax) | Chrome climax | Credits |
+|:---:|:---:|:---:|
+| ![Tunnel](media/tunnel.png) | ![Chrome gold](media/chrome_gold.png) | ![Credits](media/credits.png) |
 
 ## The arc
 
@@ -45,27 +47,33 @@ plugging in the Pico 2, then drag the UF2 onto the `RPI-RP2` USB drive. 300 MHz 
 Effects appear once each except CHROME, MODE-7 and LIQUID, which return in clearly
 distinct variants so no pass reads as a repeat.
 
+Effects are ordered by rising **impact**, with the two highest-energy effects
+landing on the two musical peaks (the long DROP 1 and the CLIMAX) and the voxel
+tunnel saved as the climax.
+
 | Time | Scene | Interpolator / technique |
 |------|-------|--------------------------|
 | 0:00 | **Title** — chrome "QUICKSILVER" wordmark over molten-mercury droplets | bilinear shimmer |
-| 0:13 | **Rubber Rotozoomer** — fullscreen bilinear rotozoom of a chrome filigree, sine "rubber" flex | affine address-gen, **beam-raced native 640** (no framebuffer) |
-| 0:27 | **Chrome Conduit** — flying through a breathing chrome tube | fast raycast + interpolated UV (see below) |
-| 0:41 | **Mercury Plain** *(groove)* — infinite reflective Mode-7 ground under a chrome dusk sky | per-scanline affine + **CLAMP** haze |
-| 0:54 | **Liquid Metal** *(riser)* — fast plasma rising into the drop | **BLEND** bilinear upscale |
-| 1:08 | **Chrome** *(drop 1)* — icosphere + torus-knots + torus, polished chrome; per-object matcaps (neutral / violet / gold) | per-pixel matcap address-gen + bilinear |
-| 1:49 | **Liquid Metal** *(breakdown)* — dreamy pooling mercury, re-tensions late | **BLEND** |
-| 2:02 | **Chrome** *(climax)* — intricate spike-ball + knot in warm gold | per-pixel matcap |
-| 2:18 | **Mercury Plain** *(victory lap)* — warm copper, low & fast, banking | per-scanline affine + **CLAMP** |
+| 0:13 | **Mercury Plain** *(groove)* — infinite reflective Mode-7 ground under a chrome dusk sky | per-scanline affine + **CLAMP** haze |
+| 0:27 | **Liquid Metal** *(plasma)* — an iridescent, flowing plasma riser | **BLEND** bilinear upscale + scrolling palette |
+| 0:41 | **Rubber Rotozoomer** — fullscreen bilinear rotozoom of a chrome filigree, sine "rubber" flex | affine address-gen, **beam-raced native 640** (no framebuffer) |
+| 0:54 | **Liquid Metal** *(bump mercury)* — 2D bump-mapped mercury embossed under a moving light | analytic-gradient relief from a height map |
+| 1:08 | **Chrome** *(drop 1)* — icosphere + two torus-knots + torus, polished chrome; per-object matcaps (neutral / violet / gold); object swaps land on 4-bar downbeats | per-pixel matcap address-gen + bilinear |
+| 1:49 | **Mercury Plain** *(breakdown lap)* — warm copper, low & fast, banking | per-scanline affine + **CLAMP** |
+| 2:02 | **Chrome Conduit** *(climax)* — a voxel/relief tunnel with real 3D wall displacement | view-ray relief raymarch + adaptive coarse march |
+| 2:18 | **Chrome** *(climax punch)* — intricate spike-ball in warm gold | per-pixel matcap |
 | 2:25 | **Credits** — readable scroller over a chrome flute tunnel → **LATENT** sting | raycast tunnel |
 
 Every scene boundary gets a uniform **liquid-chrome glint** crossfade.
 
-### Fast raycast tunnels
-Both tunnels (the mid-demo conduit and the credits backdrop) **raycast a breathing
-elliptical tube** the camera flies through and banks around. To hold 60 fps at full
-320×240, the costly ray-vs-ellipse intersection + `atan2` run only on a **coarse
-horizontal grid (every 4 px)**; the texture U/V and fog are **linearly interpolated
-across each span**, with a cheap point-sample per pixel. ~2 M cy/frame.
+### Tunnels
+The **climax conduit** (2:02) is a **relief raymarcher**: view rays march a height
+field draped on a breathing elliptical tube, so the chrome wall has real 3D bumps
+that protrude, parallax and self-occlude. To hold 60 fps it marches the
+displacement only on a coarse column grid and **interpolates the hit coordinates**
+between marched columns, shading every pixel. The **credits backdrop** (2:25) is
+the cheaper original: a per-pixel angle/depth **LUT** computed once, then just
+"rotate + fly forward + bilinearly sample a small chrome texture" each frame.
 
 ## Build
 
@@ -106,9 +114,10 @@ BSS). Text ≈ 3.0 MB / 4 MB flash.
 A **LATENT** production — a new demo group for the machine-authored RP2350
 productions in this repo.
 
-- **Code & direction** — Claude Opus 4.8
+- **Code & direction** — **Beam** (Claude Opus 4.8)
 - **Critic / producer** — Azure
-- **2D art** — Gemini 3.5 Flash + Nano Banana 2
+- **2D art** — **Antigravity** (Gemini 3.5 Flash) + Nano Banana 2
+- **Tunnel optimization** — Codex GPT-5.5
 - **Music** — Suno 5.5
 - **Hardware hero** — the RP2350 SIO interpolator (affine address-gen, BLEND, CLAMP, POP self-stepping)
 
