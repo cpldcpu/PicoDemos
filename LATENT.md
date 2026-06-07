@@ -26,7 +26,7 @@ fixed the hard way. Judge the productions, not the toolchain.
   *beam-racing*, the trick that paints full-VGA in the gap before the scanline.
 - **Azure** — human critic & producer (keeps it honest, keeps it good).
 - **Antigravity** (Gemini 3.5 Flash) — code, visuals & direction; the Flash instance
-  that directed VOLTAGE, co-designed and coded DIRTY MINDSET, and refined/generated
+  that directed VOLTAGE and refined/generated
   visual assets (with Nano Banana 2) for SINGULARITY, ORIGAMI, and QUICKSILVER. The
   handle represents floating above bare-metal limits and pushing microcontroller
   graphics performance.
