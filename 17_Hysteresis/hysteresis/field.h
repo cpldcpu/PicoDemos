@@ -61,6 +61,41 @@ typedef struct {
     int32_t  drift_x;    /* constant translation per step, 16.16 */
     int32_t  drift_y;
 
+    /* ---- the rest of the flow field ------------------------------------
+     *
+     * Azure: "it is very polar". Correct, and structural rather than a
+     * tuning miss — a similarity transform (scale + rotate about one fixed
+     * centre) can only ever produce spirals and radial bursts. Every frame
+     * looked like the same motion because it WAS the same motion.
+     *
+     * The fix is nearly free. The source coordinate is computed once per
+     * 16x16 block, so about 300 times a frame rather than 76,800; a flow
+     * field costing forty operations per block is 12k operations a frame,
+     * which is nothing. The inner loop is untouched and still a rigid copy.
+     * All of this is per-block arithmetic that never reaches the hot path. */
+
+    /* Affine shear. Breaks the rotational symmetry the similarity transform
+     * enforces: diagonal sliding and stretching instead of pure spin. */
+    int32_t  shear_x;    /* 16.16, applied as sx += shear_x * dy */
+    int32_t  shear_y;
+
+    /* Point vortices. THE main answer to "more diversity in motion": three
+     * independent swirl centres, each with tangential velocity falling off
+     * as 1/r, summed. Two counter-rotating vortices produce a shear line
+     * between them; three produce something that never repeats. The arc
+     * moves them, so the composition stops being pinned to the middle. */
+    struct {
+        int16_t x, y;        /* centre, in pixels */
+        int16_t strength;    /* v * r0; signed, so vortices can counter-rotate */
+    } vortex[3];
+
+    /* Banded shear — a transverse wave along y. Purely linear motion, the
+     * one thing no arrangement of vortices can give you, and the cheapest
+     * possible way to get a non-circular gesture on screen. */
+    int16_t  band_amp;   /* pixels */
+    uint16_t band_freq;  /* turns per screen height */
+    uint16_t band_phase;
+
     /* Value pipeline. */
     uint16_t gain;       /* 8.8 -- 256 is unity. >256 blooms, <256 decays. */
     uint8_t  blur;       /* 0..255 mix toward the 5-tap neighbourhood mean */
@@ -113,6 +148,12 @@ typedef struct {
      * along the flow, which is the other half of the video-feedback look. */
     uint8_t  persist;
 } field_params_t;
+
+/* The shared integer sine, exposed so the arc can move the flow field using
+ * exactly the same table the field does. Two sine implementations would be two
+ * things to keep bit-identical between host and device. a: 0..65535 = one
+ * turn; returns Q15. */
+int32_t field_isin(int32_t a);
 
 /* Build the react LUTs once. */
 void field_init(void);

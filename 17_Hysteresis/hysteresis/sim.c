@@ -79,6 +79,37 @@ static void arc_params(uint32_t f, field_params_t *p)
     p->drift_x = 0;
     p->drift_y = 0;
 
+    /* --- the flow field, i.e. the answer to "it is very polar" -----------
+     *
+     * Three vortices on orbits whose rates share no common factor, so the
+     * configuration never repeats inside the demo's length. Signs alternate:
+     * counter-rotating neighbours produce a shear line between them, which
+     * is the gesture a single centre can never make. */
+    const int32_t vs = ramp(f, SEC(14), SEC(70));          /* fade the flow in */
+    static const struct { int16_t r, rate, ph, str; } orb[3] = {
+        {  74,  13,     0,  210 },
+        {  96,  -8, 21000, -170 },
+        {  52,  21, 43000,  150 },
+    };
+    for (int i = 0; i < 3; i++) {
+        const int32_t a = (int32_t)(f * orb[i].rate + orb[i].ph) & 65535;
+        p->vortex[i].x = (int16_t)(FIELD_W / 2 + ((orb[i].r * field_isin(a)) >> 15));
+        p->vortex[i].y = (int16_t)(FIELD_H / 2 + ((orb[i].r * field_isin(a + 16384)) >> 16));
+        p->vortex[i].strength = (int16_t)((orb[i].str * vs) >> 16);
+    }
+
+    /* Shear breathes in and out on a slow cycle of its own, so the frame is
+     * sometimes spinning and sometimes sliding. */
+    p->shear_x = (int32_t)((field_isin((int32_t)(f * 5) & 65535) * 90) >> 15);
+    p->shear_y = (int32_t)((field_isin((int32_t)(f * 3 + 30000) & 65535) * 60) >> 15);
+
+    /* The transverse band comes up hardest in the middle third — pure linear
+     * motion against all that rotation. */
+    p->band_amp   = (int16_t)(mix(0, 5, ramp(f, SEC(55), SEC(105)))
+                            - mix(0, 5, ramp(f, SEC(140), SEC(185))));
+    p->band_freq  = 640;
+    p->band_phase = (uint16_t)((f * 300) & 65535);
+
     /* Blur vs sharpen is the balance that decides whether structure survives.
      * Blur alone flattens the field; the LUT alone drives it to two values. */
     p->blur = 170;

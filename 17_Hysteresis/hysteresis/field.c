@@ -113,6 +113,8 @@ static void build_sin(void)
 static inline int32_t isin(int32_t a) { return g_sin[(a >> 6) & 1023]; }   /* a: 0..65535 */
 static inline int32_t icos(int32_t a) { return isin(a + 16384); }
 
+int32_t field_isin(int32_t a) { return isin(a); }
+
 void field_init(void)
 {
     build_sin();
@@ -153,6 +155,33 @@ void HYST_HOT(field_step)(uint8_t *dst, const uint8_t *src,
             const int32_t ox = bx - cxi, oy = by - cyi;
             int32_t sx = p->cx + c * ox - s * oy + p->drift_x;
             int32_t sy = p->cy + s * ox + c * oy + p->drift_y;
+
+            /* shear — breaks the rotational symmetry */
+            sx += (p->shear_x * oy) >> 8;
+            sy += (p->shear_y * ox) >> 8;
+
+            /* point vortices, tangential velocity ~ 1/r.
+             *
+             * offset = (-vy, vx) * S / r^2, with S = v*r0, so the swirl is
+             * v pixels at radius r0 and falls off outward. `soft` keeps the
+             * centre finite; without it a block landing on a vortex core
+             * would sample from somewhere across the screen. int64 because
+             * vy * S << 16 overflows 32 bits, and this runs 300 times a
+             * frame, not 76,800 -- correctness is worth more than the cycle. */
+            for (int v = 0; v < 3; v++) {
+                const int32_t S = p->vortex[v].strength;
+                if (!S) continue;
+                const int32_t vx = bx - p->vortex[v].x;
+                const int32_t vy = by - p->vortex[v].y;
+                const int32_t r2 = vx * vx + vy * vy + 256;   /* soft core */
+                sx += (int32_t)(((int64_t)(-vy) * S << 16) / r2);
+                sy += (int32_t)(((int64_t)( vx) * S << 16) / r2);
+            }
+
+            /* banded transverse shear — the one non-circular gesture */
+            if (p->band_amp)
+                sx += (p->band_amp * isin(by * p->band_freq + p->band_phase))
+                      << 1;
 
             int ix = sx >> 16, iy = sy >> 16;
 
