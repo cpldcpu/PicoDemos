@@ -1,0 +1,7 @@
+*.o
+*.d
+*.exe
+screenshots/
+cmp/
+probe_*.png
+arc_strip.png

@@ -1,0 +1,141 @@
+/* Desktop entry point for HYSTERESIS.
+ *
+ * Flags exist mainly so the referee and the agent loop can drive it without a
+ * human at a keyboard:
+ *
+ *   --frames N        run exactly N steps then exit (default: whole demo)
+ *   --variant 0|1     initial condition; 1 lights ONE extra cell (referee 2)
+ *   --headless        no window, run as fast as possible
+ *   --fielddump       raw 320x240 state bytes per frame to stdout
+ *   --rawpipe         raw 640x480 BGRA per frame to stdout (video capture)
+ *   --shot N          screenshot at frame N (repeatable)
+ *   --energy          print frame,energy to stderr each second
+ *
+ * There is deliberately no --start-ms. You cannot seek a system with memory;
+ * you can only get there. --headless --frames N is how you "seek".
+ */
+
+#include <SDL2/SDL.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+
+#include "../sim.h"
+#include "../field.h"
+#include "../vga.h"
+
+void vga_raw_begin(void);
+void vga_raw_emit(void);
+void vga_field_emit(void);
+void vga_screenshot(void);
+extern int g_offline, g_rawpipe, g_fielddump, g_headless;
+
+#define MAX_SHOTS 32
+
+int main(int argc, char *argv[])
+{
+    uint32_t frames = 0;
+    int variant = 0, energy = 0, stats = 0, use_probe = 0;
+    field_params_t probe = {0};
+    uint32_t shots[MAX_SHOTS]; int nshots = 0;
+
+    for (int i = 1; i < argc; i++) {
+        if (!strcmp(argv[i], "--frames") && i + 1 < argc)       frames = (uint32_t)atoi(argv[++i]);
+        else if (!strcmp(argv[i], "--variant") && i + 1 < argc) variant = atoi(argv[++i]);
+        else if (!strcmp(argv[i], "--headless"))                g_headless = 1;
+        else if (!strcmp(argv[i], "--fielddump"))               { g_fielddump = 1; g_headless = 1; }
+        else if (!strcmp(argv[i], "--rawpipe"))                 { g_rawpipe = 1; g_headless = 1; }
+        else if (!strcmp(argv[i], "--energy"))                  energy = 1;
+        else if (!strcmp(argv[i], "--probe") && i + 1 < argc) {
+            /* zoom_excess,blur,gain,react_lo,react_hi -- pin the dynamics */
+            int z, b, g, lo, hi, fold = 0;
+            if (sscanf(argv[++i], "%d,%d,%d,%d,%d,%d", &z, &b, &g, &lo, &hi, &fold) < 5) {
+                fprintf(stderr, "--probe wants z,blur,gain,lo,hi\n"); return 1;
+            }
+            probe.zoom = 65536 + z; probe.blur = (uint8_t)b; probe.gain = (uint16_t)g;
+            probe.react_lo = (uint8_t)lo; probe.react_hi = (uint8_t)hi;
+            probe.react_fold = (uint8_t)fold;
+            probe.cx = (FIELD_W / 2) << 16; probe.cy = (FIELD_H / 2) << 16;
+            probe.drift_x = probe.drift_y = 0;
+            use_probe = 1;
+        }
+        else if (!strcmp(argv[i], "--stats"))                   stats = 1;
+        else if (!strcmp(argv[i], "--shot") && i + 1 < argc) {
+            if (nshots < MAX_SHOTS) shots[nshots++] = (uint32_t)atoi(argv[++i]);
+        } else {
+            fprintf(stderr, "unknown arg: %s\n", argv[i]);
+            return 1;
+        }
+    }
+
+    /* Binary on stdout must be pixels only — redirect stray printf to stderr
+     * before anything can print a banner onto the stream. */
+    if (g_fielddump || g_rawpipe) vga_raw_begin();
+
+    if (SDL_Init(0) != 0) { fprintf(stderr, "SDL_Init: %s\n", SDL_GetError()); return 1; }
+
+    vga_init();
+    if (use_probe) sim_set_fixed(&probe);
+    sim_reset(variant);
+
+    if (!frames) frames = sim_total_frames();
+    fprintf(stderr, "=== HYSTERESIS (host) === %u frames, variant %d%s\n",
+            frames, variant, g_headless ? ", headless" : "");
+
+    int si = 0;
+    while (sim_frame() < frames && !vga_should_quit()) {
+        /* A restart request has to rebuild the world from the seed. There is
+         * no other way back to the beginning. */
+        if (vga_consume_skip_request() == 2) { sim_reset(variant); si = 0; }
+
+        sim_tick();
+
+        if (g_fielddump) vga_field_emit();
+        if (g_rawpipe)   vga_raw_emit();
+
+        while (si < nshots && shots[si] == sim_frame()) { vga_screenshot(); si++; }
+
+        if (energy && (sim_frame() % 60) == 0)
+            fprintf(stderr, "f=%6u  t=%3us  energy=%9u  mean=%5.1f\n",
+                    sim_frame(), sim_frame() / 60, sim_energy(),
+                    (double)sim_energy() / (320.0 * 240.0));
+    }
+
+    if (stats) {
+        /* What "alive" means, measured rather than eyeballed:
+         *   mean  — is there anything there at all
+         *   sdev  — spatial structure. A uniform grey field scores a mean but
+         *           no sdev, and that is the screensaver failure in numbers.
+         *   live  — fraction of cells strictly between dead and saturated. A
+         *           field pinned at 0 or 255 is perfectly stable and perfectly
+         *           useless; without this the other two can both look fine
+         *           while the picture is pure black and white.
+         * Reported to stderr because stdout is the binary channel. */
+        const uint8_t *f = vga_320_front_buffer();
+        double m = 0, v = 0; int live = 0, mid = 0;
+        for (int i = 0; i < 320 * 240; i++) m += f[i];
+        m /= 320.0 * 240.0;
+        for (int i = 0; i < 320 * 240; i++) {
+            double d = f[i] - m; v += d * d;
+            if (f[i] > 12 && f[i] < 243) live++;
+            if (f[i] > 64 && f[i] < 192) mid++;
+        }
+        v = sqrt(v / (320.0 * 240.0));
+
+        /* mid is the one that caught the real problem. The first living
+         * regime scored a healthy mean and a big sdev while being effectively
+         * ONE BIT: every cell sat at either ~0 or ~200, so the picture was two
+         * colours and the palette had nothing to work with. A steep react curve
+         * amplifies the ordered dither to full scale, which also explains the
+         * speckle. sdev cannot see that; the midtone fraction can. */
+        fprintf(stderr, "mean=%6.2f sdev=%6.2f live=%5.1f%% mid=%5.1f%%\n",
+                m, v, 100.0 * live / (320.0 * 240.0),
+                100.0 * mid / (320.0 * 240.0));
+    }
+
+    fprintf(stderr, "done: %u frames, final energy %u (mean %.1f)\n",
+            sim_frame(), sim_energy(), (double)sim_energy() / (320.0 * 240.0));
+    SDL_Quit();
+    return 0;
+}
