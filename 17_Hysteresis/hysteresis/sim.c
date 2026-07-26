@@ -54,6 +54,11 @@ static int g_rd_amp_forced = 1;
 static int16_t g_rd_amp_val;
 void sim_set_rd_amp(int16_t a) { g_rd_amp_val = a; g_rd_amp_forced = 0; }
 
+/* Pin the kernel blend (0 = soft blur, 255 = full activator-inhibitor). -1
+ * means follow the arc. Sweeping only. */
+static int g_kern_forced = -1;
+void sim_set_kern(int w) { g_kern_forced = w; }
+
 void sim_set_fixed(const field_params_t *p)
 {
     g_fixed = *p;
@@ -140,6 +145,38 @@ static void arc_params(uint32_t f, field_params_t *p)
 
     /* Blur vs sharpen is the balance that decides whether structure survives.
      * Blur alone flattens the field; the LUT alone drives it to two values. */
+    /* The kernel. Azure's suggestion, and the highest-leverage knob added since
+     * persistence: it sets the spatial scale the field organises at, which the
+     * RD experiment showed dominates everything else.
+     *
+     * The arc walks from a plain isotropic blur (soft, diffuse -- right for the
+     * quiet opening) toward a centre-positive / ring-negative kernel, which is a
+     * discrete activator-inhibitor and makes the field grow its own Turing-like
+     * structure instead of importing it. Interpolated per frame so the change is
+     * continuous; a kernel that jumped would show for a long time afterwards. */
+    {
+        /* centre, edge_h, edge_v, corner — each sums to 256 with its
+         * multiplicities (centre + 2*eh + 2*ev + 4*corner). */
+        static const int16_t soft[4] = {  48,  32,  32,  20 };
+        static const int16_t edge[4] = { 472, -20, -20, -34 };
+
+        /* CAPPED at ~148/255, measured. A 3x3 ring-negative kernel amplifies
+         * hardest at Nyquist, so at full strength it grows the checkerboard
+         * mode and the second half of the demo degenerates into fine noise.
+         * The sweep put spatial structure at its peak between 110 and 160
+         * (sdev 55.4) while frame-to-frame churn and the flicker ratio both
+         * worsen sharply above 210 -- the degeneration shows up in the temporal
+         * numbers before it is visible. Peaking at a LOWER spatial frequency
+         * needs a 5x5 kernel, which is the next thing to try, not this. */
+        int32_t w = mix(0, 38000, ramp(f, SEC(28), SEC(120)));
+        w = mix(w, 23000, ramp(f, SEC(158), SEC(200)));   /* softer outro */
+        if (g_kern_forced >= 0) w = g_kern_forced * 257;
+        p->k_centre = (int16_t)mix(soft[0], edge[0], w);
+        p->k_edge_h = (int16_t)mix(soft[1], edge[1], w);
+        p->k_edge_v = (int16_t)mix(soft[2], edge[2], w);
+        p->k_corner = (int16_t)mix(soft[3], edge[3], w);
+    }
+
     p->blur = 170;
 
     /* Gain rides just under unity for most of the run and crosses it at the

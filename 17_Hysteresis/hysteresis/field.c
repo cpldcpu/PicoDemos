@@ -123,103 +123,178 @@ void field_init(void)
 
 /* ------------------------------------------------------------------ step -- */
 
+/* Scratch for the convolution pass. 76,800 bytes, affordable now that the
+ * reaction-diffusion state is unlinked -- it cost 153 KB and this costs half
+ * that for something that actually reaches the picture. */
+static uint8_t g_conv[FIELD_W * FIELD_H];
+
+/* PASS 1 -- convolve the previous frame.
+ *
+ * Separate from the transport pass on purpose. Nine taps combined with a
+ * four-tap bilinear fetch would be thirty-six taps per cell; convolving once
+ * into scratch and then transporting with four is thirteen, and it splits the
+ * two jobs cleanly: this pass decides spatial STRUCTURE, the next decides
+ * MOTION.
+ *
+ * The 1-cell border is copied rather than handled, which keeps every bounds
+ * test out of the inner loop. */
+/* HYST_PROF locates the cost by removing work, not by reasoning about it.
+ *   1 -- convolve becomes a straight copy: same memory traffic, no arithmetic
+ *   2 -- the convolve pass is skipped entirely and transport reads src
+ * Comparing the three tells us whether 84 cycles/cell is multiplies or memory,
+ * which decides whether hand-written DSP assembly would help at all. */
+#ifndef HYST_PROF
+#define HYST_PROF 0
+#endif
+
+static void HYST_HOT(convolve)(const uint8_t *src, const field_params_t *p)
+{
+#if HYST_PROF == 1
+    memcpy(g_conv, src, FIELD_W * FIELD_H);
+    (void)p;
+    return;
+#endif
+    const int32_t kc = p->k_centre, kh = p->k_edge_h;
+    const int32_t kv = p->k_edge_v, kq = p->k_corner;
+    const int32_t mixw = p->blur;
+
+    memcpy(g_conv, src, FIELD_W);
+    memcpy(g_conv + (FIELD_H - 1) * FIELD_W,
+           src   + (FIELD_H - 1) * FIELD_W, FIELD_W);
+
+    /* SLIDING WINDOW. Measured, not guessed: with nine byte loads per cell this
+     * loop cost 37.4 cycles/cell of an 84.2 total, and removing five of the
+     * multiplies only bought 4.2 -- so it is load-bound, not multiply-bound.
+     *
+     * The kernel is symmetric, so it only ever needs the vertical pair sum
+     * (r0[x] + r2[x]) per column, never the two values separately. Carrying
+     * three consecutive column sums and three centre-row values in registers
+     * means each step loads only what is NEW: two bytes for the next column sum
+     * and one for the next centre value. Nine loads per cell becomes three.
+     *
+     * Deliberately plain C rather than Cortex-M33 DSP intrinsics or inline
+     * assembly, which Azure suggested and which would indeed fit here (SMLAD,
+     * UXTB16, word loads). The reason is referee test 1: the host render and the
+     * device render are diffed byte for byte, and device-only assembly puts that
+     * guarantee at risk for a win this restructuring gets anyway. If the loop
+     * ever needs more, the honest version is a word-load form that BOTH
+     * compilers see identically. */
+    for (int y = 1; y < FIELD_H - 1; y++) {
+        const uint8_t *r0 = src + (y - 1) * FIELD_W;
+        const uint8_t *r1 = src +  y      * FIELD_W;
+        const uint8_t *r2 = src + (y + 1) * FIELD_W;
+        uint8_t *o = g_conv + y * FIELD_W;
+
+        o[0] = r1[0];
+
+        /* prime the window at x = 1 */
+        int32_t vm = r0[0] + r2[0];        /* column sum at x-1 */
+        int32_t v0 = r0[1] + r2[1];        /* column sum at x   */
+        int32_t lm = r1[0];                /* centre row at x-1 */
+        int32_t l0 = r1[1];                /* centre row at x   */
+
+        for (int x = 1; x < FIELD_W - 1; x++) {
+            const int32_t vp = r0[x + 1] + r2[x + 1];   /* 2 loads */
+            const int32_t lp = r1[x + 1];               /* 1 load  */
+
+            int32_t a = (kc * l0 + kh * (lm + lp) + kv * v0 + kq * (vm + vp)) >> 8;
+
+            int32_t v = l0 + (((a - l0) * mixw) >> 8);
+            o[x] = (uint8_t)(v < 0 ? 0 : v > 255 ? 255 : v);
+
+            vm = v0; v0 = vp;
+            lm = l0; l0 = lp;
+        }
+        o[FIELD_W - 1] = r1[FIELD_W - 1];
+    }
+}
+
+/* PASS 2 -- transport, with SUBPIXEL precision.
+ *
+ * The advection was integer-only, on the grounds that the block quantisation
+ * error is the fractal structure. That is true of the INTEGER part, which still
+ * varies per block and still produces the seams. The fractional part is a
+ * different thing entirely, and throwing it away cost smooth motion for
+ * nothing: because the block is copied rigidly, the fraction is CONSTANT across
+ * the block, so bilinear collapses to four weights computed once per block and
+ * a fixed four-tap sum per cell. This is precisely the Amiga barrel-shifter
+ * trick (ASH) that the pouet thread described and I only half-copied.
+ */
 void HYST_HOT(field_step)(uint8_t *dst, const uint8_t *src,
                           const field_params_t *p)
 {
     build_react(p->react_lo, p->react_hi, p->react_fold);
     const uint8_t *lut = g_lut;
 
-    /* Inverse transform, computed once per frame. The parameter is visual
-     * magnification, so sampling needs its reciprocal: one division per frame
-     * is free, one per pixel would not be. */
+#if HYST_PROF == 2
+    const uint8_t *cbuf = src;              /* skip the pass entirely */
+#else
+    convolve(src, p);
+    const uint8_t *cbuf = g_conv;
+#endif
+
     int32_t inv = p->zoom > 0 ? (int32_t)(((int64_t)65536 << 16) / p->zoom)
                               : 65536;
-    const int32_t c = (icos(p->angle) * inv) >> 15;   /* 16.16 */
+    const int32_t c = (icos(p->angle) * inv) >> 15;
     const int32_t s = (isin(p->angle) * inv) >> 15;
 
     const int32_t cxi = p->cx >> 16, cyi = p->cy >> 16;
-
-    const int32_t blur = p->blur;
     const int32_t gain = p->gain;
-
-    /* how much of the newly computed value is taken each frame; the
-     * complement is retained from the previous frame at the same position */
     const int32_t rate = 256 - (int32_t)p->persist;
 
-    /* Reaction-diffusion as a threshold bias. One load, one multiply, one
-     * shift per cell, and it buys what value-level injection could not: where
-     * the RD pattern is strong the field is pushed below its own excitation
-     * threshold and simply cannot hold, so the labyrinth appears as persistent
-     * negative space instead of being blurred away within a frame. */
     const uint8_t *bias = p->bias;
     const int32_t  bamt = bias ? p->bias_amt : 0;
 
     for (int by = 0; by < FIELD_H; by += FIELD_BLOCK) {
         for (int bx = 0; bx < FIELD_W; bx += FIELD_BLOCK) {
-            /* One source coordinate for the whole block. The block is then
-             * copied rigidly -- zoom shows up as varying offsets BETWEEN
-             * blocks, never as scaling within one. The resulting seams are the
-             * effect, not an artefact of it. */
             const int32_t ox = bx - cxi, oy = by - cyi;
             int32_t sx = p->cx + c * ox - s * oy + p->drift_x;
             int32_t sy = p->cy + s * ox + c * oy + p->drift_y;
 
-            /* shear — breaks the rotational symmetry */
             sx += (p->shear_x * oy) >> 8;
             sy += (p->shear_y * ox) >> 8;
 
-            /* point vortices, tangential velocity ~ 1/r.
-             *
-             * offset = (-vy, vx) * S / r^2, with S = v*r0, so the swirl is
-             * v pixels at radius r0 and falls off outward. `soft` keeps the
-             * centre finite; without it a block landing on a vortex core
-             * would sample from somewhere across the screen. int64 because
-             * vy * S << 16 overflows 32 bits, and this runs 300 times a
-             * frame, not 76,800 -- correctness is worth more than the cycle. */
             for (int v = 0; v < 3; v++) {
                 const int32_t S = p->vortex[v].strength;
                 if (!S) continue;
                 const int32_t vx = bx - p->vortex[v].x;
                 const int32_t vy = by - p->vortex[v].y;
-                const int32_t r2 = vx * vx + vy * vy + 256;   /* soft core */
+                const int32_t r2 = vx * vx + vy * vy + 256;
                 sx += (int32_t)(((int64_t)(-vy) * S << 16) / r2);
                 sy += (int32_t)(((int64_t)( vx) * S << 16) / r2);
             }
 
-            /* banded transverse shear — the one non-circular gesture */
             if (p->band_amp)
                 sx += (p->band_amp * isin(by * p->band_freq + p->band_phase))
                       << 1;
 
             int ix = sx >> 16, iy = sy >> 16;
+            const int32_t fx = (sx >> 8) & 255, fy = (sy >> 8) & 255;
 
-            /* Clamp the block origin, not the pixels. One clamp per block
-             * keeps every gather inside the buffer including the 1-cell halo,
-             * so the inner loop needs no bounds test at all. Edges repeat,
-             * which in feedback reads as smearing at the border -- acceptable,
-             * and cheaper than any alternative. */
-            if (ix < 1) ix = 1;
-            if (iy < 1) iy = 1;
-            if (ix > FIELD_W - FIELD_BLOCK - 1) ix = FIELD_W - FIELD_BLOCK - 1;
-            if (iy > FIELD_H - FIELD_BLOCK - 1) iy = FIELD_H - FIELD_BLOCK - 1;
+            /* Clamp the block origin so the bilinear halo stays in the buffer;
+             * one clamp per block, no bounds test per cell. */
+            if (ix < 0) ix = 0;
+            if (iy < 0) iy = 0;
+            if (ix > FIELD_W - FIELD_BLOCK - 2) ix = FIELD_W - FIELD_BLOCK - 2;
+            if (iy > FIELD_H - FIELD_BLOCK - 2) iy = FIELD_H - FIELD_BLOCK - 2;
+
+            /* four bilinear weights, once per block */
+            const int32_t w00 = ((256 - fx) * (256 - fy)) >> 8;
+            const int32_t w10 = ( fx        * (256 - fy)) >> 8;
+            const int32_t w01 = ((256 - fx) *  fy       ) >> 8;
+            const int32_t w11 = ( fx        *  fy       ) >> 8;
 
             for (int y = 0; y < FIELD_BLOCK; y++) {
-                const uint8_t *sp = src + (iy + y) * FIELD_W + ix;
+                const uint8_t *s0 = cbuf + (iy + y) * FIELD_W + ix;
+                const uint8_t *s1 = s0 + FIELD_W;
                 uint8_t       *dp = dst + (by + y) * FIELD_W + bx;
-                /* the previous value at THIS screen position, unadvected —
-                 * the persistence tap */
                 const uint8_t *pp = src + (by + y) * FIELD_W + bx;
                 const uint8_t *dith = g_bayer + (((by + y) & 3) << 2);
 
                 for (int x = 0; x < FIELD_BLOCK; x++) {
-                    const int32_t a = sp[x];
-                    const int32_t n = sp[x - 1] + sp[x + 1]
-                                    + sp[x - FIELD_W] + sp[x + FIELD_W];
+                    int32_t v = (s0[x] * w00 + s0[x + 1] * w10
+                               + s1[x] * w01 + s1[x + 1] * w11) >> 8;
 
-                    /* mix toward the neighbourhood mean */
-                    int32_t v = a + ((((n >> 2) - a) * blur) >> 8);
-
-                    /* scale, with ordered dither folded into the rounding */
                     v = (v * gain + dith[(bx + x) & 3]) >> 8;
 
                     if (bamt)
@@ -229,7 +304,6 @@ void HYST_HOT(field_step)(uint8_t *dst, const uint8_t *src,
                     if (v < 0)   v = 0;
                     if (v > 255) v = 255;
 
-                    /* react, then damp toward the previous value here */
                     const int32_t r = lut[v];
                     const int32_t q = pp[x];
                     dp[x] = (uint8_t)(q + (((r - q) * rate) >> 8));

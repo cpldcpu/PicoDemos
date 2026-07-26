@@ -50,6 +50,9 @@ void sim_set_rd_params(const rd_params_t *p);
 /* Pin the RD amplitude (negative = inhibitory). Sweeping only. */
 void sim_set_rd_amp(int16_t a);
 
+/* Pin the convolution kernel blend. Sweeping only. */
+void sim_set_kern(int w);
+
 /* Steps taken since sim_reset. */
 uint32_t sim_frame(void);
 

@@ -37,7 +37,11 @@ add_executable(hysteresis
 
 target_include_directories(hysteresis PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_compile_definitions(hysteresis PRIVATE PICO_BUILD=1)
+# HYST_PROF locates the frame cost by removing work (see field.c). Pass
+# -DHYST_PROF=1 or 2 at configure time; never overriding CMAKE_C_FLAGS, which
+# would discard the SDK's own required flags.
+set(HYST_PROF "0" CACHE STRING "profiling stub level")
+target_compile_definitions(hysteresis PRIVATE PICO_BUILD=1 HYST_PROF=${HYST_PROF})
 
 # -O3 and unrolling, but NOT -ffast-math, which SUSTAIN used.
 #

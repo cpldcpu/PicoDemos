@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
     field_params_t probe = {0};
     rd_params_t rdp = {0}; int use_rdp = 0;
     int rd_amp = 0, use_rda = 0;
+    int kern = -1;
     uint32_t shots[MAX_SHOTS]; int nshots = 0;
 
     for (int i = 1; i < argc; i++) {
@@ -66,6 +67,7 @@ int main(int argc, char *argv[])
         else if (!strcmp(argv[i], "--stats"))                   stats = 1;
         else if (!strcmp(argv[i], "--rdonly"))                  rd_only = 1;
         else if (!strcmp(argv[i], "--rdamp") && i + 1 < argc)   { rd_amp = atoi(argv[++i]); use_rda = 1; }
+        else if (!strcmp(argv[i], "--kern") && i + 1 < argc)    kern = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--rdprobe") && i + 1 < argc) {
             int du, dv, F, K;
             if (sscanf(argv[++i], "%d,%d,%d,%d", &du, &dv, &F, &K) != 4) {
@@ -95,6 +97,7 @@ int main(int argc, char *argv[])
     if (rd_only)   sim_set_rd_only(1);
     if (use_rdp)   sim_set_rd_params(&rdp);
     if (use_rda)   sim_set_rd_amp((int16_t)rd_amp);
+    if (kern >= 0) sim_set_kern(kern);
     sim_reset(variant);
 
     if (!frames) frames = sim_total_frames();

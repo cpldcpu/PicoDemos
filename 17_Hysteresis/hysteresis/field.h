@@ -98,7 +98,28 @@ typedef struct {
 
     /* Value pipeline. */
     uint16_t gain;       /* 8.8 -- 256 is unity. >256 blooms, <256 decays. */
-    uint8_t  blur;       /* 0..255 mix toward the 5-tap neighbourhood mean */
+    /* The 3x3 convolution, as FOUR symmetric coefficients rather than nine
+     * free ones (Q8, 256 = unity):
+     *
+     *     corner  edge_v  corner
+     *     edge_h  centre  edge_h
+     *     corner  edge_v  corner
+     *
+     * A general 9-tap kernel was measured on the device at 88.4 cycles/cell
+     * against a 65 budget -- 42.6 fps, which breaks the demo's frame-time
+     * contract. Every kernel the arc wants is symmetric anyway, and separating
+     * edge_h from edge_v keeps directional blur available, so four multiplies
+     * buy everything nine did.
+     *
+     * Sums near 256 keep unity gain, and kernels that do NOT sum to 256 are the
+     * interesting ones: centre-positive with a negative ring is a discrete
+     * activator-inhibitor, which is the one-field route to Turing structure that
+     * importing Gray-Scott could not deliver. */
+    int16_t  k_centre, k_edge_h, k_edge_v, k_corner;
+
+    /* How much of the convolved value to take, against the raw one. Keeps the
+     * old blur knob's meaning: 0 = untouched, 255 = fully convolved. */
+    uint8_t  blur;
 
     /* The react curve, as a threshold pair rather than a fixed shape.
      *
