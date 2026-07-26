@@ -197,6 +197,16 @@ static void HYST_HOT(convolve)(const uint8_t *src, const field_params_t *p)
      * Rounds once instead of twice, so results shift by at most a bit or two
      * against the previous version -- checked against the referee and the
      * structure metrics rather than assumed harmless. */
+    /* blur == 0 makes the kernel exactly the identity: the centre tap folds to
+     * 256 and every other coefficient to zero, so the loop's only job is to copy
+     * 76,800 bytes the slow way. The ending runs with no diffusion at all, and
+     * skipping the pass there is worth about 5 ms of the 16.67 ms frame -- which
+     * is what pays for re-injecting a title card every frame. */
+    if (p->blur == 0) {
+        memcpy(g_conv, src, FIELD_W * FIELD_H);
+        return;
+    }
+
     const int32_t mixw = p->blur;
           int32_t kc = ((p->k_centre * mixw) >> 8) + (256 - mixw);
     const int32_t kh =  (p->k_edge_h * mixw) >> 8;
@@ -311,6 +321,25 @@ void HYST_HOT(field_step)(uint8_t *dst, const uint8_t *src,
     const uint8_t *bias = p->bias;
     const int32_t  bamt = bias ? p->bias_amt : 0;
 
+    /* STILL: no advection at all. See field.h for why this exists rather than
+     * being expressed as a zoom of exactly 1.0 -- it cannot be. */
+    if (p->still) {
+        for (int y = 0; y < FIELD_H; y++) {
+            const uint8_t *s  = cbuf + y * FIELD_W;
+            const uint8_t *pp = src  + y * FIELD_W;
+            uint8_t       *dp = dst  + y * FIELD_W;
+            const uint8_t *dith = g_bayer + ((y & 3) << 2);
+
+            for (int x = 0; x < FIELD_W; x++) {
+                const int32_t v = (s[x] * gain + dith[x & 3]) >> 8;
+                const int32_t r = lut[v];
+                const int32_t q = pp[x];
+                dp[x] = (uint8_t)(q + (((r - q) * rate) >> 8));
+            }
+        }
+        return;
+    }
+
     for (int by = 0; by < FIELD_H; by += FIELD_BLOCK) {
         for (int bx = 0; bx < FIELD_W; bx += FIELD_BLOCK) {
             const int32_t ox = bx - cxi, oy = by - cyi;
@@ -396,17 +425,74 @@ void field_poke(uint8_t *f, int x, int y, uint8_t v)
 void field_inject_stencil(uint8_t *f, const uint8_t *bits, int sw, int sh,
                           int x, int y, uint8_t amp)
 {
+    field_inject_stencil_rows(f, bits, sw, sh, x, y, amp, 0, sh);
+}
+
+void HYST_HOT(field_inject_stencil_rows)(uint8_t *f, const uint8_t *bits,
+                          int sw, int sh, int x, int y, uint8_t amp,
+                          int j0, int j1)
+{
+    /* A BYTE AT A TIME, with the bounds tests hoisted out of the pixel loop.
+     *
+     * MEASURED ON THE DEVICE, because the host cannot see this at all. The
+     * obvious per-pixel version cost about 12 cycles a pixel, which is 2.2 ms
+     * for the endcard's 58,800 pixels on the single frame it lands -- a 17,699 us
+     * frame against a 16,667 us budget -- and the sustained wordmark pushed
+     * EVERY frame of its 1.4 second hold to 17.0 ms, dropping the demo to 58.2
+     * fps. In this demo an overrun is not a dropped frame; the simulation is
+     * stepped once per frame from its own counter, so the picture simply falls
+     * behind the music and stays behind.
+     *
+     * Three things pay for themselves, in order of size:
+     *   - the whole-rect bounds check, so the inner loop has no per-pixel
+     *     compare-and-branch at all (both title cards are wholly on screen);
+     *   - skipping a zero byte, eight blank pixels at a time -- a title card is
+     *     mostly empty and its gaps are whole bytes wide;
+     *   - a solid 0xFF byte with no bit tests, which is the interior of every
+     *     21-pixel stroke in the artwork.
+     *
+     * The function is also in SRAM (HYST_HOT): it runs inside the frame, on the
+     * core that is already streaming 76,800 field bytes through the XIP cache. */
     const int stride = (sw + 7) >> 3;
-    for (int j = 0; j < sh; j++) {
+    const int inside = (x >= 0 && y >= 0 &&
+                        x + sw <= FIELD_W && y + sh <= FIELD_H);
+
+    if (j0 < 0)  j0 = 0;
+    if (j1 > sh) j1 = sh;
+
+    for (int j = j0; j < j1; j++) {
         const int fy = y + j;
         if (fy < 0 || fy >= FIELD_H) continue;
-        for (int i = 0; i < sw; i++) {
-            const int fx = x + i;
-            if (fx < 0 || fx >= FIELD_W) continue;
-            if (!(bits[j * stride + (i >> 3)] & (0x80 >> (i & 7)))) continue;
-            /* additive and saturating: a disturbance, not a paste */
-            int v = f[fy * FIELD_W + fx] + amp;
-            f[fy * FIELD_W + fx] = (uint8_t)(v > 255 ? 255 : v);
+
+        const uint8_t *row = bits + j * stride;
+        uint8_t *dst = f + fy * FIELD_W + x;
+
+        for (int b = 0; b < stride; b++) {
+            const uint8_t byte = row[b];
+            if (!byte) continue;                       /* eight blank pixels */
+
+            uint8_t *q = dst + (b << 3);
+            const int lit = (b << 3);
+
+            if (inside && byte == 0xFFu && lit + 8 <= sw) {
+                for (int k = 0; k < 8; k++) {          /* stroke interior */
+                    const int v = q[k] + amp;
+                    q[k] = (uint8_t)(v > 255 ? 255 : v);
+                }
+                continue;
+            }
+
+            for (int k = 0; k < 8; k++) {
+                if (lit + k >= sw) break;              /* ragged last byte */
+                if (!(byte & (0x80 >> k))) continue;
+                if (!inside) {
+                    const int fx = x + lit + k;
+                    if (fx < 0 || fx >= FIELD_W) continue;
+                }
+                /* additive and saturating: a disturbance, not a paste */
+                const int v = q[k] + amp;
+                q[k] = (uint8_t)(v > 255 ? 255 : v);
+            }
         }
     }
 }

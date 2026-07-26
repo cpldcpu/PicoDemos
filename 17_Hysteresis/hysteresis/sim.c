@@ -8,6 +8,7 @@
 #include "sim.h"
 #include "field.h"
 #include "score.h"
+#include "stencil.h"
 #include "palette.h"
 #include "rd.h"
 #include "vga.h"
@@ -94,6 +95,140 @@ static inline int32_t mix(int32_t a, int32_t b, int32_t w)
     return a + (int32_t)(((int64_t)(b - a) * w) >> 16);
 }
 
+/* ------------------------------------------------------------- the endcard --
+ *
+ * QUIESCENCE. From 204 s the field has collapsed to black, and from there the
+ * operator is reduced to a hold: the transport is switched off entirely
+ * (field.h, `still`), the convolution is mixed out, and the react curve becomes
+ * a hard threshold. field_step then does exactly "read the same cell, threshold
+ * it, store" -- one tap per cell, which is cheaper than a normal frame rather
+ * than more expensive.
+ *
+ * This is how the title can be on screen without breaking the demo's one rule.
+ * The stencils are INJECTED as forcing (arc_inject), the same mechanism as a
+ * musical impact -- nothing is ever blitted over the picture, so no pixel
+ * becomes a function of t and the palette stays the only declared exemption.
+ * The credits are visible because the field was pushed into that shape and the
+ * medium has nothing left that would erase them.
+ *
+ * A held image IS a fixed point of the operator, not an exception to it. Which
+ * makes the ending the demo's own name taken literally, and I did not plan this:
+ * a hysteretic system holds its state after the driving force is removed. The
+ * credits persist because the field remembers them.
+ *
+ * The last two seconds drop the gain just below unity, so the fade to black is
+ * the same multiplicative decay the whole demo has been running on.
+ */
+#ifndef HYST_QGAIN
+#define HYST_QGAIN 260          /* swept below; see the note on gain */
+#endif
+
+static void arc_quiescent(uint32_t f, field_params_t *p)
+{
+    if (f < SEC(204)) return;
+
+    /* Two halves to the ending.
+     *
+     * 204.0 - 204.5 s   STILL. The transport is switched off entirely and the
+     *                   react curve is a hard threshold, which sweeps out
+     *                   everything the collapse left behind (the field arrives
+     *                   carrying dither values of 1 to 4 everywhere) and leaves
+     *                   a genuinely black screen for the card to land on.
+     *
+     * 204.5 - 210 s     DUST. The transport comes back with a slow drift and no
+     *                   diffusion, and the react curve goes to the exact
+     *                   identity with the gain a little under one. The endcard
+     *                   is re-injected every frame at full amplitude, so its
+     *                   glyphs are pinned hard while anything that spills off
+     *                   their edges is carried away and fades -- Azure's dust.
+     *                   At 208 s the re-injection stops and the letters
+     *                   themselves become dust and blow away.
+     *
+     * Azure's other suggestion was to blit the font into the framebuffer after
+     * the update. It already IS after the update -- arc_inject runs when
+     * field_step has finished -- and an additive saturating injection at
+     * amplitude 255 is bit-for-bit a blit for every pixel it touches. So the
+     * crisp font comes for free without a single pixel becoming a function of t,
+     * which is the one thing this demo has claimed throughout. */
+    const int dust = (f >= SEC(204) + 30);
+
+    p->still = !dust;
+    p->zoom = 65536 + (dust ? 620 : 0);
+    p->angle = dust ? (int32_t)((f * 4) & 65535) : 0;
+    p->drift_x = p->drift_y = 0;
+    for (int i = 0; i < 3; i++) p->vortex[i].strength = 0;
+    p->shear_x = p->shear_y = 0;
+    p->band_amp = 0;
+
+    p->blur = 0;                        /* kernel mixed out to identity */
+
+    /* A HARD THRESHOLD, not the identity, and this took three attempts.
+     *
+     * The identity LUT (lo == hi == 0) holds an image but cannot keep it clean.
+     * The transport is not reachably exact -- icos peaks at 32767, so cos(0)
+     * gives c = 65534 and every block samples about 1/256 of a pixel off -- and
+     * that slow blur drained the endcard by 17% in three and a half seconds.
+     * Compensating with a gain above unity fixed the letters and then amplified
+     * the ORDERED DITHER: the field arrives at 204 s carrying values of 1 to 4
+     * everywhere, which is field.c's anti-death dither working exactly as
+     * designed, and 260/256 per frame turns 4 into 139 over the endcard's life.
+     * Visible dirt, worst in the corners.
+     *
+     * lo = 200, hi = 201 removes both problems at once with a wide margin: an
+     * endcard cell at 255 stays saturated, a nibbled edge anywhere above 200 is
+     * put straight back, and everything the collapse left behind is below 200 and
+     * goes to zero on the first frame. The image holds itself sharp and the
+     * screen around it is genuinely black rather than nearly black.
+     *
+     * (Asking for lo = 0, hi = 255 to get "a linear ramp" is not the identity
+     * either -- that is the smoothstep path, and it has its own fixed point; the
+     * endcard settled at 152 and lowering the gain to fade it made the mean go
+     * UP, because the fixed point moves too.) */
+    if (dust) {
+        /* The exact identity branch of build_react, so spilled energy keeps its
+         * value and only the gain fades it. A threshold here would snap every
+         * loose pixel to 0 or 255 and there would be no dust at all. */
+        p->react_lo = 0;
+        p->react_hi = 0;
+    } else {
+        p->react_lo = 200;
+        p->react_hi = 201;
+    }
+    p->react_fold = 0;
+    p->react_out = 255;
+    p->persist = 0;                     /* rate = 256: take the new value whole */
+
+    /* HOLD ABOVE UNITY, and the reason is worth writing down: the identity is
+     * not reachable through this transport. inv * cos(0) uses icos, whose peak
+     * is 32767 and not 32768, so c comes out 65534 rather than 65536 and every
+     * block samples about 1/256 of a pixel off true. That is a small blur
+     * applied every frame, and it drained a nominally exact hold by 17% over
+     * three and a half seconds. No integer zoom fixes it -- c steps from 65535
+     * to 65537 and skips the value wanted -- and widening the sine table would
+     * move every hash in the demo to buy six seconds of still image.
+     *
+     * So instead of resisting the leak, saturate against it. Above unity a lit
+     * cell that the blur nibbled is pushed back up and clamped by the identity
+     * LUT at 255, while a black cell has nothing to scale, so the image holds
+     * itself sharp. Which is the same self-correcting behaviour the demo is
+     * named after, arrived at because the arithmetic left no alternative. */
+    /* TWO decay rates, and they have to be different.
+     *
+     * While the card is being re-injected every frame, the decay must be fast
+     * or the advected copies pile up: at 246 (a seventeen-frame half-life) the
+     * background filled with dense grey smear instead of dust. 200 is under
+     * three frames, which keeps the halo tight around the glyphs.
+     *
+     * After the release at 208 s nothing is being added any more, so the same
+     * fast decay simply deletes the letters -- they were gone 0.2 s after being
+     * let go, which is not blowing away, it is switching off. 248 was still too
+     * quick, and not because of the arithmetic: PAL_ASH is a dark ramp, so a
+     * cell at 57% of scale is already almost black on screen. The value has to
+     * stay high and let the PALETTE take it down. 253 barely decays at all --
+     * the letters come apart and drift, and the readout fades them out. */
+    p->gain = dust ? (f >= SEC(209) + 18 ? 253 : 200) : 256;
+}
+
 static void arc_params(uint32_t f, field_params_t *p)
 {
     /* Magnification. Held ABOVE unity for the whole demo, which is a design
@@ -114,6 +249,10 @@ static void arc_params(uint32_t f, field_params_t *p)
      * radial flow into a spiral, which is what stops a pure zoom from looking
      * like a corridor. */
     p->angle = (int32_t)((f * 7) & 65535);
+
+    /* Explicit: sim_step declares field_params_t on the stack, so anything
+     * arc_params does not assign is whatever was there before. */
+    p->still = 0;
 
     p->cx = (FIELD_W / 2) << 16;
     p->cy = (FIELD_H / 2) << 16;
@@ -248,6 +387,7 @@ static void arc_params(uint32_t f, field_params_t *p)
      * well above anything the field sustains, so the end state is black. */
     p->react_lo = (uint8_t)mix(p->react_lo, 62, ramp(f, SEC(150), SEC(198)));
     p->react_lo = (uint8_t)mix(p->react_lo, 148, ramp(f, SEC(198), SEC(210)));
+
     p->react_hi = 180;
 
     /* The ending. Withdrawing the curve's output is the only thing that
@@ -328,6 +468,12 @@ static void arc_params(uint32_t f, field_params_t *p)
      * the real arc. Worth remembering that the sweep mapped one direction. */
     p->persist = (uint8_t)mix(205, 150, ramp(f, SEC(14), SEC(128)));
     p->persist = (uint8_t)mix(p->persist, 212, ramp(f, SEC(150), SEC(205)));
+
+    /* LAST, and it must be last: it overrides rather than blends, so anything
+     * assigned after it would quietly win. Placed mid-function on the first
+     * attempt, where the persistence and react lines below it undid most of what
+     * it set, and the endcard held at 151 instead of 255. */
+    arc_quiescent(f, p);
 }
 
 /* Forcing events: the only way anything enters the picture.
@@ -363,6 +509,89 @@ static void arc_inject(uint32_t f, uint8_t *dst)
         if (!h->r) continue;
         if (f == (uint32_t)h->beat * SCORE_FRAMES_PER_BEAT)
             field_inject_blob(dst, h->x, h->y, h->r, h->amp);
+    }
+
+    /* The two title cards. Not in score.c: they are not impulses and they have
+     * no pitch, so giving score_hit_t a discriminator to carry them would make
+     * the shared table worse at the one job it is good at.
+     *
+     * WORDMARK at 191 s, in the decay -- NOT in the opening, which is where it
+     * was first put and where it does not work.
+     *
+     * At 6 s the field is empty and permissive, so 21-pixel strokes at 96 per
+     * frame are wildly supercritical: the letters read, and then they seed their
+     * own growth and the screen is full by 6.7 s instead of percolating at 24 s.
+     * That destroys the entire sparse opening the music was written against, for
+     * a logo. The opening is this demo's strongest thirty seconds -- one lit
+     * cell, near silence, everything after it derived -- and interrupting it is
+     * exactly what makes a demo feel like a slideshow.
+     *
+     * In the decay the same injection is subcritical: react_lo has risen to
+     * about 58, so the letters cannot grow, and the dying field erases them over
+     * a second and a half instead. Measured, the collapse is untouched -- 146 at
+     * 199 s, 122 at 203 s with sdev rising, black at 204 s, the same numbers as
+     * before the wordmark existed. And the system's name surfacing out of its
+     * own decay, just before it fails, is a better place for it than the top.
+     *
+     * SUSTAINED, not struck. Injected once, it was legible for three frames --
+     * 50 milliseconds, which reads as a glitch and not as a title, because the
+     * transport smears it diagonally almost at once. Re-injected it stays pinned
+     * at saturation, and tapering the last 24 frames makes the release a
+     * handover to the medium rather than a cut.
+     *
+     * Worth being plain about: 14 KB of stencil is a far larger forcing input
+     * than a blob's four numbers, and this is the one place the "small forcing
+     * vector" of PLANNING.md section 2 is stretched. What it is not is a blit --
+     * the bits are ADDED to the field and the field is what gets displayed, so
+     * no pixel becomes a function of t and the rule still holds.
+     *
+     * ENDCARD at 204.5 s, into the quiescent field (arc_quiescent), where the
+     * operator is the identity and the image simply stays. */
+    {
+        const uint32_t at = SEC(191), len = 84, rel = 24;
+        if (f >= at && f < at + len) {
+            const uint32_t left = at + len - f;
+            const int amp = left > rel ? 96 : (int)(left * 96 / rel);
+            /* Half the rows per frame, alternating, so each band is refreshed at
+             * 30 Hz -- one whole-stencil injection does not fit in the budget
+             * (field.h). Between refreshes a band blurs by well under a pixel,
+             * so the letters stay pinned at saturation either way. */
+            const int half = WORDMARK_H / 2;
+            const int band = (int)((f - at) & 1);
+            field_inject_stencil_rows(dst, g_wordmark_bits,
+                                      WORDMARK_W, WORDMARK_H,
+                                      WORDMARK_OX, WORDMARK_OY + 60,
+                                      (uint8_t)amp,
+                                      band * half, (band + 1) * half);
+        }
+    }
+
+    /* Re-injected EVERY frame while it is up, at full amplitude.
+     *
+     * Additive and saturating, so this pins the glyphs at 255 exactly -- the
+     * same pixels a blit would write -- while the field carries off and fades
+     * whatever spills past their edges. Crisp letters, dust around them, and
+     * nothing written as a function of t.
+     *
+     * The first four frames go in at a lower amplitude so the card accumulates
+     * up rather than popping, and at 208 s the injection simply stops: the
+     * letters stop being held, the drift takes them, and the credits erode the
+     * way everything else in this demo does. */
+    {
+        /* Released at 209.3, not 208. Letting go early and watching the letters
+         * blow away does not work: advection here is per 16x16 block by design,
+         * so within a fifth of a second the glyphs are not particles, they are a
+         * block-aligned grid, and it reads as corruption rather than dust. The
+         * halo around the held card is the dust effect -- moving, fading pixels,
+         * which is what was asked for -- and the release now happens late and
+         * under an already-dimming palette, so the letters visibly loosen at the
+         * very end without the grid ever taking over. */
+        const uint32_t at = SEC(204) + 30, off = SEC(209) + 18;
+        if (f >= at && f < off) {
+            const int amp = (f - at) < 4 ? 72 : 255;
+            field_inject_stencil(dst, g_endcard_bits, ENDCARD_W, ENDCARD_H,
+                                 ENDCARD_OX, ENDCARD_OY, (uint8_t)amp);
+        }
     }
 }
 
@@ -408,6 +637,19 @@ static void arc_palette(uint32_t f)
     if (f < SEC(45))       { a = PAL_COLD;  b = PAL_EMBER; w = ramp(f, SEC(12), SEC(45)) >> 8; }
     else if (f < SEC(130)) { a = PAL_EMBER; b = PAL_BLOOM; w = ramp(f, SEC(80), SEC(130)) >> 8; }
     else                   { a = PAL_BLOOM; b = PAL_ASH;   w = ramp(f, SEC(148), SEC(200)) >> 8; }
+
+    /* The endcard fades through the readout. Its cells never change: the
+     * threshold in arc_quiescent holds them at 254 for the whole six seconds and
+     * they are still there on the last frame. What goes to black is the palette,
+     * which is the exemption this demo declared before it was convenient. */
+    /* Starts at 209, not 208. The letters are released at 208 and need a second
+     * of lit palette to visibly blow away in -- fading the readout at the same
+     * moment simply hid the effect. */
+    if (f >= SEC(208) + 45) {
+        a = PAL_ASH; b = PAL_BLACK;
+        w = ramp(f, SEC(208) + 45, SEC(210) - 6) >> 8;
+    }
+
     if (w > 255) w = 255;
     palette_apply(a, b, (uint8_t)w);
 }

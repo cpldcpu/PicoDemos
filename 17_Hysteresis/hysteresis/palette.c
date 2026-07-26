@@ -18,6 +18,15 @@ static const pal_ramp_t g_ramps[PAL_COUNT] = {
      * toward equilibrium the palette flattens with it, so the ending reads as
      * the system running down rather than as a fade-out applied on top. */
     [PAL_ASH]   = {{ {  0,  0,  0}, { 18, 18, 22}, { 58, 56, 60}, {126,124,130} }},
+
+    /* Black. The endcard is held by a hard threshold in the react curve, which
+     * means its cells sit at 254 and will not fade by getting darker -- the
+     * threshold puts them straight back. So the last two seconds fade through
+     * the READOUT instead, which is the one thing this demo has always said it
+     * is allowed to do with t (palette.h). The state does not change at all
+     * while the picture goes to black, which is a fairly exact statement of
+     * what the demo is about. */
+    [PAL_BLACK] = {{ {  0,  0,  0}, {  0,  0,  0}, {  0,  0,  0}, {  0,  0,  0} }},
 };
 
 static inline int lerp(int a, int b, int w) { return a + (((b - a) * w) >> 8); }

@@ -32,6 +32,7 @@ enum {
     PAL_EMBER,      /* deep red through orange -- growth */
     PAL_BLOOM,      /* hot, high contrast, white shoulder -- the peak */
     PAL_ASH,        /* desaturating, compressing -- the decay */
+    PAL_BLACK,      /* all zero -- the endcard fades out through the readout */
     PAL_COUNT
 };
 

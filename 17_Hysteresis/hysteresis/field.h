@@ -182,6 +182,26 @@ typedef struct {
      *
      * Note this reads the previous frame UNADVECTED, so it also lays trails
      * along the flow, which is the other half of the video-feedback look. */
+    /* Hold the field STILL: the source cell is the destination cell, with no
+     * affine transform and no bilinear fetch. The rest of the value pipeline
+     * (gain, dither, react, persistence) is unchanged.
+     *
+     * This is not a shortcut, it is the only way to hold an image exactly. The
+     * affine path cannot express the identity: inv * cos(0) uses a Q15 sine
+     * whose peak is 32767, so c comes out 65534 instead of 65536 and every block
+     * samples about 1/256 of a pixel off true. No integer zoom recovers it --
+     * c steps from 65535 to 65537 and skips the value wanted. Left running, that
+     * residual drifts the endcard sideways for six seconds and the block-origin
+     * clamp smears its right-hand column into the screen edge, which is visible
+     * and looks like a bug because it is one.
+     *
+     * It is also markedly CHEAPER than the normal path: one tap per cell instead
+     * of four, no per-block setup. Azure suggested overlaying a band of pixels
+     * directly for the same saving; this gets it without any pixel becoming a
+     * function of t, because the operator is still being iterated -- it has just
+     * been handed parameters for which the previous frame is a fixed point. */
+    uint8_t  still;
+
     uint8_t  persist;
 
     /* Spatial bias on the react threshold, from the reaction-diffusion layer.
@@ -216,6 +236,20 @@ void field_poke(uint8_t *f, int x, int y, uint8_t v);
  * so an injection is a disturbance rather than a paste. */
 void field_inject_stencil(uint8_t *f, const uint8_t *bits, int sw, int sh,
                           int x, int y, uint8_t amp);
+
+/* The same, restricted to stencil rows [j0, j1).
+ *
+ * SPLITTING A TITLE CARD ACROSS FRAMES IS A BUDGET REQUIREMENT, not an effect.
+ * Measured on the device: one full injection costs about 554 us and the frame
+ * has roughly 410 us spare, so there is no version of this that fits in a single
+ * frame -- the endcard reached 17,045 us against a 16,667 us budget even after
+ * the inner loop was rewritten. And an overrun here is not a dropped frame: the
+ * simulation advances once per frame from its own counter, so the picture falls
+ * behind the music and never catches up.
+ *
+ * A card spread over four frames is 67 ms, which reads as instant. */
+void field_inject_stencil_rows(uint8_t *f, const uint8_t *bits, int sw, int sh,
+                               int x, int y, uint8_t amp, int j0, int j1);
 
 /* Radial impulse -- the ordinary forcing on a musical hit. */
 void field_inject_blob(uint8_t *f, int x, int y, int radius, uint8_t amp);
