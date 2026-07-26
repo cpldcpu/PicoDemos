@@ -152,10 +152,36 @@ static void arc_quiescent(uint32_t f, field_params_t *p)
      * which is the one thing this demo has claimed throughout. */
     const int dust = (f >= SEC(204) + 30);
 
+    /* TRANSLATION, not zoom, and this is the whole reason the endcard stopped
+     * falling apart into squares.
+     *
+     * Advection here is per 16x16 block: one source coordinate is computed at
+     * the block corner and all 256 cells share it (field.h). Under a zoom,
+     * adjacent blocks therefore step through the source at 16/zoom while
+     * stepping through the destination at 16, leaving about 0.15 px of
+     * discontinuity at every seam -- and because the output is fed straight back
+     * in, that error compounds every frame. After a second the seams are pixels
+     * wide. For the body of the demo that IS the effect; it is the Amiga
+     * blitter-feedback structure the whole thing is built on. Applied to
+     * hard-edged text it just looks broken, which is exactly what it looked
+     * like.
+     *
+     * A uniform drift has no such term: every block gets the identical offset,
+     * so the field translates rigidly and there are no seams to accumulate. The
+     * direction turns slowly, so the dust streams off the letters and the stream
+     * wanders over the six seconds. */
     p->still = !dust;
-    p->zoom = 65536 + (dust ? 620 : 0);
-    p->angle = dust ? (int32_t)((f * 4) & 65535) : 0;
-    p->drift_x = p->drift_y = 0;
+    p->zoom = 65536;
+    p->angle = 0;
+    if (dust) {
+        /* About 1.2 px per frame, on a direction that turns once every ten
+         * seconds. In Q16 pixels, so 65536 is one cell. */
+        const int32_t a = (int32_t)((f * 110) & 65535);
+        p->drift_x = (field_isin(a) * 78000) >> 15;
+        p->drift_y = (field_isin(a + 16384) * 78000) >> 15;
+    } else {
+        p->drift_x = p->drift_y = 0;
+    }
     for (int i = 0; i < 3; i++) p->vortex[i].strength = 0;
     p->shear_x = p->shear_y = 0;
     p->band_amp = 0;
