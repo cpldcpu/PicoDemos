@@ -223,16 +223,95 @@ One pixel → complexity → equilibrium. That arc is not imposed on the materia
 it is what the material *does*. SUSTAIN's return had to be constructed. This
 one is free.
 
-## 6. The referee
+## 6. The music is synthesised, not recorded
+
+Azure's objection to the brief in §9: Suno will not reliably deliver constant
+tempo, impacts spaced in seconds, or a 25-second decay. That is correct —
+those are structural requirements, and generative music is not controllable at
+that resolution. Asking for them and hoping is not a plan.
+
+So the demo generates its own music.
+
+### Three reasons, in increasing order of importance
+
+**Flash.** SUSTAIN's real constraint was flash: 2.59 MB of QOA left under 1 MB
+for code. A synth is a few KB of pattern data and a few KB of code. The ~1.9 MB
+this demo was going to spend on audio simply stops existing.
+
+**CPU is not the obstacle it sounds like.** The inherited output path is
+22050 Hz mono PWM+DMA — **13,605 cycles per sample** at 300 MHz. A generous
+eight-voice subtractive synth at ~500 cycles/sample costs 11 M cycles/s, which
+is **under 4 % of one core**. (An estimate, to be measured at step 3 with
+everything else. I have been wrong about this class of number three times.)
+
+**The material this demo needs is exactly what a small synth is best at.** Read
+the brief back: drones, pads, held bass, sparse impacts, a long decay. No
+vocals, no acoustic instruments, no groove. There is nothing on that list a
+subtractive synth struggles with, and several things it does better than a
+recording — a 25-second decay is *one envelope*.
+
+### The reason that actually decides it
+
+If the music is a recording, then half of this demo is playback of something
+fixed while the other half is generated. For a production whose entire premise
+is *nothing here is a recording*, that is a real incoherence, and the kind a
+critic finds.
+
+Concretely: **the sequencer and the forcing schedule become the same object.**
+The plan as written had music → offline analysis → extracted envelopes →
+forcing events, with an alignment step that can drift. With a synth there is no
+analysis and no alignment. The event that triggers the impact *is* the event
+that injects energy into the field. `audio_now_ms()` already derives the demo
+clock from the DMA sample count, so sync becomes sample-exact by construction
+rather than by care.
+
+It also settles referee test 1: a deterministic integer synth is bit-identical
+run to run, exactly like the field.
+
+### Realtime or offline? Both, from the same code
+
+- The **host** build renders the synth to WAV. The music can be auditioned and
+  rejected long before a Pico is involved, and the video capture gets a clean
+  master.
+- The **device** build runs the identical code live into the existing PWM/DMA
+  ring — only the QOA decoder is replaced by a synth fill.
+- Then diff the two renders sample-for-sample. If they differ, something is
+  non-deterministic, and I would much rather discover that in the audio path
+  than in the field.
+
+This is the host/device split the repo already uses for graphics, applied one
+layer down.
+
+### The honest risk
+
+I have not written music before, and a demo can be sunk by its soundtrack as
+easily as by its visuals.
+
+The mitigation is the workflow above: offline rendering means you can hear it
+and reject it early and repeatedly, at no cost to the firmware. If after a few
+rounds it is not good enough, nothing is lost — the PWM/DMA path is untouched
+and QOA still works, so falling back to a recorded track is a revert, not a
+rewrite.
+
+### Noted, not committed
+
+Closing the loop — letting the field's state modulate the synth, so the audio
+has memory too — is thematically perfect and exactly the kind of idea that
+produces arbitrary-sounding music. If it happens at all it will be one
+restrained parameter (total field energy → filter cutoff), added only after the
+music stands up on its own.
+
+## 7. The referee
 
 Same discipline as SUSTAIN: the central claim is checked by a machine, and a
 build that fails does not ship.
 
 `tools/no_keyframes.py`:
 
-1. **Determinism** — run the same seed twice, require bit-identical output.
-   Catches any accidental dependence on wall-clock, uninitialised memory, or
-   core scheduling.
+1. **Determinism** — run the same seed twice, require bit-identical output,
+   **video and audio both**. Catches any accidental dependence on wall-clock,
+   uninitialised memory, or core scheduling. Extended across the host/device
+   boundary for audio (§6): the two renders must agree sample-for-sample.
 2. **Path-dependence** — flip **one pixel** at frame 0 and run both to the end.
    The divergence must *grow*. If a demo has hidden `f(t)` structure driving
    it, the two runs re-converge and this test fails. This is the mechanical
@@ -244,7 +323,7 @@ Sub-rule 1 is enforced *structurally* rather than tested: **the operator
 signature takes no time argument.** A test you cannot fail is better than a
 test that passes.
 
-## 7. Risks, and what I would do about each
+## 8. Risks, and what I would do about each
 
 ### The concept-level threat: contraction forgets
 
@@ -256,7 +335,7 @@ Iterated feedback of this kind is an **iterated function system**, and a
 started**. Two runs from different initial images end up at the same picture.
 If HYSTERESIS is built from contraction maps, then it has no memory at all —
 sub-rule 3 is false, referee test 2 fails, and the demo would genuinely have
-looked identical if I had keyframed it. That is failure mode two in §10, and it
+looked identical if I had keyframed it. That is failure mode two in §11, and it
 is a property of the mathematics rather than of the code, so no amount of
 implementation care would rescue it.
 
@@ -289,24 +368,22 @@ not after authoring an arc to it.
 | **No seek makes iteration slow.** SUSTAIN's `SPACE`-to-node is gone by construction. | Host build runs headless at max speed to reach any *t*, plus dev-only checkpoint snapshots. Snapshots never exist in the demo build. |
 | **No camera, no 3D** — audience expectation. | Accepted. This is deliberately not another flythrough, and hedging it into one would forfeit the whole point. |
 
-## 8. Assets — later, and far fewer
+## 9. Assets — later, and almost none
 
 SUSTAIN's real constraint turned out to be flash: 2.59 MB of QOA plus 678 KB of
 art left under 1 MB for code, and I discovered that late.
 
-HYSTERESIS needs almost no art. Injection sources are **1-bit stencils** —
-logo, typography, shapes — which are tiny, and the palette does the colour that
-textures used to do.
+With the music synthesised (§6) and the palette doing the work textures used to
+do, this demo has essentially no asset dependencies left:
 
-- **Music** — the one real dependency. Needs a track with clear, spaced
-  impulses (the forcings) over sustained material, and a genuine decay at the
-  end for the equilibrium close.
-- **Stencils** — 1-bit, ≤ 320×240, a handful.
-- **Target: under 200 KB of assets excluding music**, against SUSTAIN's 678 KB.
+- **Stencils** — 1-bit, ≤ 320×240, a handful. Wordmark and endcard first;
+  abstract seeds only once I can see how the field deforms a shape.
+- **Target: under 200 KB total**, against SUSTAIN's 3.2 MB of audio plus art.
 
 Assets are requested **after** the operator loop runs on hardware, not before.
+Nothing on the critical path is waiting on a human.
 
-## 9. Build order
+## 10. Build order
 
 Device bring-up is step 3, not step 9. Every performance estimate I made from
 the desktop host during SUSTAIN was wrong, in both directions, because the host
@@ -315,15 +392,21 @@ has no XIP cache to miss.
 1. Host harness: field + one `advect` operator + animated palette. Prove the
    feedback loop is alive and stable.
 2. `no_keyframes.py` — determinism and divergence tests, before there is
-   content to protect.
+   content to protect. **Step 2 can kill the demo** (§8); that is the point of
+   it being step 2.
 3. **On hardware.** Measure real cycles/cell with the telemetry line that
    already exists in `main.c`. Confirm or kill the 65-cycle budget *now*.
 4. Full operator set + the `react` LUT + dithered rounding.
 5. Dual-core row split; re-measure.
-6. Arc: forcing schedule authored against the track.
-7. The ending — forcing stops, field decays to equilibrium.
+6. **Synth + sequencer, host-side, rendering to WAV.** Independent of 1–5, and
+   the first thing Azure can critique. Iterate here until the music stands up.
+7. Synth onto the device: replace the QOA decoder behind the existing PWM/DMA
+   ring. Compare host and device renders sample-for-sample.
+8. Arc: the forcing schedule *is* the sequencer, so this is authoring one
+   object, not aligning two.
+9. The ending — forcing stops, field decays to equilibrium as the track does.
 
-## 10. What would make this a failure
+## 11. What would make this a failure
 
 Stated up front so it can be called honestly later:
 
