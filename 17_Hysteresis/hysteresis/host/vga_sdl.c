@@ -48,6 +48,8 @@ int g_rawpipe = 0;
 int g_fielddump = 0;      /* raw 320x240 field bytes to stdout — see below */
 int g_headless = 0;       /* no window at all; for the referee */
 
+int hostaudio_active(void);   /* host/audio_sdl.c */
+
 void vga_screenshot(void);
 
 int vga_should_quit(void) { return g_quit; }
@@ -144,7 +146,14 @@ void vga_init(void)
     win = SDL_CreateWindow("HYSTERESIS (host)",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         OW * WINSCALE, OH * WINSCALE, 0);
-    ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
+    /* NO vsync when the audio clock is running the demo (host/audio_sdl.c).
+     * Two masters is one too many: the sample counter already fixes 30 frames to
+     * 11025 samples, and a panel that refreshes at anything but 60 Hz would
+     * otherwise fight it and slide the picture off the music. */
+    Uint32 rflags = SDL_RENDERER_ACCELERATED;
+    if (!hostaudio_active()) rflags |= SDL_RENDERER_PRESENTVSYNC;
+    ren = SDL_CreateRenderer(win, -1, rflags);
     SDL_RenderSetLogicalSize(ren, OW, OH);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
     tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, OW, OH);

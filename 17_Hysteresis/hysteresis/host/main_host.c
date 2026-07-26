@@ -10,6 +10,7 @@
  *   --rawpipe         raw 640x480 BGRA per frame to stdout (video capture)
  *   --shot N          screenshot at frame N (repeatable)
  *   --energy          print frame,energy to stderr each second
+ *   --mute            no audio, and let vsync pace the frames again
  *
  * There is deliberately no --start-ms. You cannot seek a system with memory;
  * you can only get there. --headless --frames N is how you "seek".
@@ -31,12 +32,21 @@ void vga_field_emit(void);
 void vga_screenshot(void);
 extern int g_offline, g_rawpipe, g_fielddump, g_headless;
 
+/* host/audio_sdl.c */
+void hostaudio_init(void);
+void hostaudio_start(void);
+void hostaudio_wait_frame(uint32_t frame);
+void hostaudio_reset(void);
+void hostaudio_shutdown(void);
+int  hostaudio_active(void);
+
 #define MAX_SHOTS 32
 
 int main(int argc, char *argv[])
 {
     uint32_t frames = 0;
     int variant = 0, energy = 0, stats = 0, use_probe = 0, hashes = 0, rd_only = 0;
+    int mute = 0;
     field_params_t probe = {0};
     rd_params_t rdp = {0}; int use_rdp = 0;
     int rd_amp = 0, use_rda = 0;
@@ -50,11 +60,22 @@ int main(int argc, char *argv[])
         else if (!strcmp(argv[i], "--fielddump"))               { g_fielddump = 1; g_headless = 1; }
         else if (!strcmp(argv[i], "--rawpipe"))                 { g_rawpipe = 1; g_headless = 1; }
         else if (!strcmp(argv[i], "--energy"))                  energy = 1;
+        else if (!strcmp(argv[i], "--mute"))                    mute = 1;
         else if (!strcmp(argv[i], "--probe") && i + 1 < argc) {
-            /* zoom_excess,blur,gain,react_lo,react_hi -- pin the dynamics */
-            int z, b, g, lo, hi, fold = 0, persist = 0;
-            if (sscanf(argv[++i], "%d,%d,%d,%d,%d,%d,%d", &z, &b, &g, &lo, &hi, &fold, &persist) < 5) {
-                fprintf(stderr, "--probe wants z,blur,gain,lo,hi\n"); return 1;
+            /* z,blur,gain,lo,hi[,fold[,persist]] -- pin the dynamics.
+             *
+             * OVERLAID ON sim_default_params, never built from zero. The old
+             * version filled in only the fields named here, so react_out and the
+             * convolution kernel arrived as zeros and the probe ran a field that
+             * could not be alive; see sim.h. Omitted trailing fields now keep the
+             * arc's own value instead of becoming 0. */
+            sim_default_params(&probe);
+            int z, b, g, lo, hi;
+            int fold = probe.react_fold, persist = probe.persist;
+            if (sscanf(argv[++i], "%d,%d,%d,%d,%d,%d,%d",
+                       &z, &b, &g, &lo, &hi, &fold, &persist) < 5) {
+                fprintf(stderr, "--probe wants z,blur,gain,lo,hi[,fold[,persist]]\n");
+                return 1;
             }
             probe.zoom = 65536 + z; probe.blur = (uint8_t)b; probe.gain = (uint16_t)g;
             probe.react_lo = (uint8_t)lo; probe.react_hi = (uint8_t)hi;
@@ -92,6 +113,12 @@ int main(int argc, char *argv[])
 
     if (SDL_Init(0) != 0) { fprintf(stderr, "SDL_Init: %s\n", SDL_GetError()); return 1; }
 
+    /* Audio BEFORE vga_init, which asks whether it is running to decide about
+     * vsync. Never in headless mode: the referee and the capture paths run as
+     * fast as the machine allows, and a realtime clock would throttle them to
+     * 210 seconds per run. */
+    if (!g_headless && !mute) hostaudio_init();
+
     vga_init();
     if (use_probe) sim_set_fixed(&probe);
     if (rd_only)   sim_set_rd_only(1);
@@ -123,12 +150,17 @@ int main(int argc, char *argv[])
     double acc_d1 = 0, acc_d2 = 0; long acc_n = 0;
 
     int si = 0;
+    hostaudio_start();
     while (sim_frame() < frames && !vga_should_quit()) {
         /* A restart request has to rebuild the world from the seed. There is
-         * no other way back to the beginning. */
-        if (vga_consume_skip_request() == 2) { sim_reset(variant); si = 0; }
+         * no other way back to the beginning -- and that goes for the music
+         * too, which is a state machine with a 45-second decay in it. */
+        if (vga_consume_skip_request() == 2) {
+            sim_reset(variant); si = 0; hostaudio_reset();
+        }
 
         sim_tick();
+        hostaudio_wait_frame(sim_frame());
 
         if (g_fielddump) vga_field_emit();
         if (g_rawpipe)   vga_raw_emit();
@@ -197,6 +229,7 @@ int main(int argc, char *argv[])
 
     fprintf(stderr, "done: %u frames, final energy %u (mean %.1f)\n",
             sim_frame(), sim_energy(), (double)sim_energy() / (320.0 * 240.0));
+    hostaudio_shutdown();
     SDL_Quit();
     return 0;
 }

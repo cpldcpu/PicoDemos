@@ -27,6 +27,7 @@ add_executable(hysteresis
     vga.c
     sim.c
     field.c
+    score.c
     palette.c
     # rd.c is NOT linked: reaction-diffusion is compiled out (HYST_RD_ENABLE in
     # sim.c) and its state is 153 KB of bss, which took the device from 318 KB

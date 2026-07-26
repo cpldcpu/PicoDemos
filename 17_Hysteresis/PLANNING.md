@@ -359,6 +359,41 @@ build order, before any content, and it is cheap. If a plain feedback loop
 re-converges after a one-pixel perturbation, I want to know that in week one,
 not after authoring an arc to it.
 
+#### Correction: the above is wrong about which map matters
+
+Written before the system existed, and measured afterwards. **A contractive
+zoom does not make this demo forget.** Running the finished field at a
+magnification of 0.982 — everything else untouched — gives a live picture whose
+divergence keeps growing, with 99.5% of cells still differing at the end. The
+prediction was that it would heal. It does the opposite.
+
+The argument was about the wrong map. A step here is *advect, convolve, apply
+the react curve, blend with the previous value*, and the memory lives in the
+**react curve**, whose fold is non-monotone and has slope above one. Value
+differences are therefore amplified regardless of which way the geometry is
+pushing pixels around. Contracting **space** does not contract **value**, and
+the IFS result only ever applied to the former.
+
+What does destroy memory is **persistence**, because that is the term which
+damps the expanding mode directly. Measured on the shipping field: at 212 the
+perturbation still spreads to 99.7% of cells; at 228 it peaks and then heals to
+0.0%; at 240 it peaks at 14.0 and heals completely — while the field keeps a
+mean of 138 and its full structure. It looks exactly like the demo and it has
+no memory.
+
+Three things follow, and none of them are cosmetic:
+
+1. **The real constraint is the persistence ceiling, not the sign of the zoom.**
+   Magnification above unity is now a look, not a load-bearing requirement.
+2. **The negative control had to be rebuilt around it.** A control derived from
+   a false prediction cannot falsify anything, and this one had already failed
+   silently twice for unrelated reasons (see `tools/no_keyframes.py`).
+3. **This is the demo's own thesis turned on its author.** The claim is that
+   the system's behaviour is not predictable from its description; the
+   description here was mine, it was reasoned from a real theorem, and the
+   system still did the other thing. It was only ever going to be settled by
+   running it.
+
 ### The rest
 
 | risk | mitigation |

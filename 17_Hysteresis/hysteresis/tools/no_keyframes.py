@@ -17,15 +17,52 @@ and a build that fails does not ship.
                      memory at all, and the demo would genuinely have looked
                      identical if it had been keyframed.
 
-    3. NEGATIVE CONTROL  Run test 2 again with the nonlinearity removed (the
-                     identity react curve), where the theory says the system
-                     MUST forget. If that passes too, test 2 is measuring
-                     nothing.
+    3. NEGATIVE CONTROL  Run test 2 again with the persistence raised past the
+                     point where the field stops remembering. Same arc, same
+                     react curve, same everything else, and the perturbation
+                     visibly peaks and then heals to nothing. If that passes
+                     too, test 2 is measuring nothing.
 
 Test 3 exists because of demo 16. There, a negative control passed when it
 should have failed, because the threshold had been guessed rather than
 measured, and the audit looked healthy while checking nothing. A referee with
 no known-bad input is not a referee.
+
+THE CONTRACTION ARGUMENT DOES NOT HOLD, and finding that out is what produced
+the control above. PLANNING.md section 8 justified keeping the magnification
+above unity by saying a contractive iterated function system converges to an
+attractor regardless of where it started, so a zoom-out demo would have no
+memory. Run as a negative control, magnification of 0.982 gives a live field
+whose divergence keeps GROWING: 99.5% of cells still differ at the end.
+
+The argument is about the wrong map. The step is advect, convolve, apply the
+react curve, then blend with the previous value, and the memory lives in the
+react curve -- its fold is non-monotone and has slope above one, so value
+differences are amplified no matter which way the geometry is pushing pixels
+around. Contracting space does not contract value. What does destroy memory is
+raising the persistence, because that is the term which damps the expanding mode
+directly, and past about 220 the largest exponent goes negative and the field
+forgets while still looking exactly like the demo.
+
+So the control is now a knob that provably works rather than an argument that
+sounded right, and the demo's real constraint is the persistence ceiling, not
+the sign of the zoom.
+
+AND EVERY TEST NOW ASSERTS THE FIELD WAS ALIVE, which is the lesson from this
+referee's own worst bug. Two different ways of producing a DEAD field both
+passed silently for a long time:
+
+  - --probe built field_params_t from zero and set only the parameters it
+    names, so react_out arrived as 0 and the react curve emitted nothing (fixed
+    in sim.h / sim_default_params);
+  - the negative control asked for the "identity react curve" by zeroing gain,
+    which does not linearise the map, it switches off the transport entirely.
+
+In both cases two empty fields agreed perfectly, so test 2 reported "the system
+forgets" and test 3 reported "the contractive case forgot, as it must". Nothing
+was being measured in either direction. A divergence number computed from two
+black screens is not evidence, so the mean level is now checked first and a dead
+field is a FAIL rather than a verdict.
 
 Usage:
     python tools/no_keyframes.py                 # all three, default length
@@ -76,13 +113,15 @@ def compare_runs(frames, variant_a, variant_b, probe=None, label=""):
             # divergence), and only the second means the system forgot nothing.
             diff = 0
             spread = 0
+            level = 0
             for i in range(0, FRAME_BYTES, 7):     # stride-sample: 11k cells
                 d = fa[i] - fb[i]
+                level += fa[i]
                 if d:
                     diff += d if d > 0 else -d
                     spread += 1
             n = len(range(0, FRAME_BYTES, 7))
-            series.append((diff / n, 100.0 * spread / n))
+            series.append((diff / n, 100.0 * spread / n, level / n))
     finally:
         for p in (a, b):
             try:
@@ -96,16 +135,49 @@ def summarise(series):
     if not series:
         return None
     n = len(series)
-    early = sum(d for d, _ in series[: max(1, n // 10)]) / max(1, n // 10)
-    late = sum(d for d, _ in series[-max(1, n // 10):]) / max(1, n // 10)
-    peak = max(d for d, _ in series)
+    k = max(1, n // 10)
+    early = sum(d for d, _, _ in series[:k]) / k
+    late = sum(d for d, _, _ in series[-k:]) / k
+    peak = max(d for d, _, _ in series)
     final_spread = series[-1][1]
-    return early, late, peak, final_spread
+    # Mean level over the last tenth of the run: whether there was a field there
+    # at all to have memory about. See the module docstring.
+    level = sum(v for _, _, v in series[-k:]) / k
+    return early, late, peak, final_spread, level
+
+
+# A field whose late mean is under this is not a picture, and any divergence
+# measured against it is noise. The shipping arc runs at a mean of about 137.
+ALIVE_MIN = 8.0
+
+# The negative control's persistence. Measured, not chosen: at 212 the field
+# still remembers (99.7% spread), at 228 it heals to 0.0% with the perturbation
+# peaking at 30.1 first, and at 240 it peaks at 14.0 and heals. 240 is far
+# enough past the boundary that the control is not itself sitting on a knife
+# edge, and the field there still has a mean of 138 and full structure.
+DAMPED_PERSIST = 240
+
+# 40 seconds, not 30. The field does not percolate until about 24 s (an actual
+# phase transition, PLANNING.md section 8), so a run that stops at 1800 frames
+# is judging a field that has only been developed for six seconds -- and a
+# parameter sweep run at 1200 frames reports every setting as dead, which cost
+# an hour of chasing a bug that was not there.
+DEFAULT_FRAMES = 2400
+
+
+def report_alive(level, failures, tag):
+    """Print the aliveness line. Returns False if the field was dead."""
+    if level >= ALIVE_MIN:
+        print(f"   field mean       {level:8.2f}   (alive)")
+        return True
+    print(f"   field mean       {level:8.2f}   DEAD — nothing was measured")
+    failures.append(tag + "/dead-field")
+    return False
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--frames", type=int, default=1800)
+    ap.add_argument("--frames", type=int, default=DEFAULT_FRAMES)
     ap.add_argument("--probe", default="900,170,258,12,180,200",
                     help="pin the dynamics so the verdict is about the "
                          "system, not about where the arc happens to be")
@@ -130,7 +202,8 @@ def main():
         print("   FAIL: no frames produced")
         failures.append("determinism")
     else:
-        worst = max(d for d, _ in s)
+        worst = max(d for d, _, _ in s)
+        report_alive(summarise(s)[4], failures, "determinism")
         if worst == 0:
             print(f"   PASS  {len(s)} frames, zero difference")
         else:
@@ -145,34 +218,53 @@ def main():
         print("   FAIL: no frames produced")
         failures.append("path-dependence")
     else:
-        early, late, peak, spread = r
+        early, late, peak, spread, level = r
+        alive = report_alive(level, failures, "path-dependence")
         print(f"   early divergence {early:8.3f}")
         print(f"   late  divergence {late:8.3f}   (peak {peak:.3f})")
         print(f"   final spread     {spread:7.1f}% of cells differ")
-        if late > early and spread > 5.0:
+        if not alive:
+            print("   FAIL  verdict withheld — see above")
+        elif late > early and spread > 5.0:
             print("   PASS  the perturbation grew and persisted")
         else:
             print("   FAIL  the runs re-converged — the system forgets")
             failures.append("path-dependence")
 
     # ---------------------------------------------------------------- 3 --
-    print("\n3. negative control — identity react curve, which MUST forget")
-    base = args.probe or "900,170,258,12,180,200,160"
-    lin = base.rsplit(",", 4)[0] + ",0,0,0,0"        # identity react curve
-    s = compare_runs(args.frames, 0, 1, lin)
+    print(f"\n3. negative control — persistence {DAMPED_PERSIST}, which MUST forget")
+    # The ONE change is the persistence. Everything else -- zoom, react curve,
+    # kernel, flow -- is exactly test 2's, so this isolates the damping term as
+    # the cause rather than switching the system off. That distinction is why
+    # this test has now been rewritten twice: the first version asked for an
+    # "identity react curve" by setting gain to zero, which does not linearise
+    # the map, it stops the transport, and two blank screens agree perfectly for
+    # reasons that have nothing to do with memory; the second used a contractive
+    # zoom, which turns out not to make the system forget at all (see above).
+    base = args.probe or "900,170,258,12,180,200"
+    parts = base.split(",")
+    if len(parts) < 6:
+        parts.append("200")                     # fold, the arc's own value
+    damped = ",".join(parts[:6] + [str(DAMPED_PERSIST)])
+    s = compare_runs(args.frames, 0, 1, damped)
     r = summarise(s)
     if r is None:
         print("   FAIL: no frames produced")
         failures.append("negative-control")
     else:
-        early, late, peak, spread = r
+        early, late, peak, spread, level = r
+        alive = report_alive(level, failures, "negative-control")
         print(f"   early divergence {early:8.3f}")
         print(f"   late  divergence {late:8.3f}   (peak {peak:.3f})")
         print(f"   final spread     {spread:7.1f}% of cells differ")
-        if late < early or spread < 5.0:
-            print("   PASS  the contractive case forgot, as it must")
+        if not alive:
+            print("   FAIL  verdict withheld — a dead field forgets trivially, "
+                  "which is not what this test is for")
+        elif late < early or spread < 5.0:
+            print(f"   PASS  the damped case forgot, as it must "
+                  f"(peaked at {peak:.1f}, then healed)")
         else:
-            print("   FAIL  even the linear system 'remembers' — test 2 is "
+            print("   FAIL  even the damped system 'remembers' — test 2 is "
                   "measuring nothing")
             failures.append("negative-control")
 

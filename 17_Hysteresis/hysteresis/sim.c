@@ -7,6 +7,7 @@
 
 #include "sim.h"
 #include "field.h"
+#include "score.h"
 #include "palette.h"
 #include "rd.h"
 #include "vga.h"
@@ -62,6 +63,17 @@ void sim_set_fixed(const field_params_t *p)
 {
     g_fixed = *p;
     g_fixed_on = 1;
+}
+
+static void arc_params(uint32_t f, field_params_t *p);
+
+/* See sim.h. The arc at 90 s: past the percolation transition, fully developed,
+ * and squarely inside the regime the parameter map says supports both structure
+ * and memory. Any field added to field_params_t is populated here for free,
+ * which is the whole point. */
+void sim_default_params(field_params_t *p)
+{
+    arc_params(SEC(90), p);
 }
 
 /* ------------------------------------------------------------------ arc --- */
@@ -320,52 +332,38 @@ static void arc_params(uint32_t f, field_params_t *p)
 
 /* Forcing events: the only way anything enters the picture.
  *
- * Spaced in SECONDS, not beats. The visual response to an injection propagates
- * over the following 2-5 s and that propagation is the effect; re-forcing
- * before the last response is visible smears everything into noise. */
+ * THE TABLE LIVES IN score.c, and is the same table the synth strikes its
+ * resonators from -- PLANNING.md section 6 argued the sequencer and the forcing
+ * schedule should be one object rather than two that have to be kept in
+ * agreement, and this is where that is cashed in. There is no alignment step
+ * between the music and the picture because there is nothing to align: the
+ * event that injects energy here IS the event that is heard.
+ *
+ * Times are beats at 120 BPM, and score.h fixes a beat at exactly 30 frames, so
+ * this is a multiply and not a conversion with a remainder.
+ *
+ * Radii start at 7, not 3. An excitable medium has a CRITICAL NUCLEUS: a blob
+ * too small to sustain a growing front just decays, so the early impacts were
+ * doing nothing and the opening was one organism pulsing alone near the centre
+ * for thirty seconds before the screen filled all at once. Big enough seeds each
+ * start their own growing region, so the frame fills progressively from several
+ * places -- a better image, and an actual narrative of growth rather than a step
+ * change. Spacing is dense through the opening for the same reason and widens
+ * once the field can carry structure on its own. */
 static void arc_inject(uint32_t f, uint8_t *dst)
 {
-    /* The opening: one lit cell, and nothing else for eight seconds. */
+    /* The opening: one lit cell, and nothing else for five seconds. */
     if (f == 0) return;
 
-    /* Provisional impulse schedule — replaced by the sequencer at step 8. */
-    /* Radii start at 6, not 3. An excitable medium has a CRITICAL NUCLEUS: a
-     * blob too small to sustain a growing front just decays, so the early
-     * impacts were doing nothing and the opening was one organism pulsing alone
-     * near the centre for thirty seconds before the screen filled all at once.
-     * Big enough seeds each start their own growing region, so the frame fills
-     * progressively from several places -- which is both a better image and an
-     * actual narrative of growth rather than a step change.
-     *
-     * Denser through the opening for the same reason, then spacing widens once
-     * the field can carry structure on its own. */
-    static const struct { uint32_t at; int x, y, r, amp; } hits[] = {
-        { SEC(  5), 104,  88, 7, 255 },
-        { SEC(  8), 216, 148, 8, 250 },
-        { SEC( 11),  86, 166, 9, 250 },
-        { SEC( 14), 234,  74,10, 255 },
-        { SEC( 18), 142, 192,10, 250 },
-        { SEC( 23),  58, 102,11, 255 },
-        { SEC( 29), 258, 130,11, 250 },
-        { SEC( 36), 160,  58,12, 255 },
-        { SEC( 44), 108, 134,12, 250 },
-        { SEC( 53), 210,  98,13, 255 },
-        { SEC( 62),  72, 178,13, 250 },
-        { SEC( 71), 248, 186,14, 255 },
-        { SEC( 80), 130,  94,14, 250 },
-        { SEC( 89), 176, 158,15, 255 },
-        { SEC( 98),  94,  60,15, 255 },
-        { SEC(107), 224, 128,15, 255 },
-        { SEC(116), 160, 120,16, 255 },
-        { SEC(125),  68, 140,15, 255 },
-        { SEC(134), 252,  96,15, 255 },
-        { SEC(143), 120, 200,14, 255 },
-        { SEC(152), 200,  44,13, 255 },
-    };
-    for (unsigned i = 0; i < sizeof hits / sizeof hits[0]; i++)
-        if (f == hits[i].at)
-            field_inject_blob(dst, hits[i].x, hits[i].y, hits[i].r,
-                              (uint8_t)hits[i].amp);
+    for (unsigned i = 0; i < score_hit_count; i++) {
+        const score_hit_t *h = &score_hits[i];
+        /* r == 0 is an audio-only event. The one at 203 s is deliberately not
+         * felt by the field: the ending is the field failing to hold its state,
+         * not the field being pushed. */
+        if (!h->r) continue;
+        if (f == (uint32_t)h->beat * SCORE_FRAMES_PER_BEAT)
+            field_inject_blob(dst, h->x, h->y, h->r, h->amp);
+    }
 }
 
 /* REACTION-DIFFUSION IS BUILT AND CURRENTLY OFF. A negative result, recorded
@@ -394,16 +392,14 @@ static void arc_inject(uint32_t f, uint8_t *dst)
  * the flow field itself, rather than the value pipeline). Compiled out so the
  * device pays nothing for it. */
 
+#if HYST_RD_ENABLE
 static int16_t arc_rd_amp(uint32_t f)
 {
-#if !HYST_RD_ENABLE
-    (void)f; return 0;
-#else
     int32_t a = mix(0, 90, ramp(f, SEC(34), SEC(100)));
     a = mix(a, 0, ramp(f, SEC(162), SEC(200)));
     return (int16_t)a;
-#endif
 }
+#endif
 
 /* Palette — the one declared exemption, allowed to be f(t). */
 static void arc_palette(uint32_t f)

@@ -41,6 +41,20 @@ void sim_present(void);
 /* Pin parameters for a sweep, bypassing the arc. Probe/tuning only. */
 void sim_set_fixed(const field_params_t *p);
 
+/* A known-good parameter set for a probe to overlay.
+ *
+ * This exists because --probe used to build field_params_t from zero and fill in
+ * only the six fields it names. Every time field.h grew one -- the convolution
+ * kernel, react_out, persist -- the probe silently received zero for it, and a
+ * react_out of zero means the react curve emits nothing at all. So the referee's
+ * pinned path-dependence test was running a DEAD FIELD and correctly reporting
+ * that it had no memory, while its negative control passed for the same reason.
+ *
+ * A test that passes because nothing happened is worse than no test, and a probe
+ * that must be updated by hand whenever a parameter is added will not be. Probes
+ * start from this and override what they mean to vary. */
+void sim_default_params(field_params_t *p);
+
 /* Debug: render the reaction-diffusion layer alone. */
 void sim_set_rd_only(int on);
 

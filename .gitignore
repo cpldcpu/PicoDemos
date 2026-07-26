@@ -93,3 +93,7 @@ Session.vim
 .claude/
 **/LATENT.md
 
+
+# Rendered audio. synthwav.exe regenerates the 9 MB master in about a second
+# from score.c and synth.c, so the file is an output, not an asset.
+**/*.wav
