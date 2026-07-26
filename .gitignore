@@ -97,3 +97,7 @@ Session.vim
 # Rendered audio. synthwav.exe regenerates the 9 MB master in about a second
 # from score.c and synth.c, so the file is an output, not an asset.
 **/*.wav
+
+# Azure's asset scratch: endcard font/threshold variants. The two that mattered
+# are kept as assets/latent_endcard_*_rejected.png; the rest is working material.
+17_Hysteresis/tmp/

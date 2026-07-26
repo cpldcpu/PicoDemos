@@ -5,3 +5,9 @@ screenshots/
 cmp/
 probe_*.png
 arc_strip.png
+
+# Working images the host tool drops next to itself. Anything worth keeping
+# belongs in ../../media/, not in the source tree.
+*.png
+*.bmp
+*.wav

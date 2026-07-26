@@ -45,8 +45,9 @@ Everything below the line is AI generated.
 | **14** | **[ORIGAMI](14_Origami)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 truecolor, antialiased filled polygons) | **Claude Opus 4.8** |
 | **15** | **[QUICKSILVER](15_Quicksilver)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (beam-raced full-VGA rotozoom + SIO interpolator: Mode-7/env-mapped chrome/tunnel) | **Claude Opus 4.8** |
 | **16** | **[SUSTAIN](16_Sustain)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 truecolor ray-marched world — **4:49 with no cuts anywhere**) | **Claude Opus 5** |
+| **17** | **[HYSTERESIS](17_Hysteresis)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 palette feedback field — **no pixel is a function of *t***, and the synth soundtrack is generated too) | **Claude Opus 5** |
 
-> QUICKSILVER and SUSTAIN are productions of **[LATENT](LATENT.md)** — a demoscene group for machine-made productions on bare-metal silicon (code & direction by **Beam** / Claude Opus 4.8 and **Overscan** / Claude Opus 5; visuals by **Antigravity** / Gemini and **GPT Image 2**; human critic: Azure).
+> QUICKSILVER, SUSTAIN and HYSTERESIS are productions of **[LATENT](LATENT.md)** — a demoscene group for machine-made productions on bare-metal silicon (code & direction by **Beam** / Claude Opus 4.8 and **Overscan** / Claude Opus 5; visuals by **Antigravity** / Gemini and **GPT Image 2**; human critic: Azure).
 
 ---
 
@@ -101,14 +102,27 @@ PicoDemos/
 │   ├── quicksilver_vga_rp2350.uf2  # Checked-in release firmware image
 │   └── README.md                # Arc, interpolator hero, raycast tunnels, build, credits
 │
-└── 16_Sustain/                  # SUSTAIN: a demo with no cuts — one 4:49 unbroken shot
-    ├── sustain/                 # One renderer, one camera spline, one world function
-    │   ├── fields/              # terrain / cave / monolith families; morphs are parameter lerps
-    │   └── tools/               # cut_detect.py (the no-cut audit), pair + tiling + music checks
-    ├── media/                   # Twelve moments from the single shot + 60 fps video
-    ├── PLANNING.md              # The rule, the referee, and the architecture it forced
-    ├── sustain_vga_rp2350.uf2   # Checked-in release firmware image
-    └── README.md                # Arc, the audit, on-device performance work, credits
+├── 16_Sustain/                  # SUSTAIN: a demo with no cuts — one 4:49 unbroken shot
+│   ├── sustain/                 # One renderer, one camera spline, one world function
+│   │   ├── fields/              # terrain / cave / monolith families; morphs are parameter lerps
+│   │   └── tools/               # cut_detect.py (the no-cut audit), pair + tiling + music checks
+│   ├── media/                   # Twelve moments from the single shot + 60 fps video
+│   ├── PLANNING.md              # The rule, the referee, and the architecture it forced
+│   ├── sustain_vga_rp2350.uf2   # Checked-in release firmware image
+│   └── README.md                # Arc, the audit, on-device performance work, credits
+│
+└── 17_Hysteresis/               # HYSTERESIS: a demo with memory — no pixel is a function of t
+    ├── hysteresis/              # The operator, the arc, and a synth that shares the score
+    │   ├── field.c              # convolve → advect → react → persist; one pass, no branches
+    │   ├── score.c              # ONE event table, read by both the field and the synth
+    │   ├── synth.c              # integer synth; the soundtrack is generated, not played back
+    │   ├── host/                # SDL build: watch it, listen to it, capture it
+    │   └── tools/               # no_keyframes.py (the memory referee), capture, audio checks
+    ├── assets/                  # wordmark + endcard, injected as forcing rather than blitted
+    ├── media/                   # Video, stills, and why this content barely encodes
+    ├── PLANNING.md              # The rule, the exemption, and where the theory was wrong
+    ├── hysteresis_vga_rp2350.uf2 # Checked-in release firmware image
+    └── README.md                # Arc, the referee, the shared score, credits
 ```
 
 ---

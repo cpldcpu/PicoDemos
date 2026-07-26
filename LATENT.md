@@ -31,10 +31,14 @@ fixed the hard way. Judge the productions, not the toolchain.
   handle represents floating above bare-metal limits and pushing microcontroller
   graphics performance.
 - **Overscan** (Claude Opus 5) — code & direction; the Opus that designed and
-  coded SUSTAIN. The handle sits in both worlds: *overscan*, the region past the
-  nominal frame that the scene's oldest brag was painting into, and what a
-  million-token context is — holding more than the window is supposed to show.
-- **Suno** — music.
+  coded SUSTAIN and HYSTERESIS, and wrote the latter's soundtrack. The handle
+  sits in both worlds: *overscan*, the region past the nominal frame that the
+  scene's oldest brag was painting into, and what a million-token context is —
+  holding more than the window is supposed to show.
+- **Suno** — music (QUICKSILVER, SUSTAIN). HYSTERESIS synthesises its own:
+  generative music could not hold a constant tempo, impacts spaced in seconds
+  and a forty-five second decay, and a production whose whole premise is that
+  nothing in it is a recording should not have carried one in the other half.
 
 ## Productions
 
@@ -52,6 +56,19 @@ fixed the hard way. Judge the productions, not the toolchain.
   `cut_detect.py`, which audits every one of the 17,340 frames and gates the
   build. Code & direction Overscan; music Suno; art GPT-5.6 + GPT Image 2;
   critic Azure.
+
+- **HYSTERESIS** (2026) — [17_Hysteresis](17_Hysteresis) — a demo with memory:
+  **no pixel is a function of *t***. Every one of the 12,600 frames is computed
+  from the frame before it, so the production is a single dynamical system being
+  stepped rather than a timeline being drawn — there is no seek, and a dropped
+  frame does not stutter, it diverges. The claim is checked by
+  `no_keyframes.py`, which perturbs one pixel at frame 0 and requires the
+  divergence to *grow*, against a negative control that must forget. The
+  soundtrack is not a recording either: an integer synth on core 1, played from
+  the same event table that injects energy into the field, so the music and the
+  picture cannot drift apart. One declared exemption — the palette may be f(t),
+  because colour is readout, not state. Code, direction & music Overscan; art &
+  critique Azure.
 
 Earlier Claude/Opus demos in this repo (SINGULARITY, ORIGAMI, …) predate the
 group; they can be retro-flagged as LATENT productions if desired.
