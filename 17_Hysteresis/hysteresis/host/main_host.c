@@ -36,8 +36,10 @@ extern int g_offline, g_rawpipe, g_fielddump, g_headless;
 int main(int argc, char *argv[])
 {
     uint32_t frames = 0;
-    int variant = 0, energy = 0, stats = 0, use_probe = 0, hashes = 0;
+    int variant = 0, energy = 0, stats = 0, use_probe = 0, hashes = 0, rd_only = 0;
     field_params_t probe = {0};
+    rd_params_t rdp = {0}; int use_rdp = 0;
+    int rd_amp = 0, use_rda = 0;
     uint32_t shots[MAX_SHOTS]; int nshots = 0;
 
     for (int i = 1; i < argc; i++) {
@@ -62,6 +64,17 @@ int main(int argc, char *argv[])
             use_probe = 1;
         }
         else if (!strcmp(argv[i], "--stats"))                   stats = 1;
+        else if (!strcmp(argv[i], "--rdonly"))                  rd_only = 1;
+        else if (!strcmp(argv[i], "--rdamp") && i + 1 < argc)   { rd_amp = atoi(argv[++i]); use_rda = 1; }
+        else if (!strcmp(argv[i], "--rdprobe") && i + 1 < argc) {
+            int du, dv, F, K;
+            if (sscanf(argv[++i], "%d,%d,%d,%d", &du, &dv, &F, &K) != 4) {
+                fprintf(stderr, "--rdprobe wants du,dv,F,k\n"); return 1;
+            }
+            rdp.du = (uint8_t)du; rdp.dv = (uint8_t)dv;
+            rdp.feed = (uint16_t)F; rdp.kill = (uint16_t)K;
+            use_rdp = 1;
+        }
         else if (!strcmp(argv[i], "--hash"))                    hashes = 1;
         else if (!strcmp(argv[i], "--shot") && i + 1 < argc) {
             if (nshots < MAX_SHOTS) shots[nshots++] = (uint32_t)atoi(argv[++i]);
@@ -79,6 +92,9 @@ int main(int argc, char *argv[])
 
     vga_init();
     if (use_probe) sim_set_fixed(&probe);
+    if (rd_only)   sim_set_rd_only(1);
+    if (use_rdp)   sim_set_rd_params(&rdp);
+    if (use_rda)   sim_set_rd_amp((int16_t)rd_amp);
     sim_reset(variant);
 
     if (!frames) frames = sim_total_frames();

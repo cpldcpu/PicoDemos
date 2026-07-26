@@ -8,10 +8,17 @@
 #include "sim.h"
 #include "field.h"
 #include "palette.h"
+#include "rd.h"
 #include "vga.h"
 #include "scene.h"
 
 #include <stdio.h>
+#include <stddef.h>
+
+/* See the note above arc_rd_amp: reaction-diffusion is built, measured, and
+ * currently off. ONE switch for both builds -- host and device must compile the
+ * same code or the bit-identical guarantee is void. */
+#define HYST_RD_ENABLE 0
 
 #define FPS            60
 #define SEC(s)         ((uint32_t)((s) * FPS))
@@ -25,6 +32,27 @@ static uint32_t g_energy;
  * you end up with a demo that dies at 2:40 on hardware only. */
 static int            g_fixed_on;
 static field_params_t g_fixed;
+
+/* Debug: show the reaction-diffusion layer on its own, so its regime can be
+ * judged without the feedback loop chewing on it. */
+static int g_rd_only;
+void sim_set_rd_only(int on) { g_rd_only = on; }
+
+/* Gray-Scott regime selection is entirely a matter of F and k, and the usual
+ * published pairs assume a laplacian normalised as (weighted mean - centre).
+ * This one is (sum of 4 - 4*centre), which is four times larger, so the
+ * diffusion coefficients do not transfer directly and the whole pair has to be
+ * swept rather than copied. */
+/* Swept, not copied from a paper: k=246 (0.060) is the labyrinth regime here.
+ * k=230 floods to near-uniform cover (mean 84, sdev 23 -- no pattern), k>=254
+ * dies out entirely. The window is narrow and these are its measured edges. */
+static rd_params_t g_rdp = { .du = 56, .dv = 28, .feed = 225, .kill = 246 };
+void sim_set_rd_params(const rd_params_t *p) { g_rdp = *p; }
+
+/* Force a constant RD amplitude, for sweeping. INT16_MIN means "use the arc". */
+static int g_rd_amp_forced = 1;
+static int16_t g_rd_amp_val;
+void sim_set_rd_amp(int16_t a) { g_rd_amp_val = a; g_rd_amp_forced = 0; }
 
 void sim_set_fixed(const field_params_t *p)
 {
@@ -191,6 +219,43 @@ static void arc_inject(uint32_t f, uint8_t *dst)
                               (uint8_t)hits[i].amp);
 }
 
+/* REACTION-DIFFUSION IS BUILT AND CURRENTLY OFF. A negative result, recorded
+ * rather than quietly deleted.
+ *
+ * rd.c works: swept to k=246 it produces proper Gray-Scott labyrinths, and
+ * tools/ can show them (--rdonly). What does not work is getting that structure
+ * to survive contact with the feedback field. Three integrations were tried:
+ *
+ *   additive value      floods brightness, kills the remaining black, and the
+ *                       organic shapes are ground into block texture within a
+ *                       frame or two
+ *   inhibitory value    raises sdev and brings some black back, but produces
+ *                       fine dark SPECKLE, not channels
+ *   react-threshold bias  changes the dynamics rather than the state, which
+ *                       should have been the strong version; still speckle, and
+ *                       above ~200 it suppresses the field outright
+ *
+ * The field imposes its own spatial scale regardless of what is fed in -- the
+ * block advection and the react curve dominate the frequency content, and a
+ * smooth 160x120 pattern has no way to assert itself against them. Which is a
+ * slightly ironic confirmation of the demo's own thesis about strong attractors.
+ *
+ * Left in the tree with its tooling because the finding is worth keeping and
+ * the next attempt should start from a different lever (advection direction, or
+ * the flow field itself, rather than the value pipeline). Compiled out so the
+ * device pays nothing for it. */
+
+static int16_t arc_rd_amp(uint32_t f)
+{
+#if !HYST_RD_ENABLE
+    (void)f; return 0;
+#else
+    int32_t a = mix(0, 90, ramp(f, SEC(34), SEC(100)));
+    a = mix(a, 0, ramp(f, SEC(162), SEC(200)));
+    return (int16_t)a;
+#endif
+}
+
 /* Palette — the one declared exemption, allowed to be f(t). */
 static void arc_palette(uint32_t f)
 {
@@ -207,6 +272,9 @@ static void arc_palette(uint32_t f)
 void sim_reset(int variant)
 {
     field_init();
+#if HYST_RD_ENABLE
+    rd_reset();
+#endif
     g_frame  = 0;
     g_energy = 0;
 
@@ -245,6 +313,34 @@ void sim_step(void)
 
     uint8_t       *dst = vga_320_back_buffer();
     const uint8_t *src = vga_320_front_buffer();
+
+    /* The slow layer. Stepped every frame regardless of whether it is being
+     * injected, so that when the arc brings it in it already has a developed
+     * pattern rather than fading up from four nuclei. */
+#if HYST_RD_ENABLE
+    rd_step(&g_rdp);
+#endif
+
+#if HYST_RD_ENABLE
+    if (g_rd_only) {
+        field_clear(dst);
+        rd_inject(dst, 255);
+        arc_palette(g_frame);
+        return;
+    }
+#endif
+
+    /* Hand the RD pattern to the field as a threshold bias rather than adding
+     * it to the picture. See rd.h: value-level injection fails in both signs. */
+#if HYST_RD_ENABLE
+    {
+        const int16_t amt = g_rd_amp_forced ? arc_rd_amp(g_frame) : g_rd_amp_val;
+        p.bias     = amt ? rd_v8() : NULL;
+        p.bias_amt = (uint8_t)(amt < 0 ? 0 : amt > 255 ? 255 : amt);
+    }
+#else
+    p.bias = NULL; p.bias_amt = 0;
+#endif
 
     field_step(dst, src, &p);
     arc_inject(g_frame, dst);

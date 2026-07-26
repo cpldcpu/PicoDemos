@@ -147,6 +147,13 @@ typedef struct {
      * Note this reads the previous frame UNADVECTED, so it also lays trails
      * along the flow, which is the other half of the video-feedback look. */
     uint8_t  persist;
+
+    /* Spatial bias on the react threshold, from the reaction-diffusion layer.
+     * Half resolution (FIELD_W/2 x FIELD_H/2), nearest-sampled -- the bias
+     * changes the dynamics smoothly enough that interpolating it would be
+     * wasted work in the hot loop. NULL disables it at no cost. */
+    const uint8_t *bias;
+    uint8_t  bias_amt;
 } field_params_t;
 
 /* The shared integer sine, exposed so the arc can move the flow field using

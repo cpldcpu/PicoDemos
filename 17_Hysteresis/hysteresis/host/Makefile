@@ -18,7 +18,7 @@ SDLLIBS   := $(shell pkg-config --libs sdl2)
 CFLAGS := -std=gnu11 -O2 -g -Wall -Wextra -Wno-unused-parameter \
           -I.. $(SDLCFLAGS) -DHOST_BUILD=1 -MMD -MP
 
-SHARED_C = ../field.c ../sim.c ../palette.c
+SHARED_C = ../field.c ../sim.c ../palette.c ../rd.c
 HOST_C   = main_host.c vga_sdl.c
 
 OBJS   = $(notdir $(SHARED_C:.c=.o)) $(HOST_C:.c=.o)
@@ -37,6 +37,8 @@ field.o: ../field.c
 sim.o: ../sim.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 palette.o: ../palette.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+rd.o: ../rd.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:

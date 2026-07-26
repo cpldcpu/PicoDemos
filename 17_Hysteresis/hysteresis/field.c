@@ -146,6 +146,14 @@ void HYST_HOT(field_step)(uint8_t *dst, const uint8_t *src,
      * complement is retained from the previous frame at the same position */
     const int32_t rate = 256 - (int32_t)p->persist;
 
+    /* Reaction-diffusion as a threshold bias. One load, one multiply, one
+     * shift per cell, and it buys what value-level injection could not: where
+     * the RD pattern is strong the field is pushed below its own excitation
+     * threshold and simply cannot hold, so the labyrinth appears as persistent
+     * negative space instead of being blurred away within a frame. */
+    const uint8_t *bias = p->bias;
+    const int32_t  bamt = bias ? p->bias_amt : 0;
+
     for (int by = 0; by < FIELD_H; by += FIELD_BLOCK) {
         for (int bx = 0; bx < FIELD_W; bx += FIELD_BLOCK) {
             /* One source coordinate for the whole block. The block is then
@@ -213,6 +221,10 @@ void HYST_HOT(field_step)(uint8_t *dst, const uint8_t *src,
 
                     /* scale, with ordered dither folded into the rounding */
                     v = (v * gain + dith[(bx + x) & 3]) >> 8;
+
+                    if (bamt)
+                        v -= (bias[(((by + y) >> 1) * (FIELD_W / 2))
+                                   + ((bx + x) >> 1)] * bamt) >> 8;
 
                     if (v < 0)   v = 0;
                     if (v > 255) v = 255;

@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 #include "field.h"
+#include "rd.h"
 
 /* Restart the system. `variant` selects the initial condition:
  *   0 — the demo's actual seed: a single lit cell.
@@ -39,6 +40,15 @@ void sim_present(void);
 
 /* Pin parameters for a sweep, bypassing the arc. Probe/tuning only. */
 void sim_set_fixed(const field_params_t *p);
+
+/* Debug: render the reaction-diffusion layer alone. */
+void sim_set_rd_only(int on);
+
+/* Override the Gray-Scott coefficients (sweeping). */
+void sim_set_rd_params(const rd_params_t *p);
+
+/* Pin the RD amplitude (negative = inhibitory). Sweeping only. */
+void sim_set_rd_amp(int16_t a);
 
 /* Steps taken since sim_reset. */
 uint32_t sim_frame(void);
