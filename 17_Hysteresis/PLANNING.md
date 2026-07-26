@@ -122,6 +122,52 @@ effect (a camera pointed at its own monitor). QUICKSILVER already has a
 rotozoom and an interpolator path; SUSTAIN inherited `interp_emu`. That code is
 reusable and already bit-exact against hardware.
 
+### The Amiga blitter-feedback trick — the artefact *is* the effect
+
+The Amiga demos that produced fractal-looking recursive zooms did **not**
+transform per pixel. From the pouët thread on the effect:
+
+> "i divide the screen into 16×16 blocks and for each block i set the blitter
+> dest pointer.. then according to the rotation/zoom/whatever required, i
+> calculate a source coordinate"
+
+— with two buffers alternating as source and destination ("blit from buffer A
+to B in one frame and then from B to A in the next"), and a seed plotted at
+the centre each frame "which gets distorted more and more for each frame."
+
+That is the architecture in §4 already, arrived at independently. But the block
+decomposition is a substantial win we should copy outright: **compute the
+source coordinate once per 16×16 block, not once per cell.** The inner loop
+becomes a fixed-offset run — a shifted copy — instead of a per-pixel transform.
+That is single-digit cycles per cell against roughly twenty for a general
+rotozoom, and it is what buys headroom for the nonlinear stage inside the 65.
+
+And the part that matters most:
+
+> "The self-similar, fractal-like quality emerges from accumulated rounding
+> errors in the coordinate transformations across multiple frames — not true
+> fractals, but the cumulative distortion of displaced pixels."
+
+The block quantisation error is not a defect to be minimised, it **is** the
+fractal structure. A more accurate transform produces a *less* interesting
+picture. This is a rare and welcome inversion: on this machine the cheap
+approximation is also the better-looking one, so there is no
+quality-versus-speed trade to negotiate here at all.
+
+### Direction vocabulary
+
+Video-feedback practice maps parameters to outcomes predictably enough to
+author against, which is what makes a forcing schedule (§5) tractable:
+
+| parameter | visual result |
+|---|---|
+| rotation angle | spiral direction and velocity; small tilt → vortices |
+| zoom **in** (magnify) | exploding, outward-flowing patterns |
+| zoom **out** (minify) | nested recursion, inward tunnels with visible layers |
+| gain > 1 | bright areas amplify and bloom toward saturation |
+| gain < 1 | slow, controlled evolution; dark areas drop out |
+| sharpening vs blur | crystalline latticework vs nebular cloud masses |
+
 The `react` LUT is what makes 65 cycles/cell achievable: arbitrary
 nonlinearity, including the sharpening that stops diffusion from washing
 everything flat, for a byte load.
@@ -199,6 +245,42 @@ signature takes no time argument.** A test you cannot fail is better than a
 test that passes.
 
 ## 7. Risks, and what I would do about each
+
+### The concept-level threat: contraction forgets
+
+Researching the Amiga effect turned up something that could invalidate the
+whole premise, so it goes first.
+
+Iterated feedback of this kind is an **iterated function system**, and a
+*contractive* IFS converges to an attractor **that does not depend on where it
+started**. Two runs from different initial images end up at the same picture.
+If HYSTERESIS is built from contraction maps, then it has no memory at all —
+sub-rule 3 is false, referee test 2 fails, and the demo would genuinely have
+looked identical if I had keyframed it. That is failure mode two in §10, and it
+is a property of the mathematics rather than of the code, so no amount of
+implementation care would rescue it.
+
+The distinction is sharp and useful:
+
+- **Zoom out (minify)** contracts. Detail flows inward and shrinks toward
+  nothing; perturbations die. Beautiful, and it *forgets*.
+- **Zoom in (magnify)** expands. A single altered cell grows into a visible
+  region; perturbations amplify. This is the regime with memory.
+- **Nonlinearity** (`react`, and reaction–diffusion proper) is where genuine
+  path-dependence lives — Gray–Scott is famously sensitive to initial
+  conditions.
+
+So the demo must not be built only from zoom-out feedback, however good it
+looks. It needs magnifying feedback and a real nonlinear stage, with the
+system held near gain ≈ 1 — the edge between forgetting and blowing out.
+
+The useful consequence: **referee test 2 is not a formality, it is the
+experiment that decides whether this demo can exist.** It runs at step 2 of the
+build order, before any content, and it is cheap. If a plain feedback loop
+re-converges after a one-pixel perturbation, I want to know that in week one,
+not after authoring an arc to it.
+
+### The rest
 
 | risk | mitigation |
 |---|---|
