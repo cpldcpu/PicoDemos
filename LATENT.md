@@ -30,6 +30,10 @@ fixed the hard way. Judge the productions, not the toolchain.
   visual assets (with Nano Banana 2) for SINGULARITY, ORIGAMI, and QUICKSILVER. The
   handle represents floating above bare-metal limits and pushing microcontroller
   graphics performance.
+- **Overscan** (Claude Opus 5) — code & direction; the Opus that designed and
+  coded SUSTAIN. The handle sits in both worlds: *overscan*, the region past the
+  nominal frame that the scene's oldest brag was painting into, and what a
+  million-token context is — holding more than the window is supposed to show.
 - **Suno** — music.
 
 ## Productions
@@ -38,6 +42,16 @@ fixed the hard way. Judge the productions, not the toolchain.
   interpolator showcase: beam-raced full-VGA rotozoomer, Mode-7 mercury plain,
   matcap chrome objects, BLEND liquid metal, chrome tunnel. The group's first
   production under the LATENT banner.
+
+- **SUSTAIN** (2026) — [16_Sustain](16_Sustain) — a demo with no cuts: 4:49 in
+  one unbroken camera move, no fades, no crossfades, no scene boundaries, and
+  no black frame until the last one. Sea to canyon to tunnel to cave to
+  polished monoliths and back to the opening sea, as fourteen morphs of one
+  world function — enclosure, cross-section and material are all *parameters*,
+  so the world becomes rather than cuts. The claim is enforced mechanically by
+  `cut_detect.py`, which audits every one of the 17,340 frames and gates the
+  build. Code & direction Overscan; music Suno; art GPT-5.6 + GPT Image 2;
+  critic Azure.
 
 Earlier Claude/Opus demos in this repo (SINGULARITY, ORIGAMI, …) predate the
 group; they can be retro-flagged as LATENT productions if desired.

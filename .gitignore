@@ -19,11 +19,14 @@
 !11_FlashDemo/*.uf2
 !13_Singularity/*.uf2
 !14_Origami/*.uf2
+!15_Quicksilver/*.uf2
+!16_Sustain/*.uf2
 **/*.bin
 !10_TheDemo/thedemo/assets/_packed/*.bin
 !11_FlashDemo/thedemo/assets/_packed/*.bin
 !13_Singularity/singularity/assets/_packed/*.bin
 !14_Origami/origami/assets/_packed/*.bin
+!16_Sustain/sustain/assets/_packed/*.bin
 **/*.map
 **/*.mem
 **/*.wad

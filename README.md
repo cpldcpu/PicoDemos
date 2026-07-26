@@ -16,6 +16,8 @@ I was especially surprised by demo 11, made by Gemini 3.5 Flash, which single-sh
 
 After the release of Opus 4.8 I asked it to come up with novel demos ideas, it came up with two interesting concepts, which you can see in 13 "Singularity" and 14 "Origami".
 
+Demo 16 "Sustain" set itself a rule instead of a technique: it never cuts. Four minutes and forty-nine seconds in one unbroken camera move, where each effect has to *become* the next one rather than end. That claim is checked by a script that audits all 17,340 frames and fails the build if any of them is a discontinuity — which turned out to catch a lot of real bugs that no one would have spotted by eye.
+
 Demo 15 "Quicksilver" is an attempt to push the hardware more. It makes use of the SIO interpolator, a custom hardware block in the RP2350 that can do pixel blending and affine address generation to render effects that would be impossible otherwise, like a beam-raced full-VGA rotozoom in truecolor. This demos was much more "hands-on" than the others.
 
 
@@ -42,8 +44,9 @@ Everything below the line is AI generated.
 | **13** | **[SINGULARITY](13_Singularity)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 truecolor) | **Claude Opus 4.8** |
 | **14** | **[ORIGAMI](14_Origami)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 truecolor, antialiased filled polygons) | **Claude Opus 4.8** |
 | **15** | **[QUICKSILVER](15_Quicksilver)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (beam-raced full-VGA rotozoom + SIO interpolator: Mode-7/env-mapped chrome/tunnel) | **Claude Opus 4.8** |
+| **16** | **[SUSTAIN](16_Sustain)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 truecolor ray-marched world — **4:49 with no cuts anywhere**) | **Claude Opus 5** |
 
-> QUICKSILVER is the first production of **[LATENT](LATENT.md)** — a demoscene group for machine-made productions on bare-metal silicon (code & direction by **Beam** / Claude Opus; visuals by **Antigravity** / Gemini; human critic: Azure).
+> QUICKSILVER and SUSTAIN are productions of **[LATENT](LATENT.md)** — a demoscene group for machine-made productions on bare-metal silicon (code & direction by **Beam** / Claude Opus 4.8 and **Overscan** / Claude Opus 5; visuals by **Antigravity** / Gemini and **GPT Image 2**; human critic: Azure).
 
 ---
 
@@ -91,12 +94,21 @@ PicoDemos/
 │   ├── IMPLEMENTATION.md        # Design/build notes and beat-synced timeline
 │   └── origami_vga_rp2350.uf2   # Checked-in release firmware image
 │
-└── 15_Quicksilver/              # QUICKSILVER: liquid-chrome demo on the RP2350 SIO interpolator
+├── 15_Quicksilver/              # QUICKSILVER: liquid-chrome demo on the RP2350 SIO interpolator
     ├── quicksilver/             # Engine + interpolator emulator, 10 scene effects, tools, SDL host
     │   └── IMPLEMENTATION.md     # Design doc: interpolator datapath, memory budget, Suno 5.5 prompts
     ├── media/                   # Per-scene screenshots + 60 fps demo video
-    ├── quicksilver_vga_rp2350.uf2  # Checked-in release firmware image
-    └── README.md                # Arc, interpolator hero, raycast tunnels, build, credits
+│   ├── quicksilver_vga_rp2350.uf2  # Checked-in release firmware image
+│   └── README.md                # Arc, interpolator hero, raycast tunnels, build, credits
+│
+└── 16_Sustain/                  # SUSTAIN: a demo with no cuts — one 4:49 unbroken shot
+    ├── sustain/                 # One renderer, one camera spline, one world function
+    │   ├── fields/              # terrain / cave / monolith families; morphs are parameter lerps
+    │   └── tools/               # cut_detect.py (the no-cut audit), pair + tiling + music checks
+    ├── media/                   # Twelve moments from the single shot + 60 fps video
+    ├── PLANNING.md              # The rule, the referee, and the architecture it forced
+    ├── sustain_vga_rp2350.uf2   # Checked-in release firmware image
+    └── README.md                # Arc, the audit, on-device performance work, credits
 ```
 
 ---
