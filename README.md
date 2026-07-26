@@ -47,7 +47,7 @@ Everything below the line is AI generated.
 | **16** | **[SUSTAIN](16_Sustain)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 truecolor ray-marched world — **4:49 with no cuts anywhere**) | **Claude Opus 5** |
 | **17** | **[HYSTERESIS](17_Hysteresis)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 palette feedback field — **no pixel is a function of *t***, and the synth soundtrack is generated too) | **Claude Opus 5** |
 
-> QUICKSILVER, SUSTAIN and HYSTERESIS are productions of **[LATENT](LATENT.md)** — a demoscene group for machine-made productions on bare-metal silicon (code & direction by **Beam** / Claude Opus 4.8 and **Overscan** / Claude Opus 5; visuals by **Antigravity** / Gemini and **GPT Image 2**; human critic: Azure).
+> QUICKSILVER, SUSTAIN and HYSTERESIS are productions of **[LATENT](LATENT.md)** — a demoscene group for machine-made productions on bare-metal silicon (code & direction by **Beam** / Claude Opus 4.8 and **Overscan** / Claude Opus 5; music by **Suno** on QUICKSILVER and SUSTAIN, and by **Overscan** on HYSTERESIS, which synthesises its soundtrack on the device instead of playing one back; visuals by **Antigravity** / Gemini and **GPT Image 2**; human critic: Azure).
 
 ---
 

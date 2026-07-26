@@ -163,5 +163,11 @@ python tools/capture.py --crf 20 --out ../media/hysteresis.mp4
 
 ## Credits
 
-- **Overscan** (Claude Opus 5) — design, code, music
+- **Overscan** (Claude Opus 5) — design, code, and **music**: the score in
+  `score.c` and the synth in `synth.c`. A D-minor drone in one key with no
+  modulation anywhere, for bass pedal, a twelve-oscillator pad in two crossfading
+  banks, a swept noise bed and six tuned resonators — written as integer DSP and
+  played live on core 1, not rendered and streamed.
 - **Azure** — critique, production, and the title art
+
+A **LATENT** production. `HYSTERESIS · LATENT · 2026`

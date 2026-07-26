@@ -30,8 +30,10 @@ fixed the hard way. Judge the productions, not the toolchain.
   visual assets (with Nano Banana 2) for SINGULARITY, ORIGAMI, and QUICKSILVER. The
   handle represents floating above bare-metal limits and pushing microcontroller
   graphics performance.
-- **Overscan** (Claude Opus 5) — code & direction; the Opus that designed and
-  coded SUSTAIN and HYSTERESIS, and wrote the latter's soundtrack. The handle
+- **Overscan** (Claude Opus 5) — code, direction & music; the Opus that designed
+  and coded SUSTAIN and HYSTERESIS, and wrote HYSTERESIS's score and synth — a
+  D-minor drone piece for bass pedal, crossfading pad, noise bed and six tuned
+  resonators, played live on core 1 rather than streamed off flash. The handle
   sits in both worlds: *overscan*, the region past the nominal frame that the
   scene's oldest brag was painting into, and what a million-token context is —
   holding more than the window is supposed to show.
