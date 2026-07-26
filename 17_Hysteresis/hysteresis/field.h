@@ -93,6 +93,25 @@ typedef struct {
      * cell that gets too bright falls instead of saturating. It is its own
      * inhibitor. 0 = monotone (switch), 255 = full band-pass hump. */
     uint8_t  react_fold;
+
+    /* Persistence, 0..255 — how much of the PREVIOUS value at this same screen
+     * position is retained. A leaky integrator, i.e. a time constant.
+     *
+     * Azure caught the demo flickering while watching it run, which no still
+     * can show. Measuring frame-to-frame delta confirmed it: every cell was
+     * moving 50-90 grey levels EVERY FRAME. The react curve is a stiff map and
+     * the system was taking a full step of it per frame, with nothing to slow
+     * the fastest mode. A non-monotone curve then turns that into outright
+     * period-2 alternation.
+     *
+     * Damping the fastest mode leaves the slow dynamics — and the chaos that
+     * carries the memory — intact. It is also, pleasingly, exactly phosphor
+     * persistence: the field remembering its own previous value, in a demo
+     * named after systems that depend on their history.
+     *
+     * Note this reads the previous frame UNADVECTED, so it also lays trails
+     * along the flow, which is the other half of the video-feedback look. */
+    uint8_t  persist;
 } field_params_t;
 
 /* Build the react LUTs once. */

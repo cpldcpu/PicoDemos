@@ -49,13 +49,14 @@ int main(int argc, char *argv[])
         else if (!strcmp(argv[i], "--energy"))                  energy = 1;
         else if (!strcmp(argv[i], "--probe") && i + 1 < argc) {
             /* zoom_excess,blur,gain,react_lo,react_hi -- pin the dynamics */
-            int z, b, g, lo, hi, fold = 0;
-            if (sscanf(argv[++i], "%d,%d,%d,%d,%d,%d", &z, &b, &g, &lo, &hi, &fold) < 5) {
+            int z, b, g, lo, hi, fold = 0, persist = 0;
+            if (sscanf(argv[++i], "%d,%d,%d,%d,%d,%d,%d", &z, &b, &g, &lo, &hi, &fold, &persist) < 5) {
                 fprintf(stderr, "--probe wants z,blur,gain,lo,hi\n"); return 1;
             }
             probe.zoom = 65536 + z; probe.blur = (uint8_t)b; probe.gain = (uint16_t)g;
             probe.react_lo = (uint8_t)lo; probe.react_hi = (uint8_t)hi;
             probe.react_fold = (uint8_t)fold;
+            probe.persist = (uint8_t)persist;
             probe.cx = (FIELD_W / 2) << 16; probe.cy = (FIELD_H / 2) << 16;
             probe.drift_x = probe.drift_y = 0;
             use_probe = 1;
@@ -83,6 +84,24 @@ int main(int argc, char *argv[])
     fprintf(stderr, "=== HYSTERESIS (host) === %u frames, variant %d%s\n",
             frames, variant, g_headless ? ", headless" : "");
 
+    /* Temporal metrics, for the flicker Azure spotted watching it live.
+     *
+     * A non-monotone react curve (bright folds down, dark rises) is a textbook
+     * period-2 oscillator: a cell can alternate every frame forever. That is
+     * invisible in a still and obvious in motion, which is exactly why it took
+     * a human watching the exe to find it.
+     *
+     * d1 = mean |frame(n) - frame(n-1)|      how much changes per frame
+     * d2 = mean |frame(n) - frame(n-2)|      how much changes per TWO frames
+     *
+     * For ordinary evolution d2 > d1: two frames of change exceed one. Under
+     * period-2 flicker d2 collapses toward zero while d1 stays large, because
+     * the field is simply alternating between two states. The ratio d2/d1 is
+     * therefore the flicker meter: ~1.4 is healthy motion, below ~0.5 is a
+     * strobing field. */
+    static uint8_t prev1[320 * 240], prev2[320 * 240];
+    double acc_d1 = 0, acc_d2 = 0; long acc_n = 0;
+
     int si = 0;
     while (sim_frame() < frames && !vga_should_quit()) {
         /* A restart request has to rebuild the world from the seed. There is
@@ -95,6 +114,20 @@ int main(int argc, char *argv[])
         if (g_rawpipe)   vga_raw_emit();
 
         while (si < nshots && shots[si] == sim_frame()) { vga_screenshot(); si++; }
+
+        if (stats) {
+            const uint8_t *f = vga_320_front_buffer();
+            if (sim_frame() > 2) {
+                long d1 = 0, d2 = 0;
+                for (int i = 0; i < 320 * 240; i += 7) {   /* stride-sampled */
+                    int a = f[i] - prev1[i]; d1 += a < 0 ? -a : a;
+                    int b = f[i] - prev2[i]; d2 += b < 0 ? -b : b;
+                }
+                acc_d1 += d1; acc_d2 += d2; acc_n++;
+            }
+            memcpy(prev2, prev1, sizeof prev2);
+            memcpy(prev1, f, sizeof prev1);
+        }
 
         if (energy && (sim_frame() % 60) == 0)
             fprintf(stderr, "f=%6u  t=%3us  energy=%9u  mean=%5.1f\n",
@@ -129,9 +162,13 @@ int main(int argc, char *argv[])
          * colours and the palette had nothing to work with. A steep react curve
          * amplifies the ordered dither to full scale, which also explains the
          * speckle. sdev cannot see that; the midtone fraction can. */
-        fprintf(stderr, "mean=%6.2f sdev=%6.2f live=%5.1f%% mid=%5.1f%%\n",
+        const double d1 = acc_n ? acc_d1 / acc_n : 0.0;
+        const double d2 = acc_n ? acc_d2 / acc_n : 0.0;
+        fprintf(stderr, "mean=%6.2f sdev=%6.2f live=%5.1f%% mid=%5.1f%% "
+                        "d1=%8.0f flick=%5.2f\n",
                 m, v, 100.0 * live / (320.0 * 240.0),
-                100.0 * mid / (320.0 * 240.0));
+                100.0 * mid / (320.0 * 240.0),
+                d1, d1 > 0 ? d2 / d1 : 0.0);
     }
 
     fprintf(stderr, "done: %u frames, final energy %u (mean %.1f)\n",

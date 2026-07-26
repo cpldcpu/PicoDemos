@@ -140,6 +140,10 @@ void HYST_HOT(field_step)(uint8_t *dst, const uint8_t *src,
     const int32_t blur = p->blur;
     const int32_t gain = p->gain;
 
+    /* how much of the newly computed value is taken each frame; the
+     * complement is retained from the previous frame at the same position */
+    const int32_t rate = 256 - (int32_t)p->persist;
+
     for (int by = 0; by < FIELD_H; by += FIELD_BLOCK) {
         for (int bx = 0; bx < FIELD_W; bx += FIELD_BLOCK) {
             /* One source coordinate for the whole block. The block is then
@@ -165,6 +169,9 @@ void HYST_HOT(field_step)(uint8_t *dst, const uint8_t *src,
             for (int y = 0; y < FIELD_BLOCK; y++) {
                 const uint8_t *sp = src + (iy + y) * FIELD_W + ix;
                 uint8_t       *dp = dst + (by + y) * FIELD_W + bx;
+                /* the previous value at THIS screen position, unadvected —
+                 * the persistence tap */
+                const uint8_t *pp = src + (by + y) * FIELD_W + bx;
                 const uint8_t *dith = g_bayer + (((by + y) & 3) << 2);
 
                 for (int x = 0; x < FIELD_BLOCK; x++) {
@@ -181,7 +188,10 @@ void HYST_HOT(field_step)(uint8_t *dst, const uint8_t *src,
                     if (v < 0)   v = 0;
                     if (v > 255) v = 255;
 
-                    dp[x] = lut[v];
+                    /* react, then damp toward the previous value here */
+                    const int32_t r = lut[v];
+                    const int32_t q = pp[x];
+                    dp[x] = (uint8_t)(q + (((r - q) * rate) >> 8));
                 }
             }
         }

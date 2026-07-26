@@ -111,6 +111,12 @@ def main():
                          "system, not about where the arc happens to be")
     args = ap.parse_args()
 
+    # "none" runs the REAL arc rather than pinned parameters. Pinning answers
+    # "is this system path-dependent"; the arc answers "is the shipping demo",
+    # which is the question that actually matters before release.
+    if args.probe.lower() == "none":
+        args.probe = None
+
     if not os.path.exists(EXE):
         print("build the host harness first (cd host && make)", file=sys.stderr)
         return 2
@@ -151,7 +157,8 @@ def main():
 
     # ---------------------------------------------------------------- 3 --
     print("\n3. negative control — identity react curve, which MUST forget")
-    lin = args.probe.rsplit(",", 3)[0] + ",0,0,0"     # react_lo=hi=fold=0
+    base = args.probe or "900,170,258,12,180,200,160"
+    lin = base.rsplit(",", 4)[0] + ",0,0,0,0"        # identity react curve
     s = compare_runs(args.frames, 0, 1, lin)
     r = summarise(s)
     if r is None:

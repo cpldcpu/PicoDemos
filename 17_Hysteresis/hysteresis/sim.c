@@ -81,26 +81,44 @@ static void arc_params(uint32_t f, field_params_t *p)
 
     /* Blur vs sharpen is the balance that decides whether structure survives.
      * Blur alone flattens the field; the LUT alone drives it to two values. */
-    p->blur = (uint8_t)mix(150, 180, ramp(f, SEC(10), SEC(120)));
+    p->blur = 170;
 
     /* Gain rides just under unity for most of the run and crosses it at the
      * peak. Above unity the field blooms toward saturation, which is the
      * intended read at the climax and death everywhere else. */
-    p->gain = (uint16_t)mix(254, 258, ramp(f, SEC(90), SEC(140)));
-    p->gain = (uint16_t)mix(p->gain, 248, ramp(f, SEC(150), SEC(200)));
+    /* Held inside the swept envelope. The first arc ramped this to 254 at the
+     * start and 248 at the end -- both outside anything that had been measured,
+     * and the middle of the demo duly fell apart. */
+    p->gain = 258;
 
     /* The excitable band. Narrow and low: cells that receive a little energy
      * from a neighbour get pulled UP into the band rather than decaying, which
      * is what lets a single lit cell colonise an empty field. */
     p->react_lo = 12;
-    p->react_hi = (uint8_t)mix(170, 195, ramp(f, SEC(20), SEC(140)));
+    p->react_hi = 180;
 
     /* SELF-LIMITING IS THE MEMORY KNOB. tools/memory_map.py swept structure
      * against path-dependence and the split was total: every fold=160 regime
      * FORGETS a one-cell perturbation, every fold>=200 regime REMEMBERS it.
      * Above ~230 it remembers but degenerates into noise. So the demo lives in
      * a narrow band, and this parameter is not a look, it is the rule. */
-    p->react_fold = (uint8_t)mix(200, 214, ramp(f, SEC(60), SEC(170)));
+    p->react_fold = 200;
+
+    /* PERSISTENCE IS THE PACING CONTROL, and the discovery of this session.
+     *
+     * Azure saw the demo flickering; measurement showed every cell moving
+     * 50-90 grey levels EVERY frame. Damping toward the previous value at the
+     * same position fixed it (frame-to-frame churn down 7x, flicker ratio
+     * 0.72 -> 1.89) and -- unexpectedly -- made the memory far STRONGER, with
+     * the one-cell perturbation spreading to 95% of the field instead of 22%.
+     * A slower mode is a second state variable, and two slow variables are
+     * more chaotic than one fast one.
+     *
+     * So it is free, and it is also the best directorial knob in the demo:
+     * high persistence reads as languid, low as agitated. High through the
+     * quiet opening, dipping at the peak, high again as it runs down. */
+    p->persist = (uint8_t)mix(202, 150, ramp(f, SEC(30), SEC(135)));
+    p->persist = (uint8_t)mix(p->persist, 212, ramp(f, SEC(150), SEC(205)));
 }
 
 /* Forcing events: the only way anything enters the picture.
