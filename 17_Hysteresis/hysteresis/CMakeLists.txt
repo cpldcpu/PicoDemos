@@ -33,7 +33,8 @@ add_executable(hysteresis
     # sim.c) and its state is 153 KB of bss, which took the device from 318 KB
     # to 491 KB of 520 and left only ~41 KB for stacks. Dead weight eating the
     # margin. Re-add this line when the define goes back to 1.
-    audio_stub.c
+    synth.c
+    audio_synth.c
 )
 
 target_include_directories(hysteresis PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

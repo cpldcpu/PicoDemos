@@ -5,9 +5,12 @@ The demo claims that every frame is computed from the previous frame and that
 the system therefore has memory. Both halves of that are checkable by machine,
 and a build that fails does not ship.
 
-    1. DETERMINISM   Two runs from the same seed must be bit-identical.
-                     Catches dependence on wall clock, uninitialised memory,
-                     or core scheduling.
+    1. DETERMINISM   Two runs from the same seed must be bit-identical, in the
+                     picture AND in the audio. Catches dependence on wall clock,
+                     uninitialised memory, or core scheduling. The audio half
+                     also checks that the samples do not depend on the block size
+                     they were asked for, which is what lets the device generate
+                     them a few per scanline and still match the host.
 
     2. PATH-DEPENDENCE  Light ONE extra cell at frame 0 and run both to the end.
                      The divergence must GROW. This is the one that matters:
@@ -79,6 +82,66 @@ FRAME_BYTES = FIELD_W * FIELD_H
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 EXE = os.path.join(HERE, "..", "host", "hysteresis.exe")
+WAV_EXE = os.path.join(HERE, "..", "host", "synthwav.exe")
+
+
+def audio_hashes(seconds, chunk=None):
+    """Run the synth and return its per-second sample hashes."""
+    scratch = os.path.join(HERE, "..", "host", "_referee_audio.wav")
+    cmd = [WAV_EXE, "-o", scratch, "--hashes", "--seconds", str(seconds)]
+    if chunk:
+        cmd += ["--chunk", str(chunk)]
+    out = subprocess.run(cmd, stdout=subprocess.PIPE,
+                         stderr=subprocess.DEVNULL).stdout.decode()
+    try:
+        os.remove(scratch)
+    except OSError:
+        pass
+    return [l.strip() for l in out.splitlines() if l.startswith("AHASH")]
+
+
+def test_audio(failures, seconds=40):
+    """PLANNING.md section 7 test 1 covers audio as well as video.
+
+    Two properties, and the second is the one that is easy to get wrong:
+
+      determinism        two runs must produce the same samples.
+      chunk independence  the same samples whether asked for one at a time or
+                          4096 at a time. The device fills its DMA ring a few
+                          samples per scanline (audio_synth.c) and the host
+                          renders in big blocks, so if the output depended on the
+                          block size at all then the two targets could not agree
+                          and the device/host hash comparison would be measuring
+                          the buffer size rather than the synth. Everything at
+                          control rate is therefore driven off an absolute sample
+                          counter and a countdown that survives across calls.
+    """
+    print("\n1b. audio — deterministic, and independent of the block size")
+    if not os.path.exists(WAV_EXE):
+        print("   SKIP  synthwav.exe not built")
+        return
+
+    a = audio_hashes(seconds)
+    if not a:
+        print("   FAIL: no hashes produced")
+        failures.append("audio")
+        return
+
+    b = audio_hashes(seconds)
+    one = audio_hashes(seconds, chunk=1)
+    big = audio_hashes(seconds, chunk=4096)
+
+    print(f"   {len(a)} one-second hashes, last {a[-1].split()[-1]}")
+    ok = True
+    for label, other in (("determinism", b), ("chunk=1", one), ("chunk=4096", big)):
+        if other == a:
+            print(f"   PASS  {label}")
+        else:
+            n = next((i for i, (x, y) in enumerate(zip(a, other)) if x != y), None)
+            print(f"   FAIL  {label} diverges at second {n}")
+            ok = False
+    if not ok:
+        failures.append("audio")
 
 
 def spawn(frames, variant, probe=None):
@@ -209,6 +272,8 @@ def main():
         else:
             print(f"   FAIL  max per-frame difference {worst:.4f}")
             failures.append("determinism")
+
+    test_audio(failures)
 
     # ---------------------------------------------------------------- 2 --
     print("\n2. path-dependence — one extra lit cell at frame 0 must not heal")

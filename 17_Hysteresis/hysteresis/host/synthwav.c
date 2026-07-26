@@ -14,6 +14,9 @@
  *   --levels    per-second peak and RMS to stderr, as a numeric read of the arc
  *   --solo LIST any of bass,pad,noise,impact,reverb -- mute the rest. This is
  *               how the mix gets set: render one voice, read its RMS, decide.
+ *   --hashes    print AHASH lines matching the device's telemetry, so the two
+ *               renders can be diffed sample-for-sample without shipping 4.6
+ *               million samples over USB
  *   --chunk N   render in blocks of N samples. Exists to be varied: the device
  *               asks for a handful of samples per scanline and the host asks for
  *               thousands, so if the output depends on N at all then the two
@@ -59,13 +62,14 @@ int main(int argc, char *argv[])
     const char *out = "hysteresis.wav";
     uint32_t seconds = 0, from = 0;
     unsigned solo = SOLO_ALL;
-    int levels = 0, chunk = CHUNK;
+    int levels = 0, hashes = 0, chunk = CHUNK;
 
     for (int i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "-o") && i + 1 < argc)             out = argv[++i];
         else if (!strcmp(argv[i], "--seconds") && i + 1 < argc)  seconds = (uint32_t)atoi(argv[++i]);
         else if (!strcmp(argv[i], "--from") && i + 1 < argc)     from = (uint32_t)atoi(argv[++i]);
         else if (!strcmp(argv[i], "--levels"))                   levels = 1;
+        else if (!strcmp(argv[i], "--hashes"))                   hashes = 1;
         else if (!strcmp(argv[i], "--chunk") && i + 1 < argc) {
             chunk = atoi(argv[++i]);
             if (chunk < 1 || chunk > CHUNK) {
@@ -119,6 +123,18 @@ int main(int argc, char *argv[])
                             (unsigned)((pos + i) / SYNTH_RATE), pk,
                             sqrt(sq / SYNTH_RATE));
                 sq = 0; pk = 0; nsec = 0;
+            }
+        }
+
+        if (hashes) {
+            /* Printed after each block so the latch is current. The device
+             * prints its own every 300 frames; matching lines mean the two
+             * renders agreed to the sample up to that point. */
+            uint32_t hp, hh;
+            static uint32_t last;
+            if (synth_hash_latch(&hp, &hh) && hp != last) {
+                last = hp;
+                printf("AHASH s=%-8u %08x\n", hp, hh);
             }
         }
 

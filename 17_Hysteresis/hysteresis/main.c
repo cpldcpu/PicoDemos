@@ -23,6 +23,7 @@
 #include "field.h"
 #include "vga.h"
 #include "audio.h"
+#include "synth.h"
 
 #define LED_PIN 25
 
@@ -88,9 +89,20 @@ int main(void)
 
         /* Same cadence and same frame indices as the host's --hash, so the
          * two logs can be diffed line for line. */
-        if ((sim_frame() % 300) == 0)
+        if ((sim_frame() % 300) == 0) {
             printf("HASH f=%-6lu %08lx\n", (unsigned long)sim_frame(),
                    (unsigned long)field_hash(vga_320_front_buffer()));
+
+            /* And the audio's. Core 1 generates the samples and latches a
+             * (position, hash) pair once a second; this prints whatever the
+             * latest one is, so the log diffs against synthwav --hashes. Both
+             * halves of referee test 1 in one place: the picture matched the
+             * host and so did the sound. */
+            uint32_t apos, ahash;
+            if (synth_hash_latch(&apos, &ahash))
+                printf("AHASH s=%-8lu %08lx\n", (unsigned long)apos,
+                       (unsigned long)ahash);
+        }
 
         const uint64_t now = time_us_64();
         if (now - last_report >= 1000000ull) {
@@ -103,9 +115,10 @@ int main(void)
             const double cyc  = avg_us * mhz / (double)(FIELD_W * FIELD_H);
 
             printf("[f=%6lu] %5.1f fps | step avg %6.0f us worst %6lu us | "
-                   "%5.1f cycles/cell | energy %lu\n",
+                   "%5.1f cycles/cell | ring %4d | energy %lu\n",
                    (unsigned long)frame, fps, avg_us,
                    (unsigned long)worst_step_us, cyc,
+                   audio_min_fill(),
                    (unsigned long)sim_energy());
 
             last_report = now;

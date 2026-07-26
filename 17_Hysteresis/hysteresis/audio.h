@@ -31,4 +31,8 @@ uint32_t audio_now_ms(void); /* ms since audio_start() */
  * walk to be sample-accurate). */
 void     audio_seek_ms(uint32_t target_ms);
 
+/* Shallowest the DMA ring has been, in unplayed samples out of 1023. Telemetry
+ * for the one audio failure the sample hash cannot see -- see audio_synth.c. */
+int      audio_min_fill(void);
+
 #endif

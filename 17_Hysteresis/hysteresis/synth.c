@@ -92,6 +92,47 @@ static uint32_t note_inc(int n) { return g_note_inc[note_clamp(n) - SYNTH_NOTE_L
 static unsigned g_solo = SOLO_ALL;
 void synth_solo(unsigned mask) { g_solo = mask; }
 
+/* ------------------------------------------------------- the sample hash ---- */
+/* FNV-1a over the int16 stream, latched at each exact second so the value can be
+ * compared across the host/device boundary. See synth.h.
+ *
+ * Published as a seqlock rather than two plain stores: the writer is core 1 and
+ * the reader is core 0, and a (pos, hash) pair caught mid-update would read as a
+ * determinism failure. Chasing an imaginary one of those is more expensive than
+ * these four lines. */
+static uint32_t          g_hash = 2166136261u;
+static volatile uint32_t g_mark_seq, g_mark_pos, g_mark_hash;
+
+static inline void hash_byte(uint8_t b)
+{
+    g_hash = (g_hash ^ b) * 16777619u;
+}
+
+static void hash_publish(uint32_t pos)
+{
+    __atomic_store_n(&g_mark_seq, g_mark_seq + 1, __ATOMIC_RELAXED);
+    __atomic_thread_fence(__ATOMIC_RELEASE);
+    g_mark_pos  = pos;
+    g_mark_hash = g_hash;
+    __atomic_thread_fence(__ATOMIC_RELEASE);
+    __atomic_store_n(&g_mark_seq, g_mark_seq + 1, __ATOMIC_RELAXED);
+}
+
+int synth_hash_latch(uint32_t *pos, uint32_t *hash)
+{
+    for (;;) {
+        const uint32_t s = __atomic_load_n(&g_mark_seq, __ATOMIC_RELAXED);
+        if (s & 1u) continue;                   /* a write is in progress */
+        __atomic_thread_fence(__ATOMIC_ACQUIRE);
+        const uint32_t p = g_mark_pos, h = g_mark_hash;
+        __atomic_thread_fence(__ATOMIC_ACQUIRE);
+        if (__atomic_load_n(&g_mark_seq, __ATOMIC_RELAXED) != s) continue;
+        if (!p) return 0;
+        *pos = p; *hash = h;
+        return 1;
+    }
+}
+
 /* xorshift32. Deterministic, which is the only requirement -- this is the one
  * place in the demo that wants to sound random, and referee test 1 still has to
  * get the same bytes twice. */
@@ -189,8 +230,15 @@ static void reso_tune(reso_t *v, int note, uint32_t nsamp)
  * the requantisation noise recirculates around -70 dB, below the PWM's floor. */
 #define NCOMB 4
 #define NAP   2
-static const uint16_t comb_len[NCOMB] = { 1153, 1327, 1481, 1613 };
-static const uint16_t ap_len[NAP]     = {  331,  127 };
+
+/* NOT const, deliberately. A const array lands in flash, and on RP2350 flash is
+ * reached through the XIP cache -- so every sample would take a cached read from
+ * the same memory core 0 is streaming 76,800 field bytes through, on the core
+ * that has a scanline deadline. Dropping const puts these in .data, which is
+ * copied to SRAM at boot. Same reason field.c's hot path is __not_in_flash_func
+ * (hot.h); six bytes of table, but they are read 132,000 times a second. */
+static uint16_t comb_len[NCOMB] = { 1153, 1327, 1481, 1613 };
+static uint16_t ap_len[NAP]     = {  331,  127 };
 
 static int16_t  g_comb[1153 + 1327 + 1481 + 1613];
 static int16_t  g_ap[331 + 127];
@@ -278,6 +326,7 @@ static struct {
 
     uint32_t pos;
     int      ctl_left;
+    int      mark_left;        /* samples until the next hash latch */
     unsigned next_hit;
     int32_t  peak;
 } S;
@@ -542,12 +591,23 @@ static void HYST_HOT(render_block)(int16_t *out, int n)
 
         const int32_t a = v < 0 ? -v : v;
         if (a > S.peak) S.peak = a;
-        out[i] = (int16_t)clampi(v, -32768, 32767);
+
+        const int16_t s = (int16_t)clampi(v, -32768, 32767);
+        out[i] = s;
+
+        /* Hash the CLAMPED OUTPUT, which is the only thing both targets are
+         * guaranteed to agree about byte for byte. */
+        hash_byte((uint8_t)((uint16_t)s & 0xFFu));
+        hash_byte((uint8_t)((uint16_t)s >> 8));
+        if (--S.mark_left <= 0) {
+            S.mark_left = SYNTH_RATE;
+            hash_publish(S.pos + (uint32_t)i + 1u);
+        }
     }
     S.pos += (uint32_t)n;
 }
 
-void synth_render(int16_t *out, int n)
+void HYST_HOT(synth_render)(int16_t *out, int n)
 {
     while (n > 0) {
         if (S.ctl_left == 0) { control_tick(); S.ctl_left = SYNTH_CTL_DIV; }
@@ -564,7 +624,10 @@ void synth_reset(void)
     build_sin();
     reverb_reset();
     memset(&S, 0, sizeof S);
-    g_rng = 0x1BADF00Du;
+    g_rng  = 0x1BADF00Du;
+    g_hash = 2166136261u;
+    S.mark_left = SYNTH_RATE;
+    hash_publish(0);                 /* pos 0 means "nothing latched yet" */
 
     /* The pedal: D1, a companion detuned about seven cents so the drone
      * breathes on a seven-second period, and D2 for the part a jack can carry. */

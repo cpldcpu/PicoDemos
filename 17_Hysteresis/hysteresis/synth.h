@@ -48,4 +48,19 @@ int32_t  synth_peak(void);
 #define SOLO_ALL    31u
 void     synth_solo(unsigned mask);
 
+/* Running FNV-1a over every emitted sample, latched once per second.
+ *
+ * This is how the device render gets diffed against the host render
+ * sample-for-sample (PLANNING.md section 7, referee test 1). Shipping 4.6
+ * million samples up a USB CDC link to compare them is not practical; hashing
+ * them is, and it is the same trick field_hash() already uses to prove the
+ * picture matches. A mismatch localises to the second it first appears in.
+ *
+ * Returns 0 if no full second has elapsed yet. Safe to call from the other core:
+ * the pair is published under a sequence counter, because a torn (pos, hash)
+ * read would look exactly like a determinism bug and send me hunting one that
+ * does not exist.
+ */
+int      synth_hash_latch(uint32_t *pos, uint32_t *hash);
+
 #endif

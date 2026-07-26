@@ -17,6 +17,7 @@
 #include "pico/stdlib.h"
 #include "pico/scanvideo.h"
 #include "pico/scanvideo/composable_scanline.h"
+#include "audio.h"
 #include "pico/multicore.h"
 #include "hardware/gpio.h"
 #include <string.h>
@@ -339,6 +340,12 @@ static void __not_in_flash_func(core1_main)(void)
             render_scanline_hires640(buf, y);       /* RGB565 framebuffer scenes */
         }
         scanvideo_end_scanline_generation(buf);
+
+        /* Audio lives here, after the buffer is handed back and before blocking
+         * on the next one. A few samples per line, on the core that has the
+         * spare cycles -- see audio_synth.c for why not core 0 and why not a
+         * half-buffer refill. */
+        audio_pump();
     }
 }
 
