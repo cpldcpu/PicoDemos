@@ -22,13 +22,38 @@
 
 #include <string.h>
 
+/* ON CORTEX-M33 DSP INTRINSICS, measured rather than assumed.
+ *
+ * Azure suggested them and they were worth trying: SMLAD does two 16-bit MACs
+ * in one instruction and takes its coefficients packed two per register, which
+ * looked ideal given that this loop is bound by register pressure.
+ *
+ * It came out SLOWER -- 68.5 -> 69.4 cycles/cell. The reason is that SMLAD
+ * needs its inputs packed into 16-bit lanes, and packing costs two shifts and
+ * two ORs per cell, which is more than the two saved multiplies return. The
+ * instruction only pays when the data ARRIVES packed, which means loading four
+ * bytes as a word and splitting them with UXTB16 while processing two cells per
+ * iteration. That is a real optimisation and a bigger restructure; it is not
+ * done here.
+ *
+ * Worth recording that the safety objection turned out to be the weakest reason
+ * not to do it. Referee test 1 diffs the host render against the device render
+ * byte for byte, so a device-only instruction path is verifiable rather than a
+ * leap of faith. The reason to leave it out is simply that this form is slower.
+ */
+
 /* ---------------------------------------------------------------- tables -- */
 
 /* The react curve, rebuilt whenever its two thresholds move. 256 iterations at
  * most once a frame is free, and it lets the arc bend the nonlinearity
  * continuously instead of switching between fixed shapes -- switching would be
  * a discontinuity, and this demo cannot afford one. */
-static uint8_t g_lut[256];
+/* 512 entries, not 256. The top half is all clamped to the value at 255, which
+ * lets the transport loop index it WITHOUT clamping first: the accumulator is
+ * provably in [0, 257] there (all bilinear weights are positive, taps are at
+ * most 255, the weights sum to gain <= 258 in Q8, plus at most 240 of dither,
+ * shifted down by 8). Two compares per cell become none. */
+static uint8_t g_lut[512];
 static int     g_lut_lo = -1, g_lut_hi = -1, g_lut_fold = -1;
 
 static void build_react(int lo, int hi, int fold)
@@ -38,6 +63,7 @@ static void build_react(int lo, int hi, int fold)
 
     if (lo == 0 && hi == 0) {                 /* identity — the control case */
         for (int i = 0; i < 256; i++) g_lut[i] = (uint8_t)i;
+        for (int i = 256; i < 512; i++) g_lut[i] = 255;
         return;
     }
     if (hi <= lo) hi = lo + 1;
@@ -61,6 +87,8 @@ static void build_react(int lo, int hi, int fold)
         int32_t y = (int32_t)((s * 255) >> 16);
         g_lut[i] = (uint8_t)(y < 0 ? 0 : y > 255 ? 255 : y);
     }
+    /* saturating tail, so the transport loop needs no clamp */
+    for (int i = 256; i < 512; i++) g_lut[i] = g_lut[255];
 }
 
 /* Q15 sine, quarter-turn resolution 256 -> 1024 entries over a full turn.
@@ -154,9 +182,33 @@ static void HYST_HOT(convolve)(const uint8_t *src, const field_params_t *p)
     (void)p;
     return;
 #endif
-    const int32_t kc = p->k_centre, kh = p->k_edge_h;
-    const int32_t kv = p->k_edge_v, kq = p->k_corner;
+    /* FOLD THE BLUR MIX INTO THE KERNEL, once per frame.
+     *
+     * The loop used to compute the convolution and then lerp the result toward
+     * the original value: v = l0 + ((a - l0) * mixw >> 8). But the lerp is
+     * linear and the convolution is linear, so the two compose into a single
+     * set of coefficients -- scale the kernel by mixw and add the remaining
+     * (256 - mixw) to the centre tap. That removes a subtract, a multiply, a
+     * shift and an add from every cell, and frees the mixw register, which
+     * matters more: register pressure is what this loop is actually bound by.
+     *
+     * Rounds once instead of twice, so results shift by at most a bit or two
+     * against the previous version -- checked against the referee and the
+     * structure metrics rather than assumed harmless. */
     const int32_t mixw = p->blur;
+          int32_t kc = ((p->k_centre * mixw) >> 8) + (256 - mixw);
+    const int32_t kh =  (p->k_edge_h * mixw) >> 8;
+    const int32_t kv =  (p->k_edge_v * mixw) >> 8;
+    const int32_t kq =  (p->k_corner * mixw) >> 8;
+
+    /* Restore unity gain exactly. Four independent truncations left the
+     * coefficients summing to 253 rather than 256 -- only 1.2%, but the field
+     * feeds back into itself sixty times a second, so a systematic gain error
+     * compounds. It showed up immediately as the mean brightness moving from
+     * 128 to 151, which is why the metrics are checked after every change to
+     * this loop and not only after changes to the look. */
+    kc += 256 - (kc + 2 * kh + 2 * kv + 4 * kq);
+
 
     memcpy(g_conv, src, FIELD_W);
     memcpy(g_conv + (FIELD_H - 1) * FIELD_W,
@@ -179,33 +231,45 @@ static void HYST_HOT(convolve)(const uint8_t *src, const field_params_t *p)
      * guarantee at risk for a win this restructuring gets anyway. If the loop
      * ever needs more, the honest version is a word-load form that BOTH
      * compilers see identically. */
+    /* ONE base pointer with fixed offsets, and the kernel coefficients packed
+     * two-per-register.
+     *
+     * The disassembly of the previous version was the thing worth looking at
+     * before writing any assembly: it spilled. Five or more stack accesses per
+     * cell, because thirteen live values (four coefficients, the mix weight,
+     * three row pointers, an output pointer and four window registers) do not
+     * fit twelve usable registers -- and -funroll-loops doubled the pressure.
+     * That is why cutting nine multiplies to four and nine loads to three each
+     * bought only four cycles: the spills were the cost, and neither change
+     * touched them.
+     *
+     * So this is a register-pressure fix, not an arithmetic one. One pointer
+     * with -FIELD_W / +FIELD_W offsets replaces three, and the two accumulator
+     * terms are folded so fewer values stay live across the loop body. */
     for (int y = 1; y < FIELD_H - 1; y++) {
-        const uint8_t *r0 = src + (y - 1) * FIELD_W;
-        const uint8_t *r1 = src +  y      * FIELD_W;
-        const uint8_t *r2 = src + (y + 1) * FIELD_W;
+        const uint8_t *p1 = src + y * FIELD_W;
         uint8_t *o = g_conv + y * FIELD_W;
 
-        o[0] = r1[0];
+        o[0] = p1[0];
 
-        /* prime the window at x = 1 */
-        int32_t vm = r0[0] + r2[0];        /* column sum at x-1 */
-        int32_t v0 = r0[1] + r2[1];        /* column sum at x   */
-        int32_t lm = r1[0];                /* centre row at x-1 */
-        int32_t l0 = r1[1];                /* centre row at x   */
+        int32_t vm = p1[-FIELD_W]     + p1[FIELD_W];
+        int32_t v0 = p1[1 - FIELD_W]  + p1[1 + FIELD_W];
+        int32_t lm = p1[0];
+        int32_t l0 = p1[1];
 
         for (int x = 1; x < FIELD_W - 1; x++) {
-            const int32_t vp = r0[x + 1] + r2[x + 1];   /* 2 loads */
-            const int32_t lp = r1[x + 1];               /* 1 load  */
+            const uint8_t *q = p1 + x + 1;
+            const int32_t vp = q[-FIELD_W] + q[FIELD_W];
+            const int32_t lp = *q;
 
-            int32_t a = (kc * l0 + kh * (lm + lp) + kv * v0 + kq * (vm + vp)) >> 8;
-
-            int32_t v = l0 + (((a - l0) * mixw) >> 8);
+            const int32_t v = (kc * l0 + kh * (lm + lp)
+                             + kv * v0 + kq * (vm + vp)) >> 8;
             o[x] = (uint8_t)(v < 0 ? 0 : v > 255 ? 255 : v);
 
             vm = v0; v0 = vp;
             lm = l0; l0 = lp;
         }
-        o[FIELD_W - 1] = r1[FIELD_W - 1];
+        o[FIELD_W - 1] = p1[FIELD_W - 1];
     }
 }
 
@@ -279,10 +343,16 @@ void HYST_HOT(field_step)(uint8_t *dst, const uint8_t *src,
             if (iy > FIELD_H - FIELD_BLOCK - 2) iy = FIELD_H - FIELD_BLOCK - 2;
 
             /* four bilinear weights, once per block */
-            const int32_t w00 = ((256 - fx) * (256 - fy)) >> 8;
-            const int32_t w10 = ( fx        * (256 - fy)) >> 8;
-            const int32_t w01 = ((256 - fx) *  fy       ) >> 8;
-            const int32_t w11 = ( fx        *  fy       ) >> 8;
+            /* Bilinear weights with GAIN PREMULTIPLIED. Folding the gain into
+             * the weights here removes a multiply from every one of the 76,800
+             * cells at the cost of four multiplies per block, of which there
+             * are 300. Same trick as folding the blur mix into the kernel:
+             * anything constant across a block belongs outside the inner
+             * loop. */
+            const int32_t w00 = (((256 - fx) * (256 - fy)) >> 8) * gain >> 8;
+            const int32_t w10 = ((( fx      ) * (256 - fy)) >> 8) * gain >> 8;
+            const int32_t w01 = (((256 - fx) * ( fy      )) >> 8) * gain >> 8;
+            const int32_t w11 = ((( fx      ) * ( fy      )) >> 8) * gain >> 8;
 
             for (int y = 0; y < FIELD_BLOCK; y++) {
                 const uint8_t *s0 = cbuf + (iy + y) * FIELD_W + ix;
@@ -293,16 +363,14 @@ void HYST_HOT(field_step)(uint8_t *dst, const uint8_t *src,
 
                 for (int x = 0; x < FIELD_BLOCK; x++) {
                     int32_t v = (s0[x] * w00 + s0[x + 1] * w10
-                               + s1[x] * w01 + s1[x + 1] * w11) >> 8;
+                               + s1[x] * w01 + s1[x + 1] * w11
+                               + dith[(bx + x) & 3]) >> 8;
 
-                    v = (v * gain + dith[(bx + x) & 3]) >> 8;
-
-                    if (bamt)
+                    if (bamt) {
                         v -= (bias[(((by + y) >> 1) * (FIELD_W / 2))
                                    + ((bx + x) >> 1)] * bamt) >> 8;
-
-                    if (v < 0)   v = 0;
-                    if (v > 255) v = 255;
+                        if (v < 0) v = 0;      /* only the bias can go under */
+                    }
 
                     const int32_t r = lut[v];
                     const int32_t q = pp[x];

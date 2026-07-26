@@ -51,7 +51,11 @@ target_compile_definitions(hysteresis PRIVATE PICO_BUILD=1 HYST_PROF=${HYST_PROF
 # to reassociate arithmetic is the wrong signal to send in a file whose whole
 # contract is bit-exact reproducibility.
 target_compile_options(hysteresis PRIVATE
-    -O3 -funroll-loops
+    # NO -funroll-loops. It doubles register pressure in the convolve loop,
+    # which the disassembly showed was already spilling five-plus times per
+    # cell -- unrolling made the real bottleneck worse while looking like an
+    # optimisation.
+    -O3
 )
 
 target_link_libraries(hysteresis

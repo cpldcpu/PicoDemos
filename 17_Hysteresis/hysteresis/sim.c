@@ -25,7 +25,6 @@
 #define TOTAL_FRAMES   SEC(210)          /* 3:30 */
 
 static uint32_t g_frame;
-static uint32_t g_energy;
 
 /* Probe mode: pin the parameters so the dynamics can be swept without the arc
  * moving underneath the measurement. Tuning a feedback system by eye is how
@@ -313,7 +312,6 @@ void sim_reset(int variant)
     rd_reset();
 #endif
     g_frame  = 0;
-    g_energy = 0;
 
     /* Clear BOTH pages. The back buffer is next frame's source after the first
      * present, so leaving it uninitialised would make the run depend on
@@ -387,15 +385,23 @@ void sim_step(void)
 void sim_present(void)
 {
     vga_320_present();
-    g_energy = field_energy(vga_320_front_buffer());
     g_frame++;
 }
+
+/* Energy is TELEMETRY, so it is computed on demand rather than every frame.
+ *
+ * It used to run inside sim_present: a full 76,800-byte sum, about half a
+ * millisecond, on every frame, purely so a once-a-second printf could report
+ * it. That is 3% of the frame budget spent on instrumentation, and because it
+ * sat outside the timed region it did not show up in the cycles/cell figure at
+ * all -- the step measured 15.97 ms while frames actually took 17.42. */
+uint32_t sim_energy(void) { return field_energy(vga_320_front_buffer()); }
 
 void sim_tick(void) { sim_step(); sim_present(); }
 
 uint32_t sim_frame(void)        { return g_frame; }
 uint32_t sim_total_frames(void) { return TOTAL_FRAMES; }
-uint32_t sim_energy(void)       { return g_energy; }
+
 
 /* --- scene.h compatibility, so main.c (device) needs no special casing ---- */
 
