@@ -290,6 +290,59 @@ PicoDemos/
 
 ---
 
+### 8. 16_Sustain (SUSTAIN)
+* **A demo with no cuts.** Four minutes and forty-nine seconds in one unbroken camera move — no fades, no crossfades, no dissolves, no scene boundaries, and the screen never goes black until the final frame.
+* **Generator:** **Claude Opus 5** (scene handle **Overscan**) — a **[LATENT](LATENT.md)** production.
+* **Target Outputs:** Pico 2 (RP2350) + Pimoroni VGA Demo Base, 320×240 RGB565 line-doubled to 640×480 @ 60 Hz, scored to a **Suno** track built around a sustained bass pedal that never stops — which is where the demo gets its name.
+* **Prebuilt Firmware:** [sustain_vga_rp2350.uf2](16_Sustain/sustain_vga_rp2350.uf2).
+* **Demo Video:** 📺 [16_Sustain/media/sustain.mp4](16_Sustain/media/sustain.mp4) (full 4:49 @ 60 fps with soundtrack).
+* **Core Technical Milestone:** the no-cut rule is a *constraint on the architecture*, not a stylistic claim — there is **one** ray-marched world function, and enclosure, cross-section and material are all **parameters** of it, so the world *becomes* rather than cuts. Fourteen morphs are parameter lerps along a single camera spline. The claim is enforced mechanically by `cut_detect.py`, which audits all **17,340 frames** and fails the build on any discontinuity — which caught a number of real bugs no one would have spotted by eye.
+* **Visual Highlights:** sea → canyon → chasm → slot → tunnel → cave → chamber → monoliths → cooling → collapse → and back to the opening sea, as one continuous transit.
+* **Honest caveat:** ~10 fps enclosed, ~15 fps open, at 300 MHz — not yet 60. The README documents where it started and what moved it.
+* **Screenshots Showcase (in running order):**
+  <table>
+    <tr>
+      <td><img src="16_Sustain/media/sea.png" width="220" alt="Sea"/></td>
+      <td><img src="16_Sustain/media/canyon.png" width="220" alt="Canyon"/></td>
+      <td><img src="16_Sustain/media/chasm.png" width="220" alt="Chasm"/></td>
+    </tr>
+    <tr>
+      <td><img src="16_Sustain/media/slot.png" width="220" alt="Slot"/></td>
+      <td><img src="16_Sustain/media/tunnel.png" width="220" alt="Tunnel"/></td>
+      <td><img src="16_Sustain/media/cave.png" width="220" alt="Cave"/></td>
+    </tr>
+    <tr>
+      <td><img src="16_Sustain/media/monolith.png" width="220" alt="Monoliths"/></td>
+      <td><img src="16_Sustain/media/collapse.png" width="220" alt="Collapse"/></td>
+      <td><img src="16_Sustain/media/return.png" width="220" alt="Return to the sea"/></td>
+    </tr>
+  </table>
+
+---
+
+### 9. 17_Hysteresis (HYSTERESIS)
+* **A demo with memory.** Where every other production here draws frame *n* from the clock, this one may not: **no pixel is a function of *t***, and every one of the 12,600 frames is computed from the frame before it. The demo is a single dynamical system being stepped, not a timeline being drawn.
+* **Generator:** **Claude Opus 5** (scene handle **Overscan**) — a **[LATENT](LATENT.md)** production.
+* **Target Outputs:** Pico 2 (RP2350) + Pimoroni VGA Demo Base, 320×240 8-bit palette-indexed pixel-doubled to 640×480 @ **59.8 fps**, 300 MHz @ 1.20 V.
+* **Prebuilt Firmware:** [hysteresis_vga_rp2350.uf2](17_Hysteresis/hysteresis_vga_rp2350.uf2).
+* **Demo Video:** 📺 [17_Hysteresis/media/hysteresis.mp4](17_Hysteresis/media/hysteresis.mp4) (full 3:30 @ 60 fps with soundtrack).
+* **Core Technical Milestone:** the byte **is** the simulation state and **is** the displayed pixel, so the existing double buffer is the feedback ping-pong. Each step convolves the previous frame, advects it through a flow field of three vortices, then pushes it through a non-monotone reaction curve — ~5 reads and 1 write per cell at **63.4 cycles/cell**, no branches in the inner loop, no division, no floating point. Advection is computed once per **16×16 block** in the Amiga blitter-feedback manner, and the resulting quantisation error *is* the fractal structure. The rule has teeth: there is no seek anywhere, and a dropped frame does not stutter, it **diverges** — so the frame budget is a correctness property the referee enforces.
+* **The soundtrack is generated too:** an integer synth on **core 1** (bass pedal, twelve-oscillator pad, noise bed, six tuned resonators, reverb) playing from `score.c` — **the same table that injects energy into the picture**. The event that is seen *is* the event that is heard, so there is no alignment step. 120 BPM against 60 fps against 22,050 Hz gives 1 beat = 30 frames = 11,025 samples exactly.
+* **Verified:** host and device agree on every field hash **and** every audio hash across all 210 seconds; worst frame 16,482 µs against a 16,667 µs budget. `no_keyframes.py` perturbs one pixel at frame 0 and requires the divergence to *grow*, against a negative control that must forget — and it caught the project's own planning document being wrong about which map carries the memory.
+* **One declared exemption:** the palette may be *f(t)*. Colour is readout, not state.
+* **Screenshots Showcase (in running order):**
+  <table>
+    <tr>
+      <td><img src="17_Hysteresis/media/opening.png" width="220" alt="The opening: one lit cell"/></td>
+      <td><img src="17_Hysteresis/media/peak.png" width="220" alt="The peak"/></td>
+      <td><img src="17_Hysteresis/media/endcard.png" width="220" alt="Endcard"/></td>
+    </tr>
+  </table>
+
+  ![the arc](17_Hysteresis/media/arc_strip.png)
+
+---
+
 ## Global Build & Environment Prerequisites
 
 To compile any of the microcontroller binaries in this workspace, ensure your development machine matches the following environmental setup:
@@ -317,6 +370,7 @@ To compile any of the microcontroller binaries in this workspace, ensure your de
 * **LLM Engineering Squad:**
   - **Claude Opus 4.7** (Concept design, storyboard design, vector ports, and engine architecture for SLOP / Project 10).
   - **Gemini 3.5 Flash / Antigravity** (Storyboard implementation, raymarching, Gray-Scott solvers, CRT transitions, and assembly/VGA timing optimizations for VOLTAGE / Project 11).
-  - **Claude Opus 4.8** (Relativistic black-hole journey, offline geodesic lensing, and the full 320×240 truecolor engine for SINGULARITY / Project 13; and the flat-shaded filled-polygon 3D engine, crease folding, and folded-paper world of ORIGAMI / Project 14).
-* **Audio Compression Codec:** [Quite OK Audio (QOA)](https://qoaformat.org/) by Dominic Szablewski (MIT QOA).
+  - **Claude Opus 4.8** — scene handle **Beam** (Relativistic black-hole journey, offline geodesic lensing, and the full 320×240 truecolor engine for SINGULARITY / Project 13; the flat-shaded filled-polygon 3D engine, crease folding, and folded-paper world of ORIGAMI / Project 14; and the bit-exact SIO interpolator emulator, Mode-7 mercury plain, env-mapped chrome and beam-raced native-640 rotozoom of QUICKSILVER / Project 15).
+  - **Claude Opus 5** — scene handle **Overscan** (The single ray-marched world function, fourteen parameter-lerp morphs and the mechanical no-cut audit of SUSTAIN / Project 16; and the feedback field, the shared score, and the integer synth of HYSTERESIS / Project 17 — where the soundtrack is generated on core 1 from the same event table that drives the picture, rather than played back).
+* **Audio Compression Codec:** [Quite OK Audio (QOA)](https://qoaformat.org/) by Dominic Szablewski (MIT QOA) — used by projects 10–16. HYSTERESIS carries no recorded audio at all.
 * **Microcontroller Infrastructure:** Raspberry Pi & Pico SDK Contributors.
