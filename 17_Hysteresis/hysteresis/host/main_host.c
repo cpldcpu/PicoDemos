@@ -36,7 +36,7 @@ extern int g_offline, g_rawpipe, g_fielddump, g_headless;
 int main(int argc, char *argv[])
 {
     uint32_t frames = 0;
-    int variant = 0, energy = 0, stats = 0, use_probe = 0;
+    int variant = 0, energy = 0, stats = 0, use_probe = 0, hashes = 0;
     field_params_t probe = {0};
     uint32_t shots[MAX_SHOTS]; int nshots = 0;
 
@@ -62,6 +62,7 @@ int main(int argc, char *argv[])
             use_probe = 1;
         }
         else if (!strcmp(argv[i], "--stats"))                   stats = 1;
+        else if (!strcmp(argv[i], "--hash"))                    hashes = 1;
         else if (!strcmp(argv[i], "--shot") && i + 1 < argc) {
             if (nshots < MAX_SHOTS) shots[nshots++] = (uint32_t)atoi(argv[++i]);
         } else {
@@ -128,6 +129,10 @@ int main(int argc, char *argv[])
             memcpy(prev2, prev1, sizeof prev2);
             memcpy(prev1, f, sizeof prev1);
         }
+
+        if (hashes && (sim_frame() % 300) == 0)
+            fprintf(stderr, "HASH f=%-6u %08lx\n", sim_frame(),
+                    (unsigned long)field_hash(vga_320_front_buffer()));
 
         if (energy && (sim_frame() % 60) == 0)
             fprintf(stderr, "f=%6u  t=%3us  energy=%9u  mean=%5.1f\n",

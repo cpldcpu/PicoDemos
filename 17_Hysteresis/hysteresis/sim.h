@@ -32,6 +32,11 @@ void sim_reset(int variant);
 /* Advance exactly one step and present. */
 void sim_tick(void);
 
+/* The two halves of sim_tick. The device must page-flip inside the vertical
+ * blanking interval, so it computes, waits for vblank, then presents. */
+void sim_step(void);
+void sim_present(void);
+
 /* Pin parameters for a sweep, bypassing the arc. Probe/tuning only. */
 void sim_set_fixed(const field_params_t *p);
 

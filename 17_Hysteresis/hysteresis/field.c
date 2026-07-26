@@ -275,6 +275,16 @@ void field_inject_blob(uint8_t *f, int x, int y, int radius, uint8_t amp)
     }
 }
 
+uint32_t field_hash(const uint8_t *f)
+{
+    uint32_t h = 2166136261u;
+    for (int i = 0; i < FIELD_W * FIELD_H; i++) {
+        h ^= f[i];
+        h *= 16777619u;
+    }
+    return h;
+}
+
 uint32_t field_energy(const uint8_t *f)
 {
     uint32_t e = 0;

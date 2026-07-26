@@ -141,29 +141,42 @@ void vga_160_present(void)
 
 /* --- scanline rendering (core 1) ---------------------------------------- */
 
-static void render_scanline_320(struct scanvideo_scanline_buffer *buf)
+/* MODE_320 at full VGA: 320x240 8bpp, palette-looked-up and 2x doubled into
+ * the 640-wide line.
+ *
+ * This REPLACES a 320-wide render_scanline_320 that SUSTAIN inherited and
+ * never called. Two things were wrong with the old one and both mattered:
+ *
+ *   - core1_main dispatched every non-MODE_RACE mode to
+ *     render_scanline_hires640, so the 8bpp path was dead code. The beam was
+ *     scanning fbh_front, which points into the second half of the shared
+ *     arena — a region the 8bpp pages never touch and vga_init zeroes. Hence
+ *     a permanently black screen while the simulation ran perfectly.
+ *   - it emitted 320 pixels into a 640-pixel mode and indexed rows with the
+ *     raw scanline number, so even once dispatched it would have produced a
+ *     half-width image reading 240 rows off the end of the buffer.
+ *
+ * SUSTAIN never noticed because it lived in MODE_HIRES from the first frame. */
+static void __not_in_flash_func(render_scanline_320x640)(
+        struct scanvideo_scanline_buffer *buf, int y)
 {
-    int y = scanvideo_scanline_number(buf->scanline_id);
+    int ys = y >> 1; if (ys >= VGA_320_H) ys = VGA_320_H - 1;
+    const uint8_t *front = (const uint8_t *)__atomic_load_n(&fb_front, __ATOMIC_SEQ_CST);
+    const uint8_t *src   = front + ys * VGA_320_W;
     uint16_t *out = (uint16_t *)buf->data;
 
-    const uint8_t *front = (const uint8_t *)__atomic_load_n(&fb_front, __ATOMIC_SEQ_CST);
-    const uint8_t *src   = front + y * VGA_320_W;
-
-    /* composable_scanline format:
-     *   [0] COMPOSABLE_RAW_RUN
-     *   [1] pixels[0]
-     *   [2] run length = (W + 1 - 3) = 318
-     *   [3..322] pixels[1..319]
-     *   [323] COMPOSABLE_EOL_ALIGN
-     */
+    /* VGA_OUT_W is defined further down with the MODE_HIRES code; spell the
+     * doubling out instead of moving the define, since W2 is what this
+     * function is actually about. */
+    enum { W2 = VGA_320_W * 2 };
     out[0] = COMPOSABLE_RAW_RUN;
     out[1] = palette_320[src[0]];
-    out[2] = VGA_320_W + 1 - 3;
-    for (int x = 1; x < VGA_320_W; x++) out[2 + x] = palette_320[src[x]];
-    out[VGA_320_W + 2] = 0;
-    out[VGA_320_W + 3] = COMPOSABLE_EOL_ALIGN;
+    out[2] = W2 + 1 - 3;
+    for (int k = 1; k < W2; k++) out[2 + k] = palette_320[src[k >> 1]];
+    out[W2 + 2] = 0;
+    out[W2 + 3] = COMPOSABLE_EOL_ALIGN;
 
-    buf->data_used = (VGA_320_W + 4) / 2;
+    buf->data_used = (W2 + 4) / 2;
     buf->status    = SCANLINE_OK;
 }
 
@@ -320,8 +333,10 @@ static void __not_in_flash_func(core1_main)(void)
             out[VGA_OUT_W + 3] = COMPOSABLE_EOL_ALIGN;
             buf->data_used = (VGA_OUT_W + 4) / 2;
             buf->status    = SCANLINE_OK;
+        } else if (m == MODE_320) {
+            render_scanline_320x640(buf, y);        /* HYSTERESIS lives here */
         } else {
-            render_scanline_hires640(buf, y);       /* all framebuffer scenes */
+            render_scanline_hires640(buf, y);       /* RGB565 framebuffer scenes */
         }
         scanvideo_end_scanline_generation(buf);
     }

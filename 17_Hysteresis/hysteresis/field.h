@@ -177,6 +177,15 @@ void field_inject_stencil(uint8_t *f, const uint8_t *bits, int sw, int sh,
 /* Radial impulse -- the ordinary forcing on a musical hit. */
 void field_inject_blob(uint8_t *f, int x, int y, int radius, uint8_t amp);
 
+/* FNV-1a over the whole field.
+ *
+ * This is referee test 1 extended across the host/device boundary, which
+ * PLANNING.md promised and which energy alone cannot deliver: two runs can
+ * agree on a sum to four significant figures and still be different pictures.
+ * A hash printed by the firmware and compared against the host at the SAME
+ * frame index answers the question exactly. */
+uint32_t field_hash(const uint8_t *f);
+
 /* Total energy, for telemetry and for the equilibrium test at the end. */
 uint32_t field_energy(const uint8_t *f);
 

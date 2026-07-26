@@ -232,7 +232,12 @@ void sim_reset(int variant)
     vga_320_present();
 }
 
-void sim_tick(void)
+/* Compute the next frame into the back buffer, WITHOUT presenting.
+ *
+ * Split out because the device has to page-flip inside the vertical blanking
+ * interval, so the order there must be compute -> wait for vblank -> present.
+ * The host has no beam to race and just calls sim_tick(). */
+void sim_step(void)
 {
     field_params_t p;
     if (g_fixed_on) { p = g_fixed; p.angle = (int32_t)((g_frame * 7) & 65535); }
@@ -244,12 +249,16 @@ void sim_tick(void)
     field_step(dst, src, &p);
     arc_inject(g_frame, dst);
     arc_palette(g_frame);
+}
 
+void sim_present(void)
+{
     vga_320_present();
-
     g_energy = field_energy(vga_320_front_buffer());
     g_frame++;
 }
+
+void sim_tick(void) { sim_step(); sim_present(); }
 
 uint32_t sim_frame(void)        { return g_frame; }
 uint32_t sim_total_frames(void) { return TOTAL_FRAMES; }
@@ -261,7 +270,7 @@ int scene_runner_tick(uint32_t t_ms_global)
 {
     (void)t_ms_global;          /* deliberately unused: see sim.h */
     if (g_frame >= TOTAL_FRAMES) return 0;
-    sim_tick();
+    sim_step();          /* main.c presents after waiting for vblank */
     return 1;
 }
 
