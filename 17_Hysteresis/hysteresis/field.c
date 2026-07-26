@@ -54,12 +54,13 @@
  * most 255, the weights sum to gain <= 258 in Q8, plus at most 240 of dither,
  * shifted down by 8). Two compares per cell become none. */
 static uint8_t g_lut[512];
-static int     g_lut_lo = -1, g_lut_hi = -1, g_lut_fold = -1;
+static int     g_lut_lo = -1, g_lut_hi = -1, g_lut_fold = -1, g_lut_out = -1;
 
-static void build_react(int lo, int hi, int fold)
+static void build_react(int lo, int hi, int fold, int out)
 {
-    if (lo == g_lut_lo && hi == g_lut_hi && fold == g_lut_fold) return;
-    g_lut_lo = lo; g_lut_hi = hi; g_lut_fold = fold;
+    if (lo == g_lut_lo && hi == g_lut_hi && fold == g_lut_fold
+        && out == g_lut_out) return;
+    g_lut_lo = lo; g_lut_hi = hi; g_lut_fold = fold; g_lut_out = out;
 
     if (lo == 0 && hi == 0) {                 /* identity — the control case */
         for (int i = 0; i < 256; i++) g_lut[i] = (uint8_t)i;
@@ -85,6 +86,7 @@ static void build_react(int lo, int hi, int fold)
 
         int64_t s = rise + (((hump - rise) * fold) >> 8);
         int32_t y = (int32_t)((s * 255) >> 16);
+        y = (y * out) >> 8;                   /* withdraw the source */
         g_lut[i] = (uint8_t)(y < 0 ? 0 : y > 255 ? 255 : y);
     }
     /* saturating tail, so the transport loop needs no clamp */
@@ -146,7 +148,7 @@ int32_t field_isin(int32_t a) { return isin(a); }
 void field_init(void)
 {
     build_sin();
-    g_lut_lo = g_lut_hi = -1;      /* force a rebuild on the next step */
+    g_lut_lo = g_lut_hi = g_lut_out = -1;   /* force a rebuild next step */
 }
 
 /* ------------------------------------------------------------------ step -- */
@@ -287,7 +289,7 @@ static void HYST_HOT(convolve)(const uint8_t *src, const field_params_t *p)
 void HYST_HOT(field_step)(uint8_t *dst, const uint8_t *src,
                           const field_params_t *p)
 {
-    build_react(p->react_lo, p->react_hi, p->react_fold);
+    build_react(p->react_lo, p->react_hi, p->react_fold, p->react_out);
     const uint8_t *lut = g_lut;
 
 #if HYST_PROF == 2

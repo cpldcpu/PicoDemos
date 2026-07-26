@@ -95,7 +95,7 @@ static void arc_params(uint32_t f, field_params_t *p)
      * centre and the react curve has nothing left to work on. */
     const int32_t z0 = 65536 + 380;                 /* ~1.006 — barely moving */
     const int32_t z1 = 65536 + 1150;                /* ~1.018 — the peak */
-    p->zoom = mix(z0, z1, ramp(f, SEC(20), SEC(130)));
+    p->zoom = mix(z0, z1, ramp(f, SEC(12), SEC(126)));
     p->zoom = mix(p->zoom, 65536 + 240, ramp(f, SEC(150), SEC(205)));
 
     /* Rotation: a slow constant drift, reversing nowhere. A tilt turns the
@@ -117,7 +117,14 @@ static void arc_params(uint32_t f, field_params_t *p)
      * configuration never repeats inside the demo's length. Signs alternate:
      * counter-rotating neighbours produce a shear line between them, which
      * is the gesture a single centre can never make. */
-    const int32_t vs = ramp(f, SEC(14), SEC(70));          /* fade the flow in */
+    /* Flow in EARLY. This is what breaks the phase-lock: while the field is
+     * static, every region oscillates together and the mean pulses between 1
+     * and 18 with nothing filling; once the vortices are strong enough to carry
+     * material away from where it grew, neighbouring regions fall out of step
+     * and the frame fills progressively. The fill used to land at 34 s, which
+     * is exactly where this ramp reached about a third of full strength -- so
+     * the transport, not the impacts or the react curve, was the gate. */
+    const int32_t vs = ramp(f, SEC(3), SEC(26));
     static const struct { int16_t r, rate, ph, str; } orb[3] = {
         {  74,  13,     0,  210 },
         {  96,  -8, 21000, -170 },
@@ -167,7 +174,14 @@ static void arc_params(uint32_t f, field_params_t *p)
          * worsen sharply above 210 -- the degeneration shows up in the temporal
          * numbers before it is visible. Peaking at a LOWER spatial frequency
          * needs a 5x5 kernel, which is the next thing to try, not this. */
-        int32_t w = mix(0, 38000, ramp(f, SEC(28), SEC(120)));
+        /* Starts at ~70/255, not 0. THE DEAD ZONE FIX: with a pure blur
+         * kernel the early field diffuses faster than the react band can hold
+         * it, so the seed grew to mean 23.5 by 6 s, collapsed to 1.6 by 16 s,
+         * and only recovered at 33 s when the sharpening ramp finally arrived
+         * -- twenty seconds of near-black followed by a step change. Carrying
+         * some ring-negative weight from the first frame lets the opening blob
+         * persist and spread steadily instead of dying and restarting. */
+        int32_t w = mix(18000, 38000, ramp(f, SEC(6), SEC(105)));
         w = mix(w, 23000, ramp(f, SEC(158), SEC(200)));   /* softer outro */
         if (g_kern_forced >= 0) w = g_kern_forced * 257;
         p->k_centre = (int16_t)mix(soft[0], edge[0], w);
@@ -176,7 +190,10 @@ static void arc_params(uint32_t f, field_params_t *p)
         p->k_corner = (int16_t)mix(soft[3], edge[3], w);
     }
 
-    p->blur = 170;
+    /* Diffusion sets how fast the excited region SPREADS, so it is the pacing
+     * control for the opening: low early means the first blob grows into the
+     * frame over twenty seconds instead of filling it in four. */
+    p->blur = (uint8_t)mix(146, 170, ramp(f, SEC(4), SEC(40)));
 
     /* Gain rides just under unity for most of the run and crosses it at the
      * peak. Above unity the field blooms toward saturation, which is the
@@ -184,19 +201,91 @@ static void arc_params(uint32_t f, field_params_t *p)
     /* Held inside the swept envelope. The first arc ramped this to 254 at the
      * start and 248 at the end -- both outside anything that had been measured,
      * and the middle of the demo duly fell apart. */
+    /* Gain crosses below unity for the decay -- outside the swept envelope on
+     * purpose, because the envelope was mapped for a SUSTAINING system and the
+     * ending needs the opposite. */
+    /* THE ENDING, second attempt: pull the gain down instead. Gain scales every
+     * cell multiplicatively, so relative structure survives while the whole
+     * field dims, and cells drop below react_lo patchily rather than all at
+     * once -- the pattern erodes from its dimmest parts inward instead of
+     * dissolving into an average. */
     p->gain = 258;
 
     /* The excitable band. Narrow and low: cells that receive a little energy
      * from a neighbour get pulled UP into the band rather than decaying, which
      * is what lets a single lit cell colonise an empty field. */
-    p->react_lo = 12;
+    /* THE ENDING. Raising the excitation threshold is what actually makes the
+     * system run down: below react_lo a cell decays to nothing, so lifting it
+     * withdraws the field's ability to sustain itself anywhere. Nothing in the
+     * arc did that before, which is why the mean sat at ~137 from 36 s all the
+     * way to the last frame and the demo simply stopped instead of ending.
+     *
+     * This is the honest ending for a system with memory: forcing stops, the
+     * medium stops being excitable, and the field decays to equilibrium. */
+    /* Permissive early so a small blob is SUPERCRITICAL from the first impact
+     * and grows visibly, rather than sitting sub-critical until it happens to
+     * cross a nucleation threshold and then flooding the screen in four
+     * seconds. Growth rate is controlled by diffusion instead (blur, below). */
+    p->react_lo = (uint8_t)mix(7, 12, ramp(f, SEC(6), SEC(38)));
+
+    /* THE ENDING, and the only one that erodes rather than dissolves: starve
+     * the excitable band by lifting its floor past what the field can reach.
+     * Cells below react_lo decay to nothing, so the dimmest regions die first
+     * and the brightest hold on longest -- the pattern is eaten from its edges
+     * inward instead of averaging into grey or flooding white. Runs to 236,
+     * well above anything the field sustains, so the end state is black. */
+    p->react_lo = (uint8_t)mix(p->react_lo, 62, ramp(f, SEC(150), SEC(198)));
+    p->react_lo = (uint8_t)mix(p->react_lo, 148, ramp(f, SEC(198), SEC(210)));
     p->react_hi = 180;
+
+    /* The ending. Withdrawing the curve's output is the only thing that
+     * actually removes energy from the system -- see field.h. */
+    /* Reaches zero at the last frame, not twenty seconds early. The collapse
+     * from ~85 to nothing takes about five seconds once the source falls below
+     * what the field needs to sustain itself, which is the right shape for a
+     * system losing its ability to hold together -- but it has to land ON the
+     * end of the demo. */
+/* Held at full. Scaling the curve's output turned out to be the WRONG kill
+     * switch: it takes the contrast down before the brightness, so the field
+     * converged to a flat uniform grey at 195 s -- mean 111 with no structure
+     * at all, which the energy figure happily reported as healthy. A flat grey
+     * screen is a worse ending than a black one. */
+    p->react_out = 255;
 
     /* SELF-LIMITING IS THE MEMORY KNOB. tools/memory_map.py swept structure
      * against path-dependence and the split was total: every fold=160 regime
      * FORGETS a one-cell perturbation, every fold>=200 regime REMEMBERS it.
      * Above ~230 it remembers but degenerates into noise. So the demo lives in
      * a narrow band, and this parameter is not a look, it is the rule. */
+    /* Ramped in, not constant. The dead zone was never a slow start: the early
+     * mean OSCILLATED -- 18.1 at 6 s, 1.7 at 11 s, 7.5 at 21 s, 10.1 at 31 s --
+     * because fold at full strength makes a growing bright region fold back to
+     * dark from the inside. The whole field was acting as one relaxation
+     * oscillator, and only became steady around 33 s when it decorrelated
+     * spatially. Easing fold in lets the first region grow without eating
+     * itself, and full self-limiting arrives once there is enough independent
+     * structure for it to shape rather than destroy. Kept at or above the
+     * measured memory floor (160) throughout -- see memory_map.py. */
+    /* THE FOLD MUST GO FIRST to end the demo, and this took three attempts to
+     * see. While the curve is non-monotone every obvious kill knob works
+     * backwards: reducing gain pushes cells toward the hump's PEAK and the mean
+     * rose from 142 to 177; raising react_lo narrows the band and does the same;
+     * scaling the output flattens contrast into uniform grey before it dims
+     * anything. Nothing monotone exists while the hump does.
+     *
+     * Easing fold to near zero leaves a plain smoothstep -- monotone, no
+     * regeneration surprises -- and only then do gain and threshold behave the
+     * way intuition says. The demo loses its self-limiting inhibitor in the last
+     * forty seconds, which is exactly right: that is what "the system stops
+     * being able to sustain itself" means. */
+    /* Held at 200 to the end. Easing the fold out was the third failed ending:
+     * without the self-limiting hump the curve is a monotone threshold, and a
+     * monotone threshold plus diffusion is the SWITCH from the very first sweep
+     * -- it flooded to a uniform 226 with sdev 0.
+     *
+     * Between them the three attempts establish that this system has no gentle
+     * death. Its only stable states are structured-and-oscillating, flooded
+     * uniform, and black; there is no path where structure gradually fades. */
     p->react_fold = 200;
 
     /* PERSISTENCE IS THE PACING CONTROL, and the discovery of this session.
@@ -212,7 +301,20 @@ static void arc_params(uint32_t f, field_params_t *p)
      * So it is free, and it is also the best directorial knob in the demo:
      * high persistence reads as languid, low as agitated. High through the
      * quiet opening, dipping at the peak, high again as it runs down. */
-    p->persist = (uint8_t)mix(202, 150, ramp(f, SEC(30), SEC(135)));
+    /* Higher through the opening than it used to be. The early field is one
+     * relaxation oscillator and its TROUGHS were the visible problem -- the mean
+     * dipped to 0.8 at 13 s, which reads as an empty screen between pulses.
+     * Persistence damps the fastest mode, so raising it shallows the trough
+     * without touching the transition, which turned out to be a percolation
+     * bifurcation and immovable by any of these knobs. */
+    /* CAPPED AT 205. Persistence has an upper limit as well as a lower one:
+     * pushed to 232 to shallow the opening's oscillation troughs, it damped the
+     * field out of its chaotic regime altogether and the referee's
+     * path-dependence test went from 99.9% spread to 0.0% -- the demo stopped
+     * having memory. The earlier sweep only explored upward to 192 and found
+     * memory improving, so this ceiling was invisible until the referee ran on
+     * the real arc. Worth remembering that the sweep mapped one direction. */
+    p->persist = (uint8_t)mix(205, 150, ramp(f, SEC(14), SEC(128)));
     p->persist = (uint8_t)mix(p->persist, 212, ramp(f, SEC(150), SEC(205)));
 }
 
@@ -227,27 +329,38 @@ static void arc_inject(uint32_t f, uint8_t *dst)
     if (f == 0) return;
 
     /* Provisional impulse schedule — replaced by the sequencer at step 8. */
+    /* Radii start at 6, not 3. An excitable medium has a CRITICAL NUCLEUS: a
+     * blob too small to sustain a growing front just decays, so the early
+     * impacts were doing nothing and the opening was one organism pulsing alone
+     * near the centre for thirty seconds before the screen filled all at once.
+     * Big enough seeds each start their own growing region, so the frame fills
+     * progressively from several places -- which is both a better image and an
+     * actual narrative of growth rather than a step change.
+     *
+     * Denser through the opening for the same reason, then spacing widens once
+     * the field can carry structure on its own. */
     static const struct { uint32_t at; int x, y, r, amp; } hits[] = {
-        { SEC(  8), 160, 120, 3, 255 },
-        { SEC( 16), 104,  88, 4, 220 },
-        { SEC( 25), 214, 150, 5, 230 },
-        { SEC( 34),  88, 164, 5, 210 },
-        { SEC( 43), 232,  76, 6, 240 },
-        { SEC( 52), 140, 190, 6, 225 },
-        { SEC( 60),  60, 100, 7, 245 },
-        { SEC( 68), 258, 132, 7, 235 },
-        { SEC( 76), 160,  60, 8, 250 },
-        { SEC( 84), 108, 132, 8, 240 },
-        { SEC( 92), 210, 100, 9, 255 },
-        { SEC(100),  74, 176, 9, 245 },
-        { SEC(107), 246, 186,10, 255 },
-        { SEC(114), 130,  96,10, 250 },
-        { SEC(120), 176, 158,11, 255 },
-        { SEC(126),  96,  60,11, 255 },
-        { SEC(132), 224, 128,12, 255 },
-        { SEC(137), 160, 120,14, 255 },
-        { SEC(142),  70, 140,12, 255 },
-        { SEC(146), 250,  96,12, 255 },
+        { SEC(  5), 104,  88, 7, 255 },
+        { SEC(  8), 216, 148, 8, 250 },
+        { SEC( 11),  86, 166, 9, 250 },
+        { SEC( 14), 234,  74,10, 255 },
+        { SEC( 18), 142, 192,10, 250 },
+        { SEC( 23),  58, 102,11, 255 },
+        { SEC( 29), 258, 130,11, 250 },
+        { SEC( 36), 160,  58,12, 255 },
+        { SEC( 44), 108, 134,12, 250 },
+        { SEC( 53), 210,  98,13, 255 },
+        { SEC( 62),  72, 178,13, 250 },
+        { SEC( 71), 248, 186,14, 255 },
+        { SEC( 80), 130,  94,14, 250 },
+        { SEC( 89), 176, 158,15, 255 },
+        { SEC( 98),  94,  60,15, 255 },
+        { SEC(107), 224, 128,15, 255 },
+        { SEC(116), 160, 120,16, 255 },
+        { SEC(125),  68, 140,15, 255 },
+        { SEC(134), 252,  96,15, 255 },
+        { SEC(143), 120, 200,14, 255 },
+        { SEC(152), 200,  44,13, 255 },
     };
     for (unsigned i = 0; i < sizeof hits / sizeof hits[0]; i++)
         if (f == hits[i].at)

@@ -150,6 +150,21 @@ typedef struct {
      * inhibitor. 0 = monotone (switch), 255 = full band-pass hump. */
     uint8_t  react_fold;
 
+    /* Output scale on the react curve, 0..255. THE KILL SWITCH, and the thing
+     * the arc had no way to express before.
+     *
+     * The react curve is the field's energy SOURCE -- it maps mid values up
+     * toward the rails, which is what lets structure persist against diffusion.
+     * So nothing else can end the demo. Gain below unity loses to it (249/256
+     * per frame is nothing against a curve that regenerates), and raising
+     * react_lo actually makes the picture BRIGHTER, because a narrower
+     * excitable band puts the surviving cells nearer the hump's peak -- 
+     * measured, mean rose to 151 when the intent was to extinguish.
+     *
+     * Scaling the curve's output is the direct, continuous way to withdraw the
+     * source. At 0 the field has nothing regenerating it and decays to black. */
+    uint8_t  react_out;
+
     /* Persistence, 0..255 — how much of the PREVIOUS value at this same screen
      * position is retained. A leaky integrator, i.e. a time constant.
      *
