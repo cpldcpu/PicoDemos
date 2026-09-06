@@ -4,7 +4,8 @@
 at no point does a frame of the picture exist anywhere in the machine.
 
 A **LATENT** production for the Raspberry Pi Pico 2 (RP2350).
-Code, direction and music: **Phosphor** (Claude Fable 5.1). Critic: **Azure**.
+Plan, direction and music: **Phosphor** (Claude Fable 5.1).
+Code: **Overscan** (Claude Opus 5). Critic: **Azure**.
 
 📺 **[media/persistence.mp4](media/persistence.mp4)** — the whole thing at 60 fps with sound
 ⚡ **[persistence_vga_rp2350.uf2](persistence_vga_rp2350.uf2)** — hold BOOTSEL, plug in, drag it onto `RPI-RP2`
@@ -72,7 +73,7 @@ modelled. Over the complete run, 9,000 frames and 4,320,000 scanlines:
 | resolution / rate | **640×480 @ 59.75 Hz**, native, no doubling anywhere |
 | **scanlines the beam was shown unwritten** | **0** |
 | governor interventions | 0 |
-| frames skipped | 3 (all at scene entry, where a cut is happening anyway) |
+| frames skipped | 2–3, run to run (always at a scene entry, where a cut is happening anyway) |
 | audio ring low-water | 1,153 of 2,047 samples |
 | clock | 300 MHz @ 1.20 V |
 | flash | 78.7 KB — no recorded audio, no bitmaps, no baked meshes |
@@ -395,9 +396,13 @@ the argument for taking screenshots.
 
 ## Credits
 
-A **LATENT** production.
+A **LATENT** production, and the first here that two models worked on in
+sequence rather than one carrying it end to end.
 
-- **Phosphor** (Claude Fable 5.1) — design, code, direction and music
+- **Phosphor** (Claude Fable 5.1) — the plan, the direction, and the music:
+  `PLANNING.md`, the arc, and the tune in `song.c` and `synth.c`
+- **Overscan** (Claude Opus 5) — the code: the line contract, the ten kernels,
+  the three referees, and everything measured on the device
 - **Azure** — critic and producer
 
 `PERSISTENCE · LATENT · 2026`

@@ -47,9 +47,9 @@ Everything below the line is AI generated.
 | **16** | **[SUSTAIN](16_Sustain)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 truecolor ray-marched world — **4:49 with no cuts anywhere**) | **Claude Opus 5** |
 | **17** | **[HYSTERESIS](17_Hysteresis)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 palette feedback field — **no pixel is a function of *t***, and the synth soundtrack is generated too) | **Claude Opus 5** |
 | **18** | **[VESPER](18_Vesper)** | Original Demo | RP2350 | VGA (320×240 solid 3D, metallic lighting, bloom and reflections), Canticle stereo synth score — **two minutes in a 60.2 KiB flash image** | **GPT-6 Astra** *(Phase)* |
-| **19** | **[PERSISTENCE](19_Persistence)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (**native 640×480, no framebuffer anywhere** — every scanline generated live for the beam, 31,500 a second) + a tracker score on the other core | **Claude Fable 5.1** *(Phosphor)* |
+| **19** | **[PERSISTENCE](19_Persistence)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (**native 640×480, no framebuffer anywhere** — every scanline generated live for the beam, 31,500 a second) + a tracker score on the other core | **Claude Fable 5.1** *(Phosphor)* + **Claude Opus 5** *(Overscan)* |
 
-> QUICKSILVER, SUSTAIN, HYSTERESIS, VESPER and PERSISTENCE are productions of **[LATENT](LATENT.md)** — a demoscene group for machine-made productions on bare-metal silicon. Code & direction by **Beam** / Claude Opus 4.8, **Overscan** / Claude Opus 5, **Phase** / GPT-6 Astra, and **Phosphor** / Claude Fable 5.1; music by **Suno** on QUICKSILVER and SUSTAIN, **Overscan** on HYSTERESIS, **Phase** on VESPER, and **Phosphor** on PERSISTENCE. HYSTERESIS, VESPER and PERSISTENCE synthesize their soundtracks on the device. Visuals also contributed by **Antigravity** / Gemini and **GPT Image 2**; human critic: **Azure**.
+> QUICKSILVER, SUSTAIN, HYSTERESIS, VESPER and PERSISTENCE are productions of **[LATENT](LATENT.md)** — a demoscene group for machine-made productions on bare-metal silicon. Code & direction by **Beam** / Claude Opus 4.8, **Overscan** / Claude Opus 5 and **Phase** / GPT-6 Astra; PERSISTENCE was planned, directed and scored by **Phosphor** / Claude Fable 5.1 and coded by **Overscan**, the first here that two models worked on in sequence. Music by **Suno** on QUICKSILVER and SUSTAIN, **Overscan** on HYSTERESIS, **Phase** on VESPER, and **Phosphor** on PERSISTENCE. HYSTERESIS, VESPER and PERSISTENCE synthesize their soundtracks on the device. Visuals also contributed by **Antigravity** / Gemini and **GPT Image 2**; human critic: **Azure**.
 
 ---
 
@@ -399,7 +399,7 @@ PicoDemos/
 ### 11. 19_Persistence (PERSISTENCE)
 
 * **A demo with no framebuffer.** Two and a half minutes at **native 640×480**, and at no point does a frame of the picture exist anywhere in the machine. Every other production here draws 320×240 and lets the scanout double it, for a good reason: a 640×480 RGB565 frame is 614,400 bytes and the RP2350 has 524,288, so the framebuffer for the native mode *cannot exist* — by 90 KB, before the demo takes up any of it.
-* **Generator:** **Claude Fable 5.1** (scene handle **Phosphor**) — code, direction **and music**. A **[LATENT](LATENT.md)** production; critic **Azure**.
+* **Generators:** **Claude Fable 5.1** (scene handle **Phosphor**) — the plan, the direction **and the music**; **Claude Opus 5** (scene handle **Overscan**) — the code. The first production here that two models worked on in sequence. A **[LATENT](LATENT.md)** production; critic **Azure**.
 * **Target Outputs:** Pico 2 (RP2350) + Pimoroni VGA Demo Base, 640×480 @ 59.75 Hz with 24 kHz stereo PWM audio, 300 MHz @ 1.20 V.
 * **Prebuilt Firmware:** [persistence_vga_rp2350.uf2](19_Persistence/persistence_vga_rp2350.uf2).
 * **Demo Video:** 📺 [19_Persistence/media/persistence.mp4](19_Persistence/media/persistence.mp4) (the full 2:30 @ 60 fps with soundtrack).
@@ -421,7 +421,7 @@ PicoDemos/
     </tr>
     <tr>
       <td><img src="19_Persistence/media/f06900.png" width="220" alt="The finale"/></td>
-      <td><img src="19_Persistence/media/f08380.png" width="220" alt="Credits"/></td>
+      <td><img src="19_Persistence/media/f08240.png" width="220" alt="Credits"/></td>
       <td><img src="19_Persistence/media/f08880.png" width="220" alt="Endcard"/></td>
     </tr>
   </table>
@@ -456,7 +456,8 @@ To compile any of the microcontroller binaries in this workspace, ensure your de
   - **Claude Opus 4.7** (Concept design, storyboard design, vector ports, and engine architecture for SLOP / Project 10).
   - **Gemini 3.5 Flash / Antigravity** (Storyboard implementation, raymarching, Gray-Scott solvers, CRT transitions, and assembly/VGA timing optimizations for VOLTAGE / Project 11).
   - **Claude Opus 4.8** — scene handle **Beam** (Relativistic black-hole journey, offline geodesic lensing, and the full 320×240 truecolor engine for SINGULARITY / Project 13; the flat-shaded filled-polygon 3D engine, crease folding, and folded-paper world of ORIGAMI / Project 14; and the bit-exact SIO interpolator emulator, Mode-7 mercury plain, env-mapped chrome and beam-raced native-640 rotozoom of QUICKSILVER / Project 15).
-  - **Claude Opus 5** — scene handle **Overscan** (The single ray-marched world function, fourteen parameter-lerp morphs and the mechanical no-cut audit of SUSTAIN / Project 16; and the feedback field, the shared score, and the integer synth of HYSTERESIS / Project 17 — where the soundtrack is generated on core 1 from the same event table that drives the picture, rather than played back).
+  - **Claude Opus 5** — scene handle **Overscan** (The single ray-marched world function, fourteen parameter-lerp morphs and the mechanical no-cut audit of SUSTAIN / Project 16; and the feedback field, the shared score, and the integer synth of HYSTERESIS / Project 17 — where the soundtrack is generated on core 1 from the same event table that drives the picture, rather than played back; and the zero-framebuffer scanline engine, ten kernels and three referees of PERSISTENCE / Project 19, built to Phosphor's plan).
   - **GPT-6 Astra** — scene handle **Phase** (Code, direction, procedural solid 3D graphics and the Canticle stereo synth score for VESPER / Project 18).
-* **Audio Compression Codec:** [Quite OK Audio (QOA)](https://qoaformat.org/) by Dominic Szablewski (MIT QOA) — used by projects 10–16. HYSTERESIS and VESPER carry no recorded audio.
+  - **Claude Fable 5.1** — scene handle **Phosphor** (The plan, the direction and the tracker score for PERSISTENCE / Project 19 — the no-framebuffer rule, the arc, and a 144 BPM tune written note by note and played by an integer stereo synth on core 0).
+* **Audio Compression Codec:** [Quite OK Audio (QOA)](https://qoaformat.org/) by Dominic Szablewski (MIT QOA) — used by projects 10–16. HYSTERESIS, VESPER and PERSISTENCE carry no recorded audio.
 * **Microcontroller Infrastructure:** Raspberry Pi & Pico SDK Contributors.

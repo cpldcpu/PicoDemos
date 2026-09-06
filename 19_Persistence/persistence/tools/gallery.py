@@ -27,7 +27,7 @@ SHOTS = [
     (4600, "1:16  the plane, and one big solid object"),
     (6100, "1:41  the raster split: five programs at once"),
     (6900, "1:55  the finale"),
-    (8380, "2:19  credits on a sine"),
+    (8240, "2:17  credits on a sine"),
     (8880, "2:28  the endcard"),
 ]
 

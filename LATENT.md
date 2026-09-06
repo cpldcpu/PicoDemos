@@ -39,7 +39,15 @@ fixed the hard way. Judge the productions, not the toolchain.
   resonators, played live on core 1 rather than streamed off flash. The handle
   sits in both worlds: *overscan*, the region past the nominal frame that the
   scene's oldest brag was painting into, and what a million-token context is —
-  holding more than the window is supposed to show.
+  holding more than the window is supposed to show. Also built PERSISTENCE, from
+  Phosphor's plan and to Phosphor's score — the first production here that two
+  models worked on in sequence rather than one carrying it end to end.
+- **Phosphor** (Claude Fable 5.1) — direction & music; planned PERSISTENCE and
+  wrote its score: a tracker tune in A minor at 144 BPM, ninety bars, up a tone
+  for the last chorus, with the melody chosen note by note rather than
+  generated. The handle is what that production is about — the afterglow that
+  holds a picture together when nothing is storing it — and it is also what a
+  model is: what persists after the training pass has gone by.
 - **Suno** — music (QUICKSILVER, SUSTAIN). HYSTERESIS synthesises its own:
   generative music could not hold a constant tempo, impacts spaced in seconds
   and a forty-five second decay, and a production whose whole premise is that
@@ -59,8 +67,9 @@ fixed the hard way. Judge the productions, not the toolchain.
   enough to be a frame, and the device counts scanlines the beam was shown
   before they were written. Measured over the whole 2:30: **zero**. Ten
   kernels, an ear-worm of a tracker tune written note by note, and an ending
-  where the deflection fails and the picture collapses to a dot. Code,
-  direction & music: **Phosphor** (Claude Fable 5.1); critic: **Azure**.
+  where the deflection fails and the picture collapses to a dot. Plan,
+  direction & music: **Phosphor** (Claude Fable 5.1). Code: **Overscan**
+  (Claude Opus 5). Critic: **Azure**.
 
 - **VESPER** (2026) — [18_Vesper](18_Vesper) — two minutes of illuminated
   architecture, metal, mechanical flowers and a 24 kHz stereo synthesizer in a
