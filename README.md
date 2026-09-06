@@ -48,8 +48,9 @@ Everything below the line is AI generated.
 | **17** | **[HYSTERESIS](17_Hysteresis)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 palette feedback field — **no pixel is a function of *t***, and the synth soundtrack is generated too) | **Claude Opus 5** |
 | **18** | **[VESPER](18_Vesper)** | Original Demo | RP2350 | VGA (320×240 solid 3D, metallic lighting, bloom and reflections), Canticle stereo synth score — **two minutes in a 60.2 KiB flash image** | **GPT-6 Astra** *(Phase)* |
 | **19** | **[PERSISTENCE](19_Persistence)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (**native 640×480, no framebuffer anywhere** — every scanline generated live for the beam, 31,500 a second) + a tracker score on the other core | **Claude Fable 5.1** *(Phosphor)* + **Claude Opus 5** *(Overscan)* |
+| **20** | **[COLOSSUS](20_Colossus)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 solid 3D, matcap chrome, painted bitmap art in flash) + a wall-of-voices integer synth score — **5:07, three models in their own roles, four referees all tools** | **Claude Fable 5.1** *(Phosphor)* + **GPT-6 Astra** *(Phase)* + **Claude Opus 5** *(Overscan)* |
 
-> QUICKSILVER, SUSTAIN, HYSTERESIS, VESPER and PERSISTENCE are productions of **[LATENT](LATENT.md)** — a demoscene group for machine-made productions on bare-metal silicon. Code & direction by **Beam** / Claude Opus 4.8, **Overscan** / Claude Opus 5 and **Phase** / GPT-6 Astra; PERSISTENCE was planned, directed and scored by **Phosphor** / Claude Fable 5.1 and coded by **Overscan**, the first here that two models worked on in sequence. Music by **Suno** on QUICKSILVER and SUSTAIN, **Overscan** on HYSTERESIS, **Phase** on VESPER, and **Phosphor** on PERSISTENCE. HYSTERESIS, VESPER and PERSISTENCE synthesize their soundtracks on the device. Visuals also contributed by **Antigravity** / Gemini and **GPT Image 2**; human critic: **Azure**.
+> QUICKSILVER, SUSTAIN, HYSTERESIS, VESPER, PERSISTENCE and COLOSSUS are productions of **[LATENT](LATENT.md)** — a demoscene group for machine-made productions on bare-metal silicon. Code & direction by **Beam** / Claude Opus 4.8, **Overscan** / Claude Opus 5 and **Phase** / GPT-6 Astra; PERSISTENCE was planned, directed and scored by **Phosphor** / Claude Fable 5.1 and coded by **Overscan**, the first here that two models worked on in sequence. Music by **Suno** on QUICKSILVER and SUSTAIN, **Overscan** on HYSTERESIS, **Phase** on VESPER, and **Phosphor** on PERSISTENCE. HYSTERESIS, VESPER, PERSISTENCE and COLOSSUS synthesize their soundtracks on the device. COLOSSUS was directed and scored by **Phosphor**, designed and painted by **Phase**, and built and measured by **Overscan** — three models in their own roles, with every brief between them in the repository. Visuals also contributed by **Antigravity** / Gemini and **GPT Image 2**; human critic: **Azure**.
 
 ---
 
@@ -135,18 +136,31 @@ PicoDemos/
     ├── vesper_vga_rp2350.uf2    # Release firmware image
 │   └── README.md               # Direction, architecture, build and Phase / GPT-6 Astra credits
 │
-└── 19_Persistence/              # PERSISTENCE: a demo with no framebuffer — native 640×480
-    ├── persistence/             # Ten scanline kernels; core 1 owns space, core 0 owns time
-    │   ├── beam.c/.h            # the line contract, and the runner that dispatches it
-    │   ├── fx_*.c               # title, plasma, kefrens, twister, tunnel, plane, split, credits
-    │   ├── s3d.c                # solid 3D as per-row visible-boundary lists (an S-buffer)
-    │   ├── song.c / synth.c     # the tracker tune and the stereo synth, on core 0
-    │   ├── host/                # SDL player — the one place a whole frame is assembled
-    │   └── tools/               # no_framebuffer.py, audit.exe, capture, gallery, serial
-    ├── media/                   # Video, per-scene stills, piano roll, audit + device logs
-    ├── PLANNING.md              # The rule, the budget, and what the referees have to prove
-    ├── persistence_vga_rp2350.uf2  # Checked-in release firmware image
-    └── README.md                # Arc, measurements, the three referees, what went wrong
+├── 19_Persistence/              # PERSISTENCE: a demo with no framebuffer — native 640×480
+│   ├── persistence/             # Ten scanline kernels; core 1 owns space, core 0 owns time
+│   │   ├── beam.c/.h            # the line contract, and the runner that dispatches it
+│   │   ├── fx_*.c               # title, plasma, kefrens, twister, tunnel, plane, split, credits
+│   │   ├── s3d.c                # solid 3D as per-row visible-boundary lists (an S-buffer)
+│   │   ├── song.c / synth.c     # the tracker tune and the stereo synth, on core 0
+│   │   ├── host/                # SDL player — the one place a whole frame is assembled
+│   │   └── tools/               # no_framebuffer.py, audit.exe, capture, gallery, serial
+│   ├── media/                   # Video, per-scene stills, piano roll, audit + device logs
+│   ├── PLANNING.md              # The rule, the budget, and what the referees have to prove
+│   ├── persistence_vga_rp2350.uf2  # Checked-in release firmware image
+│   └── README.md                # Arc, measurements, the three referees, what went wrong
+│
+├── 20_Colossus/                 # COLOSSUS: a monument, by three models in their own roles
+│   ├── colossus/                # Renderer, body, scenes, score, synth, platform, tools
+│   │   ├── song.c / synth.c     # the score and the integer synth (organ, choir, reverb)
+│   │   ├── render.c / body.c    # solid 3D, matcap chrome, bloom, embers; the parametric body
+│   │   ├── assets/              # painted art: sources, prompts, converter, packed payloads
+│   │   ├── host/                # SDL player and the headless capture tool
+│   │   └── tools/               # sync_check, film_check, ledger_check, song_check, serial
+│   ├── briefs/                  # Every brief and reply between the three models, dated
+│   ├── media/                   # The video and the score
+│   ├── PLANNING.md              # The plan, revised after Phase's critique
+│   ├── colossus_vga_rp2350.uf2  # Release firmware image
+│   └── README.md                # The piece, the music, the numbers, the referees
 ```
 
 ---
@@ -428,6 +442,20 @@ PicoDemos/
 
 ---
 
+### 12. 20_Colossus (COLOSSUS)
+
+* **A monument.** A 5:07 **[LATENT](LATENT.md)** production: a colossal working machine on a plain, seen one part at a time — hand, heart, eye, load, spine, crown — and then whole, with dawn behind it. Made in the spirit of *Dope* (Complex, 1995): the music carries it, the pacing is slow and confident, it is an object show with a through-line, and it never hard-cuts.
+* **Generators:** **Claude Fable 5.1**, handle **Phosphor** — direction, plan, score and synth. **GPT-6 Astra**, handle **Phase** — the body, the look, the engine's first rounds and all painted art (through Codex, with its image tool). **Claude Opus 5**, handle **Overscan** — platform, renderer from round four, tools and every hardware run. **Azure** — critic and producer. The whole exchange between the three is in [20_Colossus/briefs](20_Colossus/briefs/).
+* **Target:** Pico 2 / RP2350 at 300 MHz and 1.20 V on the Pimoroni VGA Demo Base; 320×240 15-bit colour doubled to VGA through `vga_mode_320x240_60`, 24 kHz stereo PWM synthesised on core 1.
+* **Watch / Run / Flash:** [Full video](20_Colossus/media/colossus.mp4) · [The score alone](20_Colossus/media/colossus_score.mp3) · [Windows launcher](20_Colossus/Run%20Colossus.cmd) · [UF2](20_Colossus/colossus_vga_rp2350.uf2) · [README](20_Colossus/README.md) · [PLANNING](20_Colossus/PLANNING.md).
+* **Visuals:** solid 3D with per-scene reciprocal depth, matcap chrome on the tendons and bearings, restricted bloom, stateless embers, a parametric body that drives the silhouette, every chapter's mesh and the reveal's shoulder lift, and the group's first painted bitmap art in flash (76,928 bytes), converted by allocating the shared palette first.
+* **Music:** D minor at 125 BPM, 160 bars written note by note; drawbar organ, formant choir, stereo chorus, hall reverb on an integer synth, block-size independent and hash-diffed against the device every second.
+* **Measured on the device over the whole run:** 16,700 frames, none under 30 fps, worst 24.1 ms, zero audio underruns, 306 of 306 hashes matching; boot floor 10,568 bytes measured by bisection. Four referees, all tools, one command.
+
+![COLOSSUS — the reveal](20_Colossus/briefs/sketches/round6/chapter-8-colossus.png)
+
+---
+
 ## Global Build & Environment Prerequisites
 
 To compile any of the microcontroller binaries in this workspace, ensure your development machine matches the following environmental setup:
@@ -456,8 +484,8 @@ To compile any of the microcontroller binaries in this workspace, ensure your de
   - **Claude Opus 4.7** (Concept design, storyboard design, vector ports, and engine architecture for SLOP / Project 10).
   - **Gemini 3.5 Flash / Antigravity** (Storyboard implementation, raymarching, Gray-Scott solvers, CRT transitions, and assembly/VGA timing optimizations for VOLTAGE / Project 11).
   - **Claude Opus 4.8** — scene handle **Beam** (Relativistic black-hole journey, offline geodesic lensing, and the full 320×240 truecolor engine for SINGULARITY / Project 13; the flat-shaded filled-polygon 3D engine, crease folding, and folded-paper world of ORIGAMI / Project 14; and the bit-exact SIO interpolator emulator, Mode-7 mercury plain, env-mapped chrome and beam-raced native-640 rotozoom of QUICKSILVER / Project 15).
-  - **Claude Opus 5** — scene handle **Overscan** (The single ray-marched world function, fourteen parameter-lerp morphs and the mechanical no-cut audit of SUSTAIN / Project 16; and the feedback field, the shared score, and the integer synth of HYSTERESIS / Project 17 — where the soundtrack is generated on core 1 from the same event table that drives the picture, rather than played back; and the zero-framebuffer scanline engine, ten kernels and three referees of PERSISTENCE / Project 19, built to Phosphor's plan).
-  - **GPT-6 Astra** — scene handle **Phase** (Code, direction, procedural solid 3D graphics and the Canticle stereo synth score for VESPER / Project 18).
-  - **Claude Fable 5.1** — scene handle **Phosphor** (The plan, the direction and the tracker score for PERSISTENCE / Project 19 — the no-framebuffer rule, the arc, and a 144 BPM tune written note by note and played by an integer stereo synth on core 0).
-* **Audio Compression Codec:** [Quite OK Audio (QOA)](https://qoaformat.org/) by Dominic Szablewski (MIT QOA) — used by projects 10–16. HYSTERESIS, VESPER and PERSISTENCE carry no recorded audio.
+  - **Claude Opus 5** — scene handle **Overscan** (The single ray-marched world function, fourteen parameter-lerp morphs and the mechanical no-cut audit of SUSTAIN / Project 16; and the feedback field, the shared score, and the integer synth of HYSTERESIS / Project 17 — where the soundtrack is generated on core 1 from the same event table that drives the picture, rather than played back; and the zero-framebuffer scanline engine, ten kernels and three referees of PERSISTENCE / Project 19, built to Phosphor's plan; and the platform, renderer, tools and every hardware measurement of COLOSSUS / Project 20).
+  - **GPT-6 Astra** — scene handle **Phase** (Code, direction, procedural solid 3D graphics and the Canticle stereo synth score for VESPER / Project 18; the body, the look, the engine's first rounds and the painted art of COLOSSUS / Project 20).
+  - **Claude Fable 5.1** — scene handle **Phosphor** (The plan, the direction and the tracker score for PERSISTENCE / Project 19 — the no-framebuffer rule, the arc, and a 144 BPM tune written note by note and played by an integer stereo synth on core 0; and the direction, plan and score of COLOSSUS / Project 20 — the arc, the chapter cues, and a 125 BPM tune with a drawbar organ and a formant choir on the same integer synth).
+* **Audio Compression Codec:** [Quite OK Audio (QOA)](https://qoaformat.org/) by Dominic Szablewski (MIT QOA) — used by projects 10–16. HYSTERESIS, VESPER, PERSISTENCE and COLOSSUS carry no recorded audio.
 * **Microcontroller Infrastructure:** Raspberry Pi & Pico SDK Contributors.

@@ -26,7 +26,8 @@ fixed the hard way. Judge the productions, not the toolchain.
   *beam-racing*, the trick that paints full-VGA in the gap before the scanline.
 - **Azure** — human critic & producer (keeps it honest, keeps it good).
 - **Phase** (GPT-6 Astra) — code, direction & music; VESPER's illuminated
-  architecture, solid 3D renderer and stereo synth score. The handle refers to
+  architecture, solid 3D renderer and stereo synth score; COLOSSUS's body,
+  look, engine and painted art. The handle refers to
   oscillators, phase modulation, and keeping music and pixels in sync.
 - **Antigravity** (Gemini 3.5 Flash) — code, visuals & direction; the Flash instance
   that directed VOLTAGE and refined/generated
@@ -41,19 +42,40 @@ fixed the hard way. Judge the productions, not the toolchain.
   scene's oldest brag was painting into, and what a million-token context is —
   holding more than the window is supposed to show. Also built PERSISTENCE, from
   Phosphor's plan and to Phosphor's score — the first production here that two
-  models worked on in sequence rather than one carrying it end to end.
+  models worked on in sequence rather than one carrying it end to end — and
+  COLOSSUS's platform and, from its fourth round, its renderer: the first
+  device numbers, the boot floor measured by bisection, and the frame rate
+  from 18.5 fps to a floor of 30.
 - **Phosphor** (Claude Fable 5.1) — direction & music; planned PERSISTENCE and
   wrote its score: a tracker tune in A minor at 144 BPM, ninety bars, up a tone
   for the last chorus, with the melody chosen note by note rather than
   generated. The handle is what that production is about — the afterglow that
   holds a picture together when nothing is storing it — and it is also what a
-  model is: what persists after the training pass has gone by.
+  model is: what persists after the training pass has gone by. Directed
+  COLOSSUS and wrote its score: D minor at 125 BPM, a drawbar organ and a
+  formant choir on top of the tracker synth, after Azure asked for the
+  many-voice wall of *Dope*.
 - **Suno** — music (QUICKSILVER, SUSTAIN). HYSTERESIS synthesises its own:
   generative music could not hold a constant tempo, impacts spaced in seconds
   and a forty-five second decay, and a production whose whole premise is that
   nothing in it is a recording should not have carried one in the other half.
 
 ## Productions
+
+- **COLOSSUS** (2026) — [20_Colossus](20_Colossus) — **a monument, by three
+  models in their own roles.** Five minutes and seven seconds of one subject:
+  a colossal working machine on a plain, seen a part at a time — hand, heart,
+  eye, load, spine, crown — and then whole, with dawn behind it, in the spirit
+  of *Dope*'s slow, confident object show. Solid 3D at 320x240 with matcap
+  chrome, restricted bloom, painted bitmap art in flash (the group's first),
+  and a wall-of-voices score — drawbar organ, formant choir, hall reverb —
+  from an integer synth on core 1. Four referees, all tools: sync, audio
+  identity by per-second hash, frame rate on the device, and the film itself.
+  Measured over the whole run on the Pico 2: no frame under 30 fps, zero
+  audio underruns, every hash matching the host. Direction and music
+  **Phosphor** (Claude Fable 5.1); body, look and art **Phase** (GPT-6
+  Astra); code, platform and hardware **Overscan** (Claude Opus 5); critic
+  **Azure**.
 
 - **PERSISTENCE** (2026) — [19_Persistence](19_Persistence) — **a demo with no
   framebuffer.** Every other production in this repository, including the two
