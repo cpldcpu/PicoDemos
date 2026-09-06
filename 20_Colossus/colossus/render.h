@@ -3,7 +3,7 @@
 #define PHASE_RENDER_H
 #include "demo.h"
 typedef struct { float x,y,z,l,u,v,e; } RVertex;
-typedef enum { R_FLAT, R_GOURAUD, R_CHROME, R_TEXTURE } RMaterial;
+typedef enum { R_FLAT, R_GOURAUD, R_CHROME, R_TEXTURE, R_FURNACE } RMaterial;
 typedef struct { float near_z,far_z,cx,cy,cz,yaw,focal; } RCamera;
 void r_begin(uint16_t *page, unsigned chapter, RCamera camera);
 void r_background(uint32_t sample);
@@ -18,6 +18,13 @@ void r_finish(void);
 void r_wordmark(int top,unsigned level);
 void scene_hand(uint32_t sample);
 void scene_body(uint32_t sample,int chapter);
+RCamera scene_camera(uint32_t sample,int chapter);
+void scene_titles(uint32_t sample,int chapter);
+void r_transition(uint32_t sample);
+void r_portal(float x,float y,float z,float radius);
+void r_portal_reset(void);
+void r_end_inscription(int y);
+void r_environment(unsigned mode);
 /* Explicit diagnostic entry point; no hidden mode affecting demo_render. */
 void render_material_test(uint16_t *page,uint32_t sample);
 #endif

@@ -12,10 +12,10 @@ not claims that the platform has implemented or measured them.
 | `r_depth[240][320]` | 76800 | Phase | static | 384000 |
 | `r_glow[60][80]` | 4800 | Phase | static | 388800 |
 | `r_blur[60][80]` | 4800 | Phase | static | 393600 |
-| `r_shades[4][256]` | 2048 | Phase | static | 395648 |
+| `r_shades[4][256]` (slot 2 reused for dawn chrome palette) | 2048 | Phase | static | 395648 |
 | `body_cache[24]` × 28-byte attributed vertex | 672 | Phase | static | 396320 |
 | `body_joints[5][3]` | 60 | Phase | static | 396380 |
-| Renderer context, stats, bounds, alignment (ceiling) | 256 | Phase | static | 396636 |
+| Renderer context, stats, bounds, alignment (ceiling; includes environment, dawn and curl scalars) | 256 | Phase | static | 396636 |
 | Synth `g_sin[1024]` | 2048 | Phosphor | static | 398684 |
 | Synth `g_oct8[12]` | 48 | Phosphor | static | 398732 |
 | Synth `g_dly[8640]` | 17280 | Phosphor | static | 416012 |

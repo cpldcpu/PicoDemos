@@ -1,0 +1,1818 @@
+[
+  {
+    "sample": 184320,
+    "triangles": 0,
+    "fill": 0,
+    "embers": 69,
+    "chapter": 0,
+    "name": "chapter-overture"
+  },
+  {
+    "sample": 737280,
+    "triangles": 70,
+    "fill": 3089,
+    "embers": 82,
+    "chapter": 1,
+    "name": "chapter-plain"
+  },
+  {
+    "sample": 1474560,
+    "triangles": 324,
+    "fill": 47217,
+    "embers": 104,
+    "chapter": 2,
+    "name": "chapter-hand"
+  },
+  {
+    "sample": 2211840,
+    "triangles": 144,
+    "fill": 31996,
+    "embers": 111,
+    "chapter": 3,
+    "name": "chapter-heart"
+  },
+  {
+    "sample": 2949120,
+    "triangles": 182,
+    "fill": 41826,
+    "embers": 84,
+    "chapter": 4,
+    "name": "chapter-eye"
+  },
+  {
+    "sample": 3686400,
+    "triangles": 158,
+    "fill": 17865,
+    "embers": 127,
+    "chapter": 5,
+    "name": "chapter-load"
+  },
+  {
+    "sample": 4608000,
+    "triangles": 616,
+    "fill": 49112,
+    "embers": 103,
+    "chapter": 6,
+    "name": "chapter-spine"
+  },
+  {
+    "sample": 5529600,
+    "triangles": 32,
+    "fill": 18840,
+    "embers": 115,
+    "chapter": 7,
+    "name": "chapter-crown"
+  },
+  {
+    "sample": 6266880,
+    "triangles": 450,
+    "fill": 11674,
+    "embers": 115,
+    "chapter": 8,
+    "name": "chapter-reveal"
+  },
+  {
+    "sample": 7004160,
+    "triangles": 418,
+    "fill": 11642,
+    "embers": 64,
+    "chapter": 9,
+    "name": "chapter-coda"
+  },
+  {
+    "sample": 344640,
+    "triangles": 8,
+    "fill": 2573,
+    "embers": 72,
+    "chapter": 0,
+    "name": "transition-008-before"
+  },
+  {
+    "sample": 368640,
+    "triangles": 74,
+    "fill": 11633,
+    "embers": 75,
+    "chapter": 1,
+    "name": "transition-008-downbeat"
+  },
+  {
+    "sample": 392640,
+    "triangles": 74,
+    "fill": 5390,
+    "embers": 75,
+    "chapter": 1,
+    "name": "transition-008-after"
+  },
+  {
+    "sample": 1081920,
+    "triangles": 74,
+    "fill": 5658,
+    "embers": 89,
+    "chapter": 1,
+    "name": "transition-024-before"
+  },
+  {
+    "sample": 1105920,
+    "triangles": 328,
+    "fill": 52043,
+    "embers": 94,
+    "chapter": 2,
+    "name": "transition-024-downbeat"
+  },
+  {
+    "sample": 1129920,
+    "triangles": 328,
+    "fill": 45820,
+    "embers": 94,
+    "chapter": 2,
+    "name": "transition-024-after"
+  },
+  {
+    "sample": 1819200,
+    "triangles": 326,
+    "fill": 53140,
+    "embers": 107,
+    "chapter": 2,
+    "name": "transition-040-before"
+  },
+  {
+    "sample": 1843200,
+    "triangles": 146,
+    "fill": 39885,
+    "embers": 108,
+    "chapter": 3,
+    "name": "transition-040-downbeat"
+  },
+  {
+    "sample": 1867200,
+    "triangles": 146,
+    "fill": 33593,
+    "embers": 108,
+    "chapter": 3,
+    "name": "transition-040-after"
+  },
+  {
+    "sample": 2556480,
+    "triangles": 148,
+    "fill": 35613,
+    "embers": 113,
+    "chapter": 3,
+    "name": "transition-056-before"
+  },
+  {
+    "sample": 2580480,
+    "triangles": 186,
+    "fill": 50466,
+    "embers": 78,
+    "chapter": 4,
+    "name": "transition-056-downbeat"
+  },
+  {
+    "sample": 2604480,
+    "triangles": 186,
+    "fill": 44226,
+    "embers": 78,
+    "chapter": 4,
+    "name": "transition-056-after"
+  },
+  {
+    "sample": 3293760,
+    "triangles": 186,
+    "fill": 22244,
+    "embers": 94,
+    "chapter": 4,
+    "name": "transition-072-before"
+  },
+  {
+    "sample": 3317760,
+    "triangles": 174,
+    "fill": 26084,
+    "embers": 126,
+    "chapter": 5,
+    "name": "transition-072-downbeat"
+  },
+  {
+    "sample": 3341760,
+    "triangles": 174,
+    "fill": 19819,
+    "embers": 126,
+    "chapter": 5,
+    "name": "transition-072-after"
+  },
+  {
+    "sample": 4031040,
+    "triangles": 166,
+    "fill": 21159,
+    "embers": 127,
+    "chapter": 5,
+    "name": "transition-088-before"
+  },
+  {
+    "sample": 4055040,
+    "triangles": 154,
+    "fill": 18769,
+    "embers": 115,
+    "chapter": 6,
+    "name": "transition-088-downbeat"
+  },
+  {
+    "sample": 4079040,
+    "triangles": 158,
+    "fill": 12942,
+    "embers": 115,
+    "chapter": 6,
+    "name": "transition-088-after"
+  },
+  {
+    "sample": 5136960,
+    "triangles": 630,
+    "fill": 8480,
+    "embers": 115,
+    "chapter": 6,
+    "name": "transition-112-before"
+  },
+  {
+    "sample": 5160960,
+    "triangles": 36,
+    "fill": 27451,
+    "embers": 115,
+    "chapter": 7,
+    "name": "transition-112-downbeat"
+  },
+  {
+    "sample": 5184960,
+    "triangles": 36,
+    "fill": 21210,
+    "embers": 115,
+    "chapter": 7,
+    "name": "transition-112-after"
+  },
+  {
+    "sample": 5874240,
+    "triangles": 36,
+    "fill": 21437,
+    "embers": 115,
+    "chapter": 7,
+    "name": "transition-128-before"
+  },
+  {
+    "sample": 5898240,
+    "triangles": 476,
+    "fill": 44278,
+    "embers": 115,
+    "chapter": 8,
+    "name": "transition-128-downbeat"
+  },
+  {
+    "sample": 5922240,
+    "triangles": 472,
+    "fill": 38884,
+    "embers": 115,
+    "chapter": 8,
+    "name": "transition-128-after"
+  },
+  {
+    "sample": 6611520,
+    "triangles": 454,
+    "fill": 12653,
+    "embers": 115,
+    "chapter": 8,
+    "name": "transition-144-before"
+  },
+  {
+    "sample": 6635520,
+    "triangles": 454,
+    "fill": 14540,
+    "embers": 64,
+    "chapter": 9,
+    "name": "transition-144-downbeat"
+  },
+  {
+    "sample": 6659520,
+    "triangles": 454,
+    "fill": 12638,
+    "embers": 64,
+    "chapter": 9,
+    "name": "transition-144-after"
+  },
+  {
+    "sample": 23040,
+    "triangles": 0,
+    "fill": 0,
+    "embers": 66,
+    "chapter": 0,
+    "name": "bar-000"
+  },
+  {
+    "sample": 69120,
+    "triangles": 0,
+    "fill": 0,
+    "embers": 66,
+    "chapter": 0,
+    "name": "bar-001"
+  },
+  {
+    "sample": 115200,
+    "triangles": 0,
+    "fill": 0,
+    "embers": 67,
+    "chapter": 0,
+    "name": "bar-002"
+  },
+  {
+    "sample": 161280,
+    "triangles": 0,
+    "fill": 0,
+    "embers": 68,
+    "chapter": 0,
+    "name": "bar-003"
+  },
+  {
+    "sample": 207360,
+    "triangles": 0,
+    "fill": 0,
+    "embers": 69,
+    "chapter": 0,
+    "name": "bar-004"
+  },
+  {
+    "sample": 253440,
+    "triangles": 4,
+    "fill": 173,
+    "embers": 70,
+    "chapter": 0,
+    "name": "bar-005"
+  },
+  {
+    "sample": 299520,
+    "triangles": 4,
+    "fill": 173,
+    "embers": 71,
+    "chapter": 0,
+    "name": "bar-006"
+  },
+  {
+    "sample": 345600,
+    "triangles": 8,
+    "fill": 2573,
+    "embers": 72,
+    "chapter": 0,
+    "name": "bar-007"
+  },
+  {
+    "sample": 391680,
+    "triangles": 74,
+    "fill": 5390,
+    "embers": 75,
+    "chapter": 1,
+    "name": "bar-008"
+  },
+  {
+    "sample": 437760,
+    "triangles": 70,
+    "fill": 3000,
+    "embers": 75,
+    "chapter": 1,
+    "name": "bar-009"
+  },
+  {
+    "sample": 483840,
+    "triangles": 70,
+    "fill": 3004,
+    "embers": 75,
+    "chapter": 1,
+    "name": "bar-010"
+  },
+  {
+    "sample": 529920,
+    "triangles": 70,
+    "fill": 3027,
+    "embers": 76,
+    "chapter": 1,
+    "name": "bar-011"
+  },
+  {
+    "sample": 576000,
+    "triangles": 70,
+    "fill": 3062,
+    "embers": 77,
+    "chapter": 1,
+    "name": "bar-012"
+  },
+  {
+    "sample": 622080,
+    "triangles": 70,
+    "fill": 3052,
+    "embers": 77,
+    "chapter": 1,
+    "name": "bar-013"
+  },
+  {
+    "sample": 668160,
+    "triangles": 70,
+    "fill": 3090,
+    "embers": 78,
+    "chapter": 1,
+    "name": "bar-014"
+  },
+  {
+    "sample": 714240,
+    "triangles": 70,
+    "fill": 3090,
+    "embers": 79,
+    "chapter": 1,
+    "name": "bar-015"
+  },
+  {
+    "sample": 760320,
+    "triangles": 70,
+    "fill": 3135,
+    "embers": 82,
+    "chapter": 1,
+    "name": "bar-016"
+  },
+  {
+    "sample": 806400,
+    "triangles": 70,
+    "fill": 3163,
+    "embers": 82,
+    "chapter": 1,
+    "name": "bar-017"
+  },
+  {
+    "sample": 852480,
+    "triangles": 70,
+    "fill": 3203,
+    "embers": 83,
+    "chapter": 1,
+    "name": "bar-018"
+  },
+  {
+    "sample": 898560,
+    "triangles": 70,
+    "fill": 3173,
+    "embers": 84,
+    "chapter": 1,
+    "name": "bar-019"
+  },
+  {
+    "sample": 944640,
+    "triangles": 70,
+    "fill": 3235,
+    "embers": 86,
+    "chapter": 1,
+    "name": "bar-020"
+  },
+  {
+    "sample": 990720,
+    "triangles": 70,
+    "fill": 3258,
+    "embers": 86,
+    "chapter": 1,
+    "name": "bar-021"
+  },
+  {
+    "sample": 1036800,
+    "triangles": 70,
+    "fill": 3261,
+    "embers": 87,
+    "chapter": 1,
+    "name": "bar-022"
+  },
+  {
+    "sample": 1082880,
+    "triangles": 74,
+    "fill": 5659,
+    "embers": 89,
+    "chapter": 1,
+    "name": "bar-023"
+  },
+  {
+    "sample": 1128960,
+    "triangles": 328,
+    "fill": 45814,
+    "embers": 94,
+    "chapter": 2,
+    "name": "bar-024"
+  },
+  {
+    "sample": 1175040,
+    "triangles": 324,
+    "fill": 43642,
+    "embers": 94,
+    "chapter": 2,
+    "name": "bar-025"
+  },
+  {
+    "sample": 1221120,
+    "triangles": 324,
+    "fill": 43663,
+    "embers": 94,
+    "chapter": 2,
+    "name": "bar-026"
+  },
+  {
+    "sample": 1267200,
+    "triangles": 324,
+    "fill": 44468,
+    "embers": 94,
+    "chapter": 2,
+    "name": "bar-027"
+  },
+  {
+    "sample": 1313280,
+    "triangles": 324,
+    "fill": 45242,
+    "embers": 95,
+    "chapter": 2,
+    "name": "bar-028"
+  },
+  {
+    "sample": 1359360,
+    "triangles": 324,
+    "fill": 45964,
+    "embers": 95,
+    "chapter": 2,
+    "name": "bar-029"
+  },
+  {
+    "sample": 1405440,
+    "triangles": 324,
+    "fill": 46400,
+    "embers": 96,
+    "chapter": 2,
+    "name": "bar-030"
+  },
+  {
+    "sample": 1451520,
+    "triangles": 324,
+    "fill": 47034,
+    "embers": 98,
+    "chapter": 2,
+    "name": "bar-031"
+  },
+  {
+    "sample": 1497600,
+    "triangles": 324,
+    "fill": 47503,
+    "embers": 104,
+    "chapter": 2,
+    "name": "bar-032"
+  },
+  {
+    "sample": 1543680,
+    "triangles": 324,
+    "fill": 47776,
+    "embers": 104,
+    "chapter": 2,
+    "name": "bar-033"
+  },
+  {
+    "sample": 1589760,
+    "triangles": 322,
+    "fill": 48313,
+    "embers": 104,
+    "chapter": 2,
+    "name": "bar-034"
+  },
+  {
+    "sample": 1635840,
+    "triangles": 322,
+    "fill": 49121,
+    "embers": 104,
+    "chapter": 2,
+    "name": "bar-035"
+  },
+  {
+    "sample": 1681920,
+    "triangles": 322,
+    "fill": 49886,
+    "embers": 105,
+    "chapter": 2,
+    "name": "bar-036"
+  },
+  {
+    "sample": 1728000,
+    "triangles": 322,
+    "fill": 50797,
+    "embers": 105,
+    "chapter": 2,
+    "name": "bar-037"
+  },
+  {
+    "sample": 1774080,
+    "triangles": 322,
+    "fill": 50712,
+    "embers": 106,
+    "chapter": 2,
+    "name": "bar-038"
+  },
+  {
+    "sample": 1820160,
+    "triangles": 326,
+    "fill": 53159,
+    "embers": 107,
+    "chapter": 2,
+    "name": "bar-039"
+  },
+  {
+    "sample": 1866240,
+    "triangles": 148,
+    "fill": 33604,
+    "embers": 108,
+    "chapter": 3,
+    "name": "bar-040"
+  },
+  {
+    "sample": 1912320,
+    "triangles": 140,
+    "fill": 31231,
+    "embers": 108,
+    "chapter": 3,
+    "name": "bar-041"
+  },
+  {
+    "sample": 1958400,
+    "triangles": 146,
+    "fill": 31331,
+    "embers": 108,
+    "chapter": 3,
+    "name": "bar-042"
+  },
+  {
+    "sample": 2004480,
+    "triangles": 146,
+    "fill": 31421,
+    "embers": 108,
+    "chapter": 3,
+    "name": "bar-043"
+  },
+  {
+    "sample": 2050560,
+    "triangles": 146,
+    "fill": 31912,
+    "embers": 109,
+    "chapter": 3,
+    "name": "bar-044"
+  },
+  {
+    "sample": 2096640,
+    "triangles": 146,
+    "fill": 31809,
+    "embers": 109,
+    "chapter": 3,
+    "name": "bar-045"
+  },
+  {
+    "sample": 2142720,
+    "triangles": 142,
+    "fill": 31768,
+    "embers": 110,
+    "chapter": 3,
+    "name": "bar-046"
+  },
+  {
+    "sample": 2188800,
+    "triangles": 142,
+    "fill": 32173,
+    "embers": 110,
+    "chapter": 3,
+    "name": "bar-047"
+  },
+  {
+    "sample": 2234880,
+    "triangles": 144,
+    "fill": 31993,
+    "embers": 111,
+    "chapter": 3,
+    "name": "bar-048"
+  },
+  {
+    "sample": 2280960,
+    "triangles": 142,
+    "fill": 32596,
+    "embers": 111,
+    "chapter": 3,
+    "name": "bar-049"
+  },
+  {
+    "sample": 2327040,
+    "triangles": 142,
+    "fill": 32647,
+    "embers": 111,
+    "chapter": 3,
+    "name": "bar-050"
+  },
+  {
+    "sample": 2373120,
+    "triangles": 148,
+    "fill": 32744,
+    "embers": 111,
+    "chapter": 3,
+    "name": "bar-051"
+  },
+  {
+    "sample": 2419200,
+    "triangles": 146,
+    "fill": 33256,
+    "embers": 111,
+    "chapter": 3,
+    "name": "bar-052"
+  },
+  {
+    "sample": 2465280,
+    "triangles": 148,
+    "fill": 33238,
+    "embers": 111,
+    "chapter": 3,
+    "name": "bar-053"
+  },
+  {
+    "sample": 2511360,
+    "triangles": 142,
+    "fill": 33253,
+    "embers": 112,
+    "chapter": 3,
+    "name": "bar-054"
+  },
+  {
+    "sample": 2557440,
+    "triangles": 146,
+    "fill": 35625,
+    "embers": 113,
+    "chapter": 3,
+    "name": "bar-055"
+  },
+  {
+    "sample": 2603520,
+    "triangles": 186,
+    "fill": 44226,
+    "embers": 78,
+    "chapter": 4,
+    "name": "bar-056"
+  },
+  {
+    "sample": 2649600,
+    "triangles": 182,
+    "fill": 41826,
+    "embers": 78,
+    "chapter": 4,
+    "name": "bar-057"
+  },
+  {
+    "sample": 2695680,
+    "triangles": 182,
+    "fill": 41826,
+    "embers": 78,
+    "chapter": 4,
+    "name": "bar-058"
+  },
+  {
+    "sample": 2741760,
+    "triangles": 182,
+    "fill": 41826,
+    "embers": 78,
+    "chapter": 4,
+    "name": "bar-059"
+  },
+  {
+    "sample": 2787840,
+    "triangles": 182,
+    "fill": 41826,
+    "embers": 79,
+    "chapter": 4,
+    "name": "bar-060"
+  },
+  {
+    "sample": 2833920,
+    "triangles": 182,
+    "fill": 41826,
+    "embers": 79,
+    "chapter": 4,
+    "name": "bar-061"
+  },
+  {
+    "sample": 2880000,
+    "triangles": 182,
+    "fill": 41826,
+    "embers": 79,
+    "chapter": 4,
+    "name": "bar-062"
+  },
+  {
+    "sample": 2926080,
+    "triangles": 182,
+    "fill": 41826,
+    "embers": 80,
+    "chapter": 4,
+    "name": "bar-063"
+  },
+  {
+    "sample": 2972160,
+    "triangles": 182,
+    "fill": 43527,
+    "embers": 84,
+    "chapter": 4,
+    "name": "bar-064"
+  },
+  {
+    "sample": 3018240,
+    "triangles": 182,
+    "fill": 52230,
+    "embers": 84,
+    "chapter": 4,
+    "name": "bar-065"
+  },
+  {
+    "sample": 3064320,
+    "triangles": 182,
+    "fill": 55759,
+    "embers": 85,
+    "chapter": 4,
+    "name": "bar-066"
+  },
+  {
+    "sample": 3110400,
+    "triangles": 182,
+    "fill": 51542,
+    "embers": 85,
+    "chapter": 4,
+    "name": "bar-067"
+  },
+  {
+    "sample": 3156480,
+    "triangles": 182,
+    "fill": 9832,
+    "embers": 87,
+    "chapter": 4,
+    "name": "bar-068"
+  },
+  {
+    "sample": 3202560,
+    "triangles": 182,
+    "fill": 25400,
+    "embers": 88,
+    "chapter": 4,
+    "name": "bar-069"
+  },
+  {
+    "sample": 3248640,
+    "triangles": 182,
+    "fill": 25008,
+    "embers": 90,
+    "chapter": 4,
+    "name": "bar-070"
+  },
+  {
+    "sample": 3294720,
+    "triangles": 186,
+    "fill": 22380,
+    "embers": 94,
+    "chapter": 4,
+    "name": "bar-071"
+  },
+  {
+    "sample": 3340800,
+    "triangles": 174,
+    "fill": 19813,
+    "embers": 126,
+    "chapter": 5,
+    "name": "bar-072"
+  },
+  {
+    "sample": 3386880,
+    "triangles": 166,
+    "fill": 17403,
+    "embers": 126,
+    "chapter": 5,
+    "name": "bar-073"
+  },
+  {
+    "sample": 3432960,
+    "triangles": 164,
+    "fill": 17416,
+    "embers": 127,
+    "chapter": 5,
+    "name": "bar-074"
+  },
+  {
+    "sample": 3479040,
+    "triangles": 164,
+    "fill": 17491,
+    "embers": 127,
+    "chapter": 5,
+    "name": "bar-075"
+  },
+  {
+    "sample": 3525120,
+    "triangles": 162,
+    "fill": 17578,
+    "embers": 127,
+    "chapter": 5,
+    "name": "bar-076"
+  },
+  {
+    "sample": 3571200,
+    "triangles": 164,
+    "fill": 17649,
+    "embers": 127,
+    "chapter": 5,
+    "name": "bar-077"
+  },
+  {
+    "sample": 3617280,
+    "triangles": 164,
+    "fill": 17749,
+    "embers": 127,
+    "chapter": 5,
+    "name": "bar-078"
+  },
+  {
+    "sample": 3663360,
+    "triangles": 160,
+    "fill": 17821,
+    "embers": 127,
+    "chapter": 5,
+    "name": "bar-079"
+  },
+  {
+    "sample": 3709440,
+    "triangles": 160,
+    "fill": 17906,
+    "embers": 127,
+    "chapter": 5,
+    "name": "bar-080"
+  },
+  {
+    "sample": 3755520,
+    "triangles": 160,
+    "fill": 18018,
+    "embers": 127,
+    "chapter": 5,
+    "name": "bar-081"
+  },
+  {
+    "sample": 3801600,
+    "triangles": 160,
+    "fill": 18191,
+    "embers": 127,
+    "chapter": 5,
+    "name": "bar-082"
+  },
+  {
+    "sample": 3847680,
+    "triangles": 162,
+    "fill": 18314,
+    "embers": 127,
+    "chapter": 5,
+    "name": "bar-083"
+  },
+  {
+    "sample": 3893760,
+    "triangles": 164,
+    "fill": 18464,
+    "embers": 127,
+    "chapter": 5,
+    "name": "bar-084"
+  },
+  {
+    "sample": 3939840,
+    "triangles": 164,
+    "fill": 18584,
+    "embers": 127,
+    "chapter": 5,
+    "name": "bar-085"
+  },
+  {
+    "sample": 3985920,
+    "triangles": 164,
+    "fill": 18632,
+    "embers": 127,
+    "chapter": 5,
+    "name": "bar-086"
+  },
+  {
+    "sample": 4032000,
+    "triangles": 166,
+    "fill": 21158,
+    "embers": 127,
+    "chapter": 5,
+    "name": "bar-087"
+  },
+  {
+    "sample": 4078080,
+    "triangles": 158,
+    "fill": 12931,
+    "embers": 115,
+    "chapter": 6,
+    "name": "bar-088"
+  },
+  {
+    "sample": 4124160,
+    "triangles": 150,
+    "fill": 10739,
+    "embers": 115,
+    "chapter": 6,
+    "name": "bar-089"
+  },
+  {
+    "sample": 4170240,
+    "triangles": 150,
+    "fill": 10267,
+    "embers": 115,
+    "chapter": 6,
+    "name": "bar-090"
+  },
+  {
+    "sample": 4216320,
+    "triangles": 156,
+    "fill": 9787,
+    "embers": 115,
+    "chapter": 6,
+    "name": "bar-091"
+  },
+  {
+    "sample": 4262400,
+    "triangles": 150,
+    "fill": 8951,
+    "embers": 115,
+    "chapter": 6,
+    "name": "bar-092"
+  },
+  {
+    "sample": 4308480,
+    "triangles": 156,
+    "fill": 8367,
+    "embers": 115,
+    "chapter": 6,
+    "name": "bar-093"
+  },
+  {
+    "sample": 4354560,
+    "triangles": 150,
+    "fill": 8431,
+    "embers": 115,
+    "chapter": 6,
+    "name": "bar-094"
+  },
+  {
+    "sample": 4400640,
+    "triangles": 154,
+    "fill": 8149,
+    "embers": 115,
+    "chapter": 6,
+    "name": "bar-095"
+  },
+  {
+    "sample": 4446720,
+    "triangles": 596,
+    "fill": 74092,
+    "embers": 102,
+    "chapter": 6,
+    "name": "bar-096"
+  },
+  {
+    "sample": 4492800,
+    "triangles": 584,
+    "fill": 67509,
+    "embers": 102,
+    "chapter": 6,
+    "name": "bar-097"
+  },
+  {
+    "sample": 4538880,
+    "triangles": 590,
+    "fill": 59596,
+    "embers": 102,
+    "chapter": 6,
+    "name": "bar-098"
+  },
+  {
+    "sample": 4584960,
+    "triangles": 614,
+    "fill": 52834,
+    "embers": 102,
+    "chapter": 6,
+    "name": "bar-099"
+  },
+  {
+    "sample": 4631040,
+    "triangles": 624,
+    "fill": 45579,
+    "embers": 103,
+    "chapter": 6,
+    "name": "bar-100"
+  },
+  {
+    "sample": 4677120,
+    "triangles": 618,
+    "fill": 40511,
+    "embers": 103,
+    "chapter": 6,
+    "name": "bar-101"
+  },
+  {
+    "sample": 4723200,
+    "triangles": 630,
+    "fill": 36881,
+    "embers": 104,
+    "chapter": 6,
+    "name": "bar-102"
+  },
+  {
+    "sample": 4769280,
+    "triangles": 620,
+    "fill": 32804,
+    "embers": 106,
+    "chapter": 6,
+    "name": "bar-103"
+  },
+  {
+    "sample": 4815360,
+    "triangles": 622,
+    "fill": 27921,
+    "embers": 115,
+    "chapter": 6,
+    "name": "bar-104"
+  },
+  {
+    "sample": 4861440,
+    "triangles": 624,
+    "fill": 22624,
+    "embers": 115,
+    "chapter": 6,
+    "name": "bar-105"
+  },
+  {
+    "sample": 4907520,
+    "triangles": 622,
+    "fill": 17215,
+    "embers": 115,
+    "chapter": 6,
+    "name": "bar-106"
+  },
+  {
+    "sample": 4953600,
+    "triangles": 624,
+    "fill": 12737,
+    "embers": 115,
+    "chapter": 6,
+    "name": "bar-107"
+  },
+  {
+    "sample": 4999680,
+    "triangles": 628,
+    "fill": 9470,
+    "embers": 115,
+    "chapter": 6,
+    "name": "bar-108"
+  },
+  {
+    "sample": 5045760,
+    "triangles": 626,
+    "fill": 7947,
+    "embers": 115,
+    "chapter": 6,
+    "name": "bar-109"
+  },
+  {
+    "sample": 5091840,
+    "triangles": 628,
+    "fill": 6859,
+    "embers": 115,
+    "chapter": 6,
+    "name": "bar-110"
+  },
+  {
+    "sample": 5137920,
+    "triangles": 630,
+    "fill": 8475,
+    "embers": 115,
+    "chapter": 6,
+    "name": "bar-111"
+  },
+  {
+    "sample": 5184000,
+    "triangles": 36,
+    "fill": 21208,
+    "embers": 115,
+    "chapter": 7,
+    "name": "bar-112"
+  },
+  {
+    "sample": 5230080,
+    "triangles": 32,
+    "fill": 18822,
+    "embers": 115,
+    "chapter": 7,
+    "name": "bar-113"
+  },
+  {
+    "sample": 5276160,
+    "triangles": 32,
+    "fill": 18811,
+    "embers": 115,
+    "chapter": 7,
+    "name": "bar-114"
+  },
+  {
+    "sample": 5322240,
+    "triangles": 32,
+    "fill": 18816,
+    "embers": 115,
+    "chapter": 7,
+    "name": "bar-115"
+  },
+  {
+    "sample": 5368320,
+    "triangles": 32,
+    "fill": 18803,
+    "embers": 115,
+    "chapter": 7,
+    "name": "bar-116"
+  },
+  {
+    "sample": 5414400,
+    "triangles": 32,
+    "fill": 18819,
+    "embers": 115,
+    "chapter": 7,
+    "name": "bar-117"
+  },
+  {
+    "sample": 5460480,
+    "triangles": 32,
+    "fill": 18813,
+    "embers": 115,
+    "chapter": 7,
+    "name": "bar-118"
+  },
+  {
+    "sample": 5506560,
+    "triangles": 32,
+    "fill": 18830,
+    "embers": 115,
+    "chapter": 7,
+    "name": "bar-119"
+  },
+  {
+    "sample": 5552640,
+    "triangles": 32,
+    "fill": 18857,
+    "embers": 115,
+    "chapter": 7,
+    "name": "bar-120"
+  },
+  {
+    "sample": 5598720,
+    "triangles": 32,
+    "fill": 18889,
+    "embers": 115,
+    "chapter": 7,
+    "name": "bar-121"
+  },
+  {
+    "sample": 5644800,
+    "triangles": 32,
+    "fill": 18912,
+    "embers": 115,
+    "chapter": 7,
+    "name": "bar-122"
+  },
+  {
+    "sample": 5690880,
+    "triangles": 32,
+    "fill": 18946,
+    "embers": 115,
+    "chapter": 7,
+    "name": "bar-123"
+  },
+  {
+    "sample": 5736960,
+    "triangles": 32,
+    "fill": 18975,
+    "embers": 115,
+    "chapter": 7,
+    "name": "bar-124"
+  },
+  {
+    "sample": 5783040,
+    "triangles": 32,
+    "fill": 18998,
+    "embers": 115,
+    "chapter": 7,
+    "name": "bar-125"
+  },
+  {
+    "sample": 5829120,
+    "triangles": 32,
+    "fill": 19016,
+    "embers": 115,
+    "chapter": 7,
+    "name": "bar-126"
+  },
+  {
+    "sample": 5875200,
+    "triangles": 36,
+    "fill": 21436,
+    "embers": 115,
+    "chapter": 7,
+    "name": "bar-127"
+  },
+  {
+    "sample": 5921280,
+    "triangles": 472,
+    "fill": 38916,
+    "embers": 115,
+    "chapter": 8,
+    "name": "bar-128"
+  },
+  {
+    "sample": 5967360,
+    "triangles": 460,
+    "fill": 35738,
+    "embers": 115,
+    "chapter": 8,
+    "name": "bar-129"
+  },
+  {
+    "sample": 6013440,
+    "triangles": 452,
+    "fill": 28888,
+    "embers": 115,
+    "chapter": 8,
+    "name": "bar-130"
+  },
+  {
+    "sample": 6059520,
+    "triangles": 454,
+    "fill": 20860,
+    "embers": 115,
+    "chapter": 8,
+    "name": "bar-131"
+  },
+  {
+    "sample": 6105600,
+    "triangles": 418,
+    "fill": 16518,
+    "embers": 115,
+    "chapter": 8,
+    "name": "bar-132"
+  },
+  {
+    "sample": 6151680,
+    "triangles": 420,
+    "fill": 13495,
+    "embers": 115,
+    "chapter": 8,
+    "name": "bar-133"
+  },
+  {
+    "sample": 6197760,
+    "triangles": 450,
+    "fill": 11873,
+    "embers": 115,
+    "chapter": 8,
+    "name": "bar-134"
+  },
+  {
+    "sample": 6243840,
+    "triangles": 450,
+    "fill": 11694,
+    "embers": 115,
+    "chapter": 8,
+    "name": "bar-135"
+  },
+  {
+    "sample": 6289920,
+    "triangles": 450,
+    "fill": 11678,
+    "embers": 115,
+    "chapter": 8,
+    "name": "bar-136"
+  },
+  {
+    "sample": 6336000,
+    "triangles": 450,
+    "fill": 11670,
+    "embers": 115,
+    "chapter": 8,
+    "name": "bar-137"
+  },
+  {
+    "sample": 6382080,
+    "triangles": 450,
+    "fill": 11670,
+    "embers": 115,
+    "chapter": 8,
+    "name": "bar-138"
+  },
+  {
+    "sample": 6428160,
+    "triangles": 450,
+    "fill": 11678,
+    "embers": 115,
+    "chapter": 8,
+    "name": "bar-139"
+  },
+  {
+    "sample": 6474240,
+    "triangles": 450,
+    "fill": 11694,
+    "embers": 115,
+    "chapter": 8,
+    "name": "bar-140"
+  },
+  {
+    "sample": 6520320,
+    "triangles": 450,
+    "fill": 11690,
+    "embers": 115,
+    "chapter": 8,
+    "name": "bar-141"
+  },
+  {
+    "sample": 6566400,
+    "triangles": 450,
+    "fill": 11690,
+    "embers": 115,
+    "chapter": 8,
+    "name": "bar-142"
+  },
+  {
+    "sample": 6612480,
+    "triangles": 454,
+    "fill": 12654,
+    "embers": 115,
+    "chapter": 8,
+    "name": "bar-143"
+  },
+  {
+    "sample": 6658560,
+    "triangles": 454,
+    "fill": 12642,
+    "embers": 64,
+    "chapter": 9,
+    "name": "bar-144"
+  },
+  {
+    "sample": 6704640,
+    "triangles": 450,
+    "fill": 11665,
+    "embers": 64,
+    "chapter": 9,
+    "name": "bar-145"
+  },
+  {
+    "sample": 6750720,
+    "triangles": 450,
+    "fill": 11663,
+    "embers": 64,
+    "chapter": 9,
+    "name": "bar-146"
+  },
+  {
+    "sample": 6796800,
+    "triangles": 450,
+    "fill": 11677,
+    "embers": 64,
+    "chapter": 9,
+    "name": "bar-147"
+  },
+  {
+    "sample": 6842880,
+    "triangles": 442,
+    "fill": 11675,
+    "embers": 64,
+    "chapter": 9,
+    "name": "bar-148"
+  },
+  {
+    "sample": 6888960,
+    "triangles": 422,
+    "fill": 11680,
+    "embers": 64,
+    "chapter": 9,
+    "name": "bar-149"
+  },
+  {
+    "sample": 6935040,
+    "triangles": 426,
+    "fill": 11672,
+    "embers": 64,
+    "chapter": 9,
+    "name": "bar-150"
+  },
+  {
+    "sample": 6981120,
+    "triangles": 418,
+    "fill": 11669,
+    "embers": 64,
+    "chapter": 9,
+    "name": "bar-151"
+  },
+  {
+    "sample": 7027200,
+    "triangles": 430,
+    "fill": 11668,
+    "embers": 64,
+    "chapter": 9,
+    "name": "bar-152"
+  },
+  {
+    "sample": 7073280,
+    "triangles": 446,
+    "fill": 11668,
+    "embers": 64,
+    "chapter": 9,
+    "name": "bar-153"
+  },
+  {
+    "sample": 7119360,
+    "triangles": 442,
+    "fill": 11671,
+    "embers": 64,
+    "chapter": 9,
+    "name": "bar-154"
+  },
+  {
+    "sample": 7165440,
+    "triangles": 418,
+    "fill": 11670,
+    "embers": 64,
+    "chapter": 9,
+    "name": "bar-155"
+  },
+  {
+    "sample": 7211520,
+    "triangles": 426,
+    "fill": 11660,
+    "embers": 64,
+    "chapter": 9,
+    "name": "bar-156"
+  },
+  {
+    "sample": 7257600,
+    "triangles": 422,
+    "fill": 11669,
+    "embers": 64,
+    "chapter": 9,
+    "name": "bar-157"
+  },
+  {
+    "sample": 7303680,
+    "triangles": 422,
+    "fill": 11669,
+    "embers": 64,
+    "chapter": 9,
+    "name": "bar-158"
+  },
+  {
+    "sample": 7349760,
+    "triangles": 426,
+    "fill": 11659,
+    "embers": 64,
+    "chapter": 9,
+    "name": "bar-159"
+  },
+  {
+    "sample": 1140480,
+    "triangles": 328,
+    "fill": 43511,
+    "embers": 94,
+    "chapter": 2,
+    "name": "detail-24-75"
+  },
+  {
+    "sample": 1451520,
+    "triangles": 324,
+    "fill": 47034,
+    "embers": 98,
+    "chapter": 2,
+    "name": "detail-31-5"
+  },
+  {
+    "sample": 1797120,
+    "triangles": 322,
+    "fill": 50726,
+    "embers": 107,
+    "chapter": 2,
+    "name": "detail-39"
+  },
+  {
+    "sample": 1935360,
+    "triangles": 142,
+    "fill": 31262,
+    "embers": 108,
+    "chapter": 3,
+    "name": "detail-42"
+  },
+  {
+    "sample": 2119680,
+    "triangles": 142,
+    "fill": 31812,
+    "embers": 110,
+    "chapter": 3,
+    "name": "detail-46"
+  },
+  {
+    "sample": 2304000,
+    "triangles": 144,
+    "fill": 32617,
+    "embers": 111,
+    "chapter": 3,
+    "name": "detail-50"
+  },
+  {
+    "sample": 2488320,
+    "triangles": 142,
+    "fill": 33256,
+    "embers": 112,
+    "chapter": 3,
+    "name": "detail-54"
+  },
+  {
+    "sample": 2764800,
+    "triangles": 182,
+    "fill": 41826,
+    "embers": 79,
+    "chapter": 4,
+    "name": "detail-60"
+  },
+  {
+    "sample": 3041280,
+    "triangles": 182,
+    "fill": 56016,
+    "embers": 85,
+    "chapter": 4,
+    "name": "detail-66"
+  },
+  {
+    "sample": 3133440,
+    "triangles": 182,
+    "fill": 25808,
+    "embers": 87,
+    "chapter": 4,
+    "name": "detail-68"
+  },
+  {
+    "sample": 3225600,
+    "triangles": 182,
+    "fill": 44328,
+    "embers": 90,
+    "chapter": 4,
+    "name": "detail-70"
+  },
+  {
+    "sample": 3409920,
+    "triangles": 166,
+    "fill": 17380,
+    "embers": 127,
+    "chapter": 5,
+    "name": "detail-74"
+  },
+  {
+    "sample": 3594240,
+    "triangles": 164,
+    "fill": 17738,
+    "embers": 127,
+    "chapter": 5,
+    "name": "detail-78"
+  },
+  {
+    "sample": 3778560,
+    "triangles": 160,
+    "fill": 18120,
+    "embers": 127,
+    "chapter": 5,
+    "name": "detail-82"
+  },
+  {
+    "sample": 3962880,
+    "triangles": 164,
+    "fill": 18683,
+    "embers": 127,
+    "chapter": 5,
+    "name": "detail-86"
+  },
+  {
+    "sample": 4147200,
+    "triangles": 150,
+    "fill": 10588,
+    "embers": 115,
+    "chapter": 6,
+    "name": "detail-90"
+  },
+  {
+    "sample": 4423680,
+    "triangles": 600,
+    "fill": 76716,
+    "embers": 102,
+    "chapter": 6,
+    "name": "detail-96"
+  },
+  {
+    "sample": 4792320,
+    "triangles": 620,
+    "fill": 30500,
+    "embers": 115,
+    "chapter": 6,
+    "name": "detail-104"
+  },
+  {
+    "sample": 5068800,
+    "triangles": 628,
+    "fill": 7319,
+    "embers": 115,
+    "chapter": 6,
+    "name": "detail-110"
+  },
+  {
+    "sample": 5898700,
+    "triangles": 472,
+    "fill": 44286,
+    "embers": 115,
+    "chapter": 8,
+    "name": "detail-128-01"
+  },
+  {
+    "sample": 5944320,
+    "triangles": 464,
+    "fill": 36664,
+    "embers": 115,
+    "chapter": 8,
+    "name": "detail-129"
+  },
+  {
+    "sample": 5990400,
+    "triangles": 462,
+    "fill": 33097,
+    "embers": 115,
+    "chapter": 8,
+    "name": "detail-130"
+  },
+  {
+    "sample": 6174720,
+    "triangles": 438,
+    "fill": 12507,
+    "embers": 115,
+    "chapter": 8,
+    "name": "detail-134"
+  },
+  {
+    "sample": 6451200,
+    "triangles": 450,
+    "fill": 11674,
+    "embers": 115,
+    "chapter": 8,
+    "name": "detail-140"
+  },
+  {
+    "sample": 6658560,
+    "triangles": 454,
+    "fill": 12642,
+    "embers": 64,
+    "chapter": 9,
+    "name": "detail-144-5"
+  },
+  {
+    "sample": 6796800,
+    "triangles": 450,
+    "fill": 11677,
+    "embers": 64,
+    "chapter": 9,
+    "name": "detail-147-5"
+  },
+  {
+    "sample": 6935040,
+    "triangles": 426,
+    "fill": 11672,
+    "embers": 64,
+    "chapter": 9,
+    "name": "detail-150-5"
+  },
+  {
+    "sample": 7073280,
+    "triangles": 446,
+    "fill": 11668,
+    "embers": 64,
+    "chapter": 9,
+    "name": "detail-153-5"
+  },
+  {
+    "sample": 7234560,
+    "triangles": 424,
+    "fill": 11668,
+    "embers": 64,
+    "chapter": 9,
+    "name": "detail-157"
+  },
+  {
+    "sample": 7349760,
+    "triangles": 426,
+    "fill": 11659,
+    "embers": 64,
+    "chapter": 9,
+    "name": "detail-159-5"
+  }
+]

@@ -390,7 +390,7 @@ int song_transpose(uint32_t bar) { return bar >= 112 && bar < 128 ? 2 : 0; }
 
 static const char *const k_section_names[] = {
     "overture", "the plain", "the hand", "the heart", "the eye",
-    "the forge", "the spine", "the crown", "the colossus", "coda",
+    "the load", "the spine", "the crown", "the colossus", "coda",
 };
 
 int song_section(uint32_t bar)

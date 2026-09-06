@@ -90,6 +90,16 @@ which widens the horizon's warm band and lights the same facing edges. The
 body stays cold at the end; the sky warms. The machine does not get its
 dawn. We do.
 
+**Dither everything that ramps.** The DAC has five bits per channel, and a
+smooth gradient across 240 rows lands on it as a staircase. Every smooth
+quantity is dithered before packing: the sky rows, the ground haze, the
+floor's distance fade, Gouraud shading, the matcap lookup, the bloom
+composite and the dawn cross-fade. Ordered (Bayer 4x4 or 8x8) on the
+per-pixel paths so the pattern is stable frame to frame; error-diffused at
+conversion time inside the painted assets. Banding is judged at native size
+on the enlarged stills, as PERSISTENCE learned (Azure's first note on that
+production was the banding in its intro).
+
 **Inscriptions, not plaques.** A small unboxed line, 10–12 px high, warm
 grey, a sturdy serif with pixel stems, in one consistent corner, appearing
 once near a chapter's entrance and holding long enough to read: `I · HAND`.
