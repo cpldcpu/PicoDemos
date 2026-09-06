@@ -1,0 +1,64 @@
+{
+  "production": "VESPER / LATENT / 2026",
+  "credits": {
+    "scene_handle": "Phase",
+    "model": "GPT-6 Astra",
+    "critic": "Azure"
+  },
+  "score": "Canticle (approved revision)",
+  "hardware_tested": false,
+  "flash_image_bytes": 61640,
+  "uf2_bytes": 123904,
+  "uf2_sha256": "0a0fc74d36fecf265a942a3bd0328c315bc97596cb218897cab29fc626c61a84",
+  "main_sram_through_static_data_bytes": 484256,
+  "main_sram_remaining_for_heap_bytes": 40032,
+  "stack_bytes_in_each_scratch_bank": 4096,
+  "audio": {
+    "frames": 2880000,
+    "sample_rate": 24000,
+    "channels": 2,
+    "peak": 29308,
+    "rms": 3526.47,
+    "dc": -8.34,
+    "stereo_difference_rms": 1338.15
+  },
+  "host_tests": [
+    "7201 guarded frames including endpoint",
+    "DAC pixel format",
+    "nonblank interior frames",
+    "black endpoint",
+    "visual seek independence",
+    "exact chapter boundaries",
+    "complete stereo block independence: 1 versus 997 frames",
+    "silence after the score",
+    "signed integer overflow trapping",
+    "SDL video and audio using dummy drivers"
+  ],
+  "host_check_output": [
+    "PASS stereo synth: 2,880,000 samples/channel, blocks 1 and 997: 98ce36b36f832a53",
+    "PASS 7201 frames including black endpoint, guards, DAC layout, nonblank scenes, seek: 88902915db171efe; max 1014 triangles"
+  ],
+  "capture": [
+    {
+      "codec_type": "video",
+      "width": 960,
+      "height": 720,
+      "r_frame_rate": "60/1",
+      "duration": "120.000000"
+    },
+    {
+      "codec_type": "audio",
+      "sample_rate": "24000",
+      "channels": 2,
+      "r_frame_rate": "0/0",
+      "duration": "120.000000"
+    }
+  ],
+  "unverified": [
+    "physical VGA and PWM output",
+    "device render frame rate",
+    "runtime heap high-water mark",
+    "audio ring minimum on device",
+    "host/device audio equivalence"
+  ]
+}

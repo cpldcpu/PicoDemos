@@ -1,0 +1,21 @@
+{
+  "status": "approved and integrated",
+  "score": "Canticle",
+  "approval": "User: ok, that is much better. integrate it",
+  "approved_pcm_matches_production": true,
+  "stereo_frames_compared": 2880000,
+  "pcm_sha256": "c1176f368edf0bda20b1afbed42089bc4f616ecf750bd9ad277a5afcd5fcc411",
+  "video_audio_correlation_with_approved_pcm": 0.9996805862377722,
+  "release_sha256": {
+    "vesper/synth.c": "61344cb2078682f2b0de6b1f92fb6549a2bde457c5164eac386e9a226e0f227b",
+    "vesper/build_host/vesper.exe": "0830922f4051d239cb5a20c6b96d669a8d087b188ee3abf5f0aad35381e13c61",
+    "vesper_vga_rp2350.uf2": "dd1319605bd629d0b1406d69e992f1610cdd21511203fd6e0307c4e1dbf015b1",
+    "media/vesper.mp4": "769c9e2464172e3fe2a51dd02e663d07765f20bf8ac869275ef99056f35605e8"
+  },
+  "release_validation": "passed",
+  "host_checks": [
+    "PASS stereo synth: 2,880,000 samples/channel, blocks 1 and 997: 98ce36b36f832a53",
+    "PASS 7201 frames including black endpoint, guards, DAC layout, nonblank scenes, seek: 5c4061a49ae04474; max 1014 triangles"
+  ],
+  "hardware_tested": false
+}

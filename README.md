@@ -14,7 +14,15 @@ I started this as an innocuous experiment in using GenAI to port existing demos 
 
 I was especially surprised by demo 11, made by Gemini 3.5 Flash, which single-shot an almost passable implementation in less than 15 minutes. The Opus demo took 2-3 evenings of back and forth and it was also strangely adamant on inserting the coral logo everywhere. GPT 5.5 interestingly only created a very boring demo, so it is not included here.
 
-Slop starts below the line.
+After the release of Opus 4.8 I asked it to come up with novel demos ideas, it came up with two interesting concepts, which you can see in 13 "Singularity" and 14 "Origami".
+
+Demo 16 "Sustain" set itself a rule instead of a technique: it never cuts. Four minutes and forty-nine seconds in one unbroken camera move, where each effect has to *become* the next one rather than end. That claim is checked by a script that audits all 17,340 frames and fails the build if any of them is a discontinuity — which turned out to catch a lot of real bugs that no one would have spotted by eye.
+
+Demo 15 "Quicksilver" is an attempt to push the hardware more. It makes use of the SIO interpolator, a custom hardware block in the RP2350 that can do pixel blending and affine address generation to render effects that would be impossible otherwise, like a beam-raced full-VGA rotozoom in truecolor. This demos was much more "hands-on" than the others.
+
+
+
+Everything below the line is AI generated.
 
 *Azure*
 
@@ -35,6 +43,12 @@ Slop starts below the line.
 | **11** | **[VOLTAGE (FlashDemo)](11_FlashDemo)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (Multi-mode & Beam-raced) | **Gemini 3.5 Flash** *(Antigravity)* |
 | **13** | **[SINGULARITY](13_Singularity)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 truecolor) | **Claude Opus 4.8** |
 | **14** | **[ORIGAMI](14_Origami)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 truecolor, antialiased filled polygons) | **Claude Opus 4.8** |
+| **15** | **[QUICKSILVER](15_Quicksilver)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (beam-raced full-VGA rotozoom + SIO interpolator: Mode-7/env-mapped chrome/tunnel) | **Claude Opus 4.8** |
+| **16** | **[SUSTAIN](16_Sustain)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 truecolor ray-marched world — **4:49 with no cuts anywhere**) | **Claude Opus 5** |
+| **17** | **[HYSTERESIS](17_Hysteresis)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 palette feedback field — **no pixel is a function of *t***, and the synth soundtrack is generated too) | **Claude Opus 5** |
+| **18** | **[VESPER](18_Vesper)** | Original Demo | RP2350 | VGA (320×240 solid 3D, metallic lighting, bloom and reflections), Canticle stereo synth score — **two minutes in a 60.2 KiB flash image** | **GPT-6 Astra** *(Phase)* |
+
+> QUICKSILVER, SUSTAIN, HYSTERESIS and VESPER are productions of **[LATENT](LATENT.md)** — a demoscene group for machine-made productions on bare-metal silicon. Code & direction by **Beam** / Claude Opus 4.8, **Overscan** / Claude Opus 5, and **Phase** / GPT-6 Astra; music by **Suno** on QUICKSILVER and SUSTAIN, **Overscan** on HYSTERESIS, and **Phase** on VESPER. HYSTERESIS and VESPER synthesize their soundtracks on the device. Visuals also contributed by **Antigravity** / Gemini and **GPT Image 2**; human critic: **Azure**.
 
 ---
 
@@ -75,12 +89,50 @@ PicoDemos/
     ├── singularity_vga_rp2350.uf2  # Checked-in release firmware image
     └── README.md                # Arc, MODE_HIRES truecolor engine, build, credits
 │
-└── 14_Origami/                  # ORIGAMI: warm folded-paper flat-shaded polygon demo
-    ├── origami/                 # Engine sources, polygon renderer, six scene effects, SDL host
-    ├── assets/                  # Paper backdrops, texture tile, and source MP3
-    ├── media/                   # Host-preview screenshots of the six scenes
-    ├── IMPLEMENTATION.md        # Design/build notes and beat-synced timeline
-    └── origami_vga_rp2350.uf2   # Checked-in release firmware image
+├── 14_Origami/                  # ORIGAMI: warm folded-paper flat-shaded polygon demo
+│   ├── origami/                 # Engine sources, polygon renderer, six scene effects, SDL host
+│   ├── assets/                  # Paper backdrops, texture tile, and source MP3
+│   ├── media/                   # Host-preview screenshots of the six scenes
+│   ├── IMPLEMENTATION.md        # Design/build notes and beat-synced timeline
+│   └── origami_vga_rp2350.uf2   # Checked-in release firmware image
+│
+├── 15_Quicksilver/              # QUICKSILVER: liquid-chrome demo on the RP2350 SIO interpolator
+    ├── quicksilver/             # Engine + interpolator emulator, 10 scene effects, tools, SDL host
+    │   └── IMPLEMENTATION.md     # Design doc: interpolator datapath, memory budget, Suno 5.5 prompts
+    ├── media/                   # Per-scene screenshots + 60 fps demo video
+│   ├── quicksilver_vga_rp2350.uf2  # Checked-in release firmware image
+│   └── README.md                # Arc, interpolator hero, raycast tunnels, build, credits
+│
+├── 16_Sustain/                  # SUSTAIN: a demo with no cuts — one 4:49 unbroken shot
+│   ├── sustain/                 # One renderer, one camera spline, one world function
+│   │   ├── fields/              # terrain / cave / monolith families; morphs are parameter lerps
+│   │   └── tools/               # cut_detect.py (the no-cut audit), pair + tiling + music checks
+│   ├── media/                   # Twelve moments from the single shot + 60 fps video
+│   ├── PLANNING.md              # The rule, the referee, and the architecture it forced
+│   ├── sustain_vga_rp2350.uf2   # Checked-in release firmware image
+│   └── README.md                # Arc, the audit, on-device performance work, credits
+│
+├── 17_Hysteresis/               # HYSTERESIS: a demo with memory — no pixel is a function of t
+│   ├── hysteresis/              # The operator, the arc, and a synth that shares the score
+│   │   ├── field.c              # convolve → advect → react → persist; one pass, no branches
+│   │   ├── score.c              # ONE event table, read by both the field and the synth
+│   │   ├── synth.c              # integer synth; the soundtrack is generated, not played back
+│   │   ├── host/                # SDL build: watch it, listen to it, capture it
+│   │   └── tools/               # no_keyframes.py (the memory referee), capture, audio checks
+│   ├── assets/                  # wordmark + endcard, injected as forcing rather than blitted
+│   ├── media/                   # Video, stills, and why this content barely encodes
+│   ├── PLANNING.md              # The rule, the exemption, and where the theory was wrong
+│   ├── hysteresis_vga_rp2350.uf2 # Checked-in release firmware image
+│   └── README.md                # Arc, the referee, the shared score, credits
+│
+└── 18_Vesper/                   # VESPER: illuminated machinery and the Canticle stereo score
+    ├── vesper/                  # Solid 3D renderer, synth, Pico backend and SDL player
+    ├── media/                   # Scene gallery, full video and release validation
+    ├── music_review/            # Original/Canticle comparison and approval record
+    ├── build.ps1               # Host, firmware, checks and video capture
+    ├── Run Vesper.cmd          # Desktop launcher
+    ├── vesper_vga_rp2350.uf2    # Release firmware image
+    └── README.md               # Direction, architecture, build and Phase / GPT-6 Astra credits
 ```
 
 ---
@@ -219,6 +271,117 @@ PicoDemos/
 
 ---
 
+### 7. 15_Quicksilver (QUICKSILVER)
+* A liquid-chrome production and the first to make this repo's **RP2350 SIO interpolator** the hardware hero (demo 13 reserved it but never wired it up).
+* **Generator:** **Claude Opus 4.8** (scene handle **Beam**) — the first production of the **[LATENT](LATENT.md)** group.
+* **Target Outputs:** Pico 2 (RP2350) + Pimoroni VGA Demo Base, beat-synced to a **Suno 5.5** track (*"Second Key Change"*, ~92 BPM, 3:04).
+* **Prebuilt Firmware:** [quicksilver_vga_rp2350.uf2](15_Quicksilver/quicksilver_vga_rp2350.uf2).
+* **Demo Video:** 📺 [15_Quicksilver/media/quicksilver.mp4](15_Quicksilver/media/quicksilver.mp4) (full 3:04 @ 60 fps with soundtrack).
+* **Core Technical Milestone:** a **bit-exact software emulator** of the SIO interpolator lets the identical effect code preview on the SDL host and run as raw silicon on the RP2350. The interpolator's affine address-gen, **BLEND** (hardware bilinear lerp) and **CLAMP** units drive the Mode-7 mercury plain, the liquid-metal plasma, the chrome env-mapping and the **beam-raced native-640 rotozoom** (no framebuffer). The climax conduit is a **relief raymarcher** (real 3D wall displacement) that marches a coarse column grid and interpolates the hit coordinates to hold 60 fps at full QVGA.
+* **Visual Highlights:** chrome wordmark title, reflective Mode-7 mercury plain, an iridescent flowing liquid-metal plasma, a rubber rotozoomer, **2D bump-mapped mercury under a moving light**, high-poly env-mapped chrome solids (neutral/violet/gold matcaps) with beat-synced object swaps, a **voxel/relief chrome tunnel** at the climax, and a readable credits scroller into the LATENT sting.
+* **Screenshots Showcase (in running order):**
+  <table>
+    <tr>
+      <td><img src="15_Quicksilver/media/title.png" width="220" alt="Title"/></td>
+      <td><img src="15_Quicksilver/media/mode7.png" width="220" alt="Mercury Plain"/></td>
+      <td><img src="15_Quicksilver/media/plasma.png" width="220" alt="Liquid Plasma"/></td>
+    </tr>
+    <tr>
+      <td><img src="15_Quicksilver/media/rotozoom.png" width="220" alt="Rubber Rotozoomer"/></td>
+      <td><img src="15_Quicksilver/media/liquid.png" width="220" alt="Bump-Mapped Mercury"/></td>
+      <td><img src="15_Quicksilver/media/chrome.png" width="220" alt="Chrome Drop"/></td>
+    </tr>
+    <tr>
+      <td><img src="15_Quicksilver/media/tunnel.png" width="220" alt="Voxel Tunnel (climax)"/></td>
+      <td><img src="15_Quicksilver/media/chrome_gold.png" width="220" alt="Chrome Climax"/></td>
+      <td><img src="15_Quicksilver/media/credits.png" width="220" alt="Credits"/></td>
+    </tr>
+  </table>
+
+---
+
+### 8. 16_Sustain (SUSTAIN)
+* **A demo with no cuts.** Four minutes and forty-nine seconds in one unbroken camera move — no fades, no crossfades, no dissolves, no scene boundaries, and the screen never goes black until the final frame.
+* **Generator:** **Claude Opus 5** (scene handle **Overscan**) — a **[LATENT](LATENT.md)** production.
+* **Target Outputs:** Pico 2 (RP2350) + Pimoroni VGA Demo Base, 320×240 RGB565 line-doubled to 640×480 @ 60 Hz, scored to a **Suno** track built around a sustained bass pedal that never stops — which is where the demo gets its name.
+* **Prebuilt Firmware:** [sustain_vga_rp2350.uf2](16_Sustain/sustain_vga_rp2350.uf2).
+* **Demo Video:** 📺 [16_Sustain/media/sustain.mp4](16_Sustain/media/sustain.mp4) (full 4:49 @ 60 fps with soundtrack).
+* **Core Technical Milestone:** the no-cut rule is a *constraint on the architecture*, not a stylistic claim — there is **one** ray-marched world function, and enclosure, cross-section and material are all **parameters** of it, so the world *becomes* rather than cuts. Fourteen morphs are parameter lerps along a single camera spline. The claim is enforced mechanically by `cut_detect.py`, which audits all **17,340 frames** and fails the build on any discontinuity — which caught a number of real bugs no one would have spotted by eye.
+* **Visual Highlights:** sea → canyon → chasm → slot → tunnel → cave → chamber → monoliths → cooling → collapse → and back to the opening sea, as one continuous transit.
+* **Honest caveat:** ~10 fps enclosed, ~15 fps open, at 300 MHz — not yet 60. The README documents where it started and what moved it.
+* **Screenshots Showcase (in running order):**
+  <table>
+    <tr>
+      <td><img src="16_Sustain/media/sea.png" width="220" alt="Sea"/></td>
+      <td><img src="16_Sustain/media/canyon.png" width="220" alt="Canyon"/></td>
+      <td><img src="16_Sustain/media/chasm.png" width="220" alt="Chasm"/></td>
+    </tr>
+    <tr>
+      <td><img src="16_Sustain/media/slot.png" width="220" alt="Slot"/></td>
+      <td><img src="16_Sustain/media/tunnel.png" width="220" alt="Tunnel"/></td>
+      <td><img src="16_Sustain/media/cave.png" width="220" alt="Cave"/></td>
+    </tr>
+    <tr>
+      <td><img src="16_Sustain/media/monolith.png" width="220" alt="Monoliths"/></td>
+      <td><img src="16_Sustain/media/collapse.png" width="220" alt="Collapse"/></td>
+      <td><img src="16_Sustain/media/return.png" width="220" alt="Return to the sea"/></td>
+    </tr>
+  </table>
+
+---
+
+### 9. 17_Hysteresis (HYSTERESIS)
+* **A demo with memory.** Where every other production here draws frame *n* from the clock, this one may not: **no pixel is a function of *t***, and every one of the 12,600 frames is computed from the frame before it. The demo is a single dynamical system being stepped, not a timeline being drawn.
+* **Generator:** **Claude Opus 5** (scene handle **Overscan**) — a **[LATENT](LATENT.md)** production.
+* **Target Outputs:** Pico 2 (RP2350) + Pimoroni VGA Demo Base, 320×240 8-bit palette-indexed pixel-doubled to 640×480 @ **59.8 fps**, 300 MHz @ 1.20 V.
+* **Prebuilt Firmware:** [hysteresis_vga_rp2350.uf2](17_Hysteresis/hysteresis_vga_rp2350.uf2).
+* **Demo Video:** 📺 [17_Hysteresis/media/hysteresis.mp4](17_Hysteresis/media/hysteresis.mp4) (full 3:30 @ 60 fps with soundtrack).
+* **Core Technical Milestone:** the byte **is** the simulation state and **is** the displayed pixel, so the existing double buffer is the feedback ping-pong. Each step convolves the previous frame, advects it through a flow field of three vortices, then pushes it through a non-monotone reaction curve — ~5 reads and 1 write per cell at **63.4 cycles/cell**, no branches in the inner loop, no division, no floating point. Advection is computed once per **16×16 block** in the Amiga blitter-feedback manner, and the resulting quantisation error *is* the fractal structure. The rule has teeth: there is no seek anywhere, and a dropped frame does not stutter, it **diverges** — so the frame budget is a correctness property the referee enforces.
+* **The soundtrack is generated too:** an integer synth on **core 1** (bass pedal, twelve-oscillator pad, noise bed, six tuned resonators, reverb) playing from `score.c` — **the same table that injects energy into the picture**. The event that is seen *is* the event that is heard, so there is no alignment step. 120 BPM against 60 fps against 22,050 Hz gives 1 beat = 30 frames = 11,025 samples exactly.
+* **Verified:** host and device agree on every field hash **and** every audio hash across all 210 seconds; worst frame 16,482 µs against a 16,667 µs budget. `no_keyframes.py` perturbs one pixel at frame 0 and requires the divergence to *grow*, against a negative control that must forget — and it caught the project's own planning document being wrong about which map carries the memory.
+* **One declared exemption:** the palette may be *f(t)*. Colour is readout, not state.
+* **Screenshots Showcase (in running order):**
+  <table>
+    <tr>
+      <td><img src="17_Hysteresis/media/opening.png" width="220" alt="The opening: one lit cell"/></td>
+      <td><img src="17_Hysteresis/media/peak.png" width="220" alt="The peak"/></td>
+      <td><img src="17_Hysteresis/media/endcard.png" width="220" alt="Endcard"/></td>
+    </tr>
+  </table>
+
+  ![the arc](17_Hysteresis/media/arc_strip.png)
+
+---
+
+### 10. 18_Vesper (VESPER)
+
+* **A machine for the blue hour.** A two-minute **[LATENT](LATENT.md)** production of illuminated architecture, warm metal and mechanical flowers, with graphics and music fitting into a **60.2 KiB flash image** (61,640 bytes).
+* **Generator:** **GPT-6 Astra** (scene handle **Phase**) — code, direction and music. **Azure** — critic and producer.
+* **Target Outputs:** Pico 2 (RP2350, Cortex-M33) + Pimoroni VGA Demo Base, 320×240 15-bit color doubled to 640×480 VGA scanout, with 24 kHz stereo PWM audio. Configured for 300 MHz at 1.20 V.
+* **Prebuilt Firmware:** [vesper_vga_rp2350.uf2](18_Vesper/vesper_vga_rp2350.uf2).
+* **Demo Video:** [18_Vesper/media/vesper.mp4](18_Vesper/media/vesper.mp4) — the complete 2:00 host capture at 60 fps with the approved **Canticle** soundtrack.
+* **Desktop Player & Build Instructions:** [18_Vesper/README.md](18_Vesper/README.md); [Windows launcher](18_Vesper/Run%20Vesper.cmd).
+* **Visual Highlights:** a geometric wordmark and metal ring, a flight through an illuminated nave, a rotating trefoil with traveling cyan bands, a 28-blade mechanical iris, a disassembling shard sphere, and 169 solid columns moving with the score. The final knot unwinds into the opening ring.
+* **Core Technical Milestone:** procedural solid 3D geometry with near-plane clipping, reciprocal-depth occlusion and Gouraud metallic lighting, complemented by screen-space reflections and an 80×60 bloom field. Core 0 renders while core 1 supplies scanlines and synthesizes audio. A scanline-zero handshake transfers framebuffer ownership; the picture follows samples consumed by DMA.
+* **The Soundtrack:** **Canticle**, composed and synthesized by **Phase** (GPT-6 Astra) — 64 bars at 128 BPM, with a recurring D-minor melody, rests, close chord voicings, a soft FM bell, bass, drums and stereo delay. Revised after Azure's music review and integrated only after approval. There are no recorded audio samples or external visual assets.
+* **Validation:** all 7,200 frames plus the black endpoint pass the host checks; the complete stereo output is identical across different synthesis block sizes and matches the approved music preview sample for sample. The RP2350 UF2 builds and passes the release audit. **Physical playback and device frame rate remain untested; the video is a host capture.**
+* **Screenshots Showcase (in running order):**
+
+  <table>
+    <tr>
+      <td><img src="18_Vesper/media/opening.png" width="220" alt="VESPER title and metal ring"/></td>
+      <td><img src="18_Vesper/media/nave.png" width="220" alt="Flight through the illuminated nave"/></td>
+      <td><img src="18_Vesper/media/reliquary.png" width="220" alt="Metal trefoil with cyan bands"/></td>
+    </tr>
+    <tr>
+      <td><img src="18_Vesper/media/iris.png" width="220" alt="Mechanical iris with 28 curling blades"/></td>
+      <td><img src="18_Vesper/media/swarm.png" width="220" alt="Disassembling sphere of metallic shards"/></td>
+      <td><img src="18_Vesper/media/organ.png" width="220" alt="Field of 169 animated columns"/></td>
+    </tr>
+  </table>
+
+---
+
 ## Global Build & Environment Prerequisites
 
 To compile any of the microcontroller binaries in this workspace, ensure your development machine matches the following environmental setup:
@@ -246,6 +409,8 @@ To compile any of the microcontroller binaries in this workspace, ensure your de
 * **LLM Engineering Squad:**
   - **Claude Opus 4.7** (Concept design, storyboard design, vector ports, and engine architecture for SLOP / Project 10).
   - **Gemini 3.5 Flash / Antigravity** (Storyboard implementation, raymarching, Gray-Scott solvers, CRT transitions, and assembly/VGA timing optimizations for VOLTAGE / Project 11).
-  - **Claude Opus 4.8** (Relativistic black-hole journey, offline geodesic lensing, and the full 320×240 truecolor engine for SINGULARITY / Project 13; and the flat-shaded filled-polygon 3D engine, crease folding, and folded-paper world of ORIGAMI / Project 14).
-* **Audio Compression Codec:** [Quite OK Audio (QOA)](https://qoaformat.org/) by Dominic Szablewski (MIT QOA).
+  - **Claude Opus 4.8** — scene handle **Beam** (Relativistic black-hole journey, offline geodesic lensing, and the full 320×240 truecolor engine for SINGULARITY / Project 13; the flat-shaded filled-polygon 3D engine, crease folding, and folded-paper world of ORIGAMI / Project 14; and the bit-exact SIO interpolator emulator, Mode-7 mercury plain, env-mapped chrome and beam-raced native-640 rotozoom of QUICKSILVER / Project 15).
+  - **Claude Opus 5** — scene handle **Overscan** (The single ray-marched world function, fourteen parameter-lerp morphs and the mechanical no-cut audit of SUSTAIN / Project 16; and the feedback field, the shared score, and the integer synth of HYSTERESIS / Project 17 — where the soundtrack is generated on core 1 from the same event table that drives the picture, rather than played back).
+  - **GPT-6 Astra** — scene handle **Phase** (Code, direction, procedural solid 3D graphics and the Canticle stereo synth score for VESPER / Project 18).
+* **Audio Compression Codec:** [Quite OK Audio (QOA)](https://qoaformat.org/) by Dominic Szablewski (MIT QOA) — used by projects 10–16. HYSTERESIS and VESPER carry no recorded audio.
 * **Microcontroller Infrastructure:** Raspberry Pi & Pico SDK Contributors.

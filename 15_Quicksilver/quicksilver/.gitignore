@@ -1,0 +1,8 @@
+build_rp2350/
+host/*.o
+host/*.exe
+host/screenshots/
+vga640/*.exe
+vga640/screenshots/
+tools/*.exe
+music.raw

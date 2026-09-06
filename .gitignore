@@ -17,15 +17,17 @@
 !02_Dawn/*.uf2
 !10_TheDemo/*.uf2
 !11_FlashDemo/*.uf2
-!12_DIRTY_MINDSET/*.uf2
 !13_Singularity/*.uf2
 !14_Origami/*.uf2
+!15_Quicksilver/*.uf2
+!16_Sustain/*.uf2
+!17_Hysteresis/*.uf2
 **/*.bin
 !10_TheDemo/thedemo/assets/_packed/*.bin
 !11_FlashDemo/thedemo/assets/_packed/*.bin
-!12_DIRTY_MINDSET/thedemo/assets/_packed/*.bin
 !13_Singularity/singularity/assets/_packed/*.bin
 !14_Origami/origami/assets/_packed/*.bin
+!16_Sustain/sustain/assets/_packed/*.bin
 **/*.map
 **/*.mem
 **/*.wad
@@ -71,6 +73,9 @@
 **/assets_by_nanobanana/
 **/thedemo_assets/
 
+# Make auto-generated header dependency files (host build, -MMD -MP)
+**/*.d
+
 # Python caching
 **/__pycache__/
 
@@ -85,3 +90,14 @@ Session.vim
 
 # Agent instruction and notes files
 **/CLAUDE.md
+.claude/
+**/LATENT.md
+
+
+# Rendered audio. synthwav.exe regenerates the 9 MB master in about a second
+# from score.c and synth.c, so the file is an output, not an asset.
+**/*.wav
+
+# Azure's asset scratch: endcard font/threshold variants. The two that mattered
+# are kept as assets/latent_endcard_*_rejected.png; the rest is working material.
+17_Hysteresis/tmp/
