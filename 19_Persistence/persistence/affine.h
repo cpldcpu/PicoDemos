@@ -4,6 +4,7 @@
 #define PV_AFFINE_H
 
 #include <stdint.h>
+#include "dither.h"
 
 enum { AFFINE_TEX_FLOOR = 0, AFFINE_TEX_GRID = 1 };
 
@@ -17,8 +18,8 @@ typedef struct {
 
 void affine_texture_generate(int style);                     /* core 0, into the arena */
 void affine_rows(const affine_cam_t *cam, uint32_t parity);   /* core 0, per frame      */
-void affine_sky(const uint16_t *sky, uint32_t parity);        /* core 0, per frame      */
-void affine_sky_dusk(uint16_t *sky, int horizon, int warm);   /* the standard gradient  */
+void affine_sky(const rgb8_t *sky, uint32_t parity);           /* core 0, per frame      */
+void affine_sky_dusk(rgb8_t *sky, int horizon, int warm);      /* the standard gradient  */
 void affine_line_p(uint32_t parity, uint16_t *px, int y);     /* core 1                 */
 void qs_texmap_setup_interp0(void);                           /* on the drawing core    */
 

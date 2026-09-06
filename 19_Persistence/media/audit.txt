@@ -4,7 +4,7 @@ video
   ok    no unintended black frames
   ok    no flat frames
   ok    all 10 cues drew
-  ok    s3d: worst frame merged 37 slivers of 480 rows (budget 48); 21580 total
+  ok    s3d: worst frame lost a sliver in 58 of 480 rows (budget 96); 59184 total
   ok    frames are deterministic (6 probes, rendered twice)
 
 audio

@@ -15,6 +15,7 @@
 #include "tables.h"
 #include "text.h"
 #include "copper.h"
+#include "dither.h"
 
 #include <string.h>
 
@@ -51,7 +52,7 @@ static const char *const s_credits[] = {
 #define CR_SCALE 3
 
 typedef struct {
-    uint16_t bg[PV_H];
+    rgb8_t   bg[PV_H];
     int32_t  scroll;                 /* pixels the text has travelled up */
     int16_t  wave[PV_H];             /* per-row horizontal displacement   */
     uint8_t  fade;                   /* 255 = full                        */
@@ -68,8 +69,13 @@ static void credits_frame(uint32_t f, uint32_t local)
     copper_rows(p->bg, f, COPPER_DUSK);
     p->scroll = (int32_t)local * 5 / 2;                /* 2.5 px a frame */
 
+    /* A scroller on a sine is a demoscene reflex, but the text still has to be
+     * readable: ninety pixels of swing over a 480-row screen meant a line's
+     * left edge moved most of a character width between its top row and its
+     * bottom, and the letters sheared. Twenty-two pixels, half the speed, and
+     * a longer wavelength keeps the motion and returns the words. */
     for (int y = 0; y < PV_H; y++)
-        p->wave[y] = (int16_t)((pv_sin16((uint32_t)(y * 2 + f * 4)) * 90) >> 15);
+        p->wave[y] = (int16_t)((pv_sin16((uint32_t)(y + f * 2)) * 22) >> 15);
 
     /* fade the whole thing out over the last bar of the scene */
     p->fade = local > 700 ? (uint8_t)(local >= 800 ? 0 : 255 - (local - 700) * 255 / 100) : 255;
@@ -78,7 +84,7 @@ static void credits_frame(uint32_t f, uint32_t local)
 static void PV_HOT(credits_line)(uint32_t f, uint16_t *px, int y)
 {
     const credits_p_t *p = &P[f & 1];
-    pv_fill(px, 0, PV_W, p->bg[y]);
+    pv_fill_row_dither(px, &p->bg[y], y);
     if (!p->fade) return;
 
     /* Which credit line, if any, covers this row? The text starts below the
@@ -98,7 +104,7 @@ static void PV_HOT(credits_line)(uint32_t f, uint16_t *px, int y)
     r = r * p->fade >> 8; g = g * p->fade >> 8; b = b * p->fade >> 8;
 
     const int w = text_width(s, CR_SCALE);
-    text_row(px, (PV_W - w) / 2 + p->wave[y], s, CR_SCALE, gy, rgb565_pack(r, g, b));
+    text_row(px, (PV_W - w) / 2 + p->wave[y], s, CR_SCALE, gy, pv_pack_dither(r, g, b, 0, y));
 }
 
 const scene_t fx_credits = { "credits", credits_enter, credits_frame, credits_line, NULL, NULL };
@@ -107,7 +113,7 @@ const scene_t fx_credits = { "credits", credits_enter, credits_frame, credits_li
 /* PRODUCTION / GROUP / YEAR, then the tube loses its deflection. */
 
 typedef struct {
-    uint16_t bg[PV_H];
+    rgb8_t   bg[PV_H];
     int16_t  y0, y1;          /* the visible band collapses to a line     */
     int16_t  x0, x1;          /* then the line collapses to a dot         */
     uint8_t  bright;          /* and the dot burns out                    */
@@ -168,7 +174,7 @@ static void PV_HOT(endcard_line)(uint32_t f, uint16_t *px, int y)
     const int span = p->y1 - p->y0;
     const int sy = span > 0 ? mid + (y - mid) * PV_H / span : mid;
 
-    pv_fill(px, 0, PV_W, p->bg[sy < 0 ? 0 : (sy >= PV_H ? PV_H - 1 : sy)]);
+    pv_fill_row_dither(px, &p->bg[sy < 0 ? 0 : (sy >= PV_H ? PV_H - 1 : sy)], y);
 
     static const struct { const char *s; int y0, scale; } lines[] = {
         { "PERSISTENCE", 180, 6 },
@@ -179,7 +185,8 @@ static void PV_HOT(endcard_line)(uint32_t f, uint16_t *px, int y)
         const int gy = text_glyph_row(sy, lines[i].y0, lines[i].scale);
         if (gy < 0) continue;
         const int r = 240, g = 190 + gy * 6, b = 120 + gy * 12;
-        text_row_centred(px, lines[i].s, lines[i].scale, gy, rgb565_pack(r, g > 255 ? 255 : g, b > 255 ? 255 : b));
+        text_row_centred(px, lines[i].s, lines[i].scale, gy,
+                         pv_pack_dither(r, g > 255 ? 255 : g, b > 255 ? 255 : b, 0, y));
     }
 }
 

@@ -78,14 +78,50 @@
  * low bit of each field before the shift keeps a halved colour from bleeding
  * out of one channel into the next. */
 #define DIM_MASK 0x0841u
+#define dim0(c) (c)
 static inline uint16_t dim1(uint16_t c) { return (uint16_t)((c & (uint16_t)~DIM_MASK) >> 1); }
 static inline uint16_t dim2(uint16_t c) { return dim1(dim1(c)); }
+
+/* Depth shading, dithered.
+ *
+ * Three brightness levels applied per span put hard steps across the tube --
+ * 24-pixel blocks, and a tunnel is exactly the shape that shows them, because
+ * the bands follow the radius and the blocks do not. Halving again would cost
+ * a level and still step.
+ *
+ * Instead there are five levels, and the two new ones are the checkerboard
+ * between their neighbours: alternate pixels take the brighter and the darker
+ * value, and the eye averages them to the level in between. It is the same
+ * ordered dithering the gradients use (dither.h), on brightness rather than on
+ * colour, and it costs nothing -- the phase is fixed for a whole run of
+ * pixels, so it is chosen once per span by hoisting the loop rather than per
+ * pixel by branching. */
+#define TUN_TEXEL (*(const uint16_t *)(tex + interp_pop_full_result(interp0)))
+
+#define TUN_LOOP(LO, HI) \
+    do { \
+        if (ph) { \
+            for (int i = 0; i < SPAN; i += 4) { \
+                d[i + 0] = HI(TUN_TEXEL); \
+                d[i + 1] = LO(TUN_TEXEL); \
+                d[i + 2] = HI(TUN_TEXEL); \
+                d[i + 3] = LO(TUN_TEXEL); \
+            } \
+        } else { \
+            for (int i = 0; i < SPAN; i += 4) { \
+                d[i + 0] = LO(TUN_TEXEL); \
+                d[i + 1] = HI(TUN_TEXEL); \
+                d[i + 2] = LO(TUN_TEXEL); \
+                d[i + 3] = HI(TUN_TEXEL); \
+            } \
+        } \
+    } while (0)
 
 typedef struct {
     int16_t  cx, cy;          /* the axis, in pixels                    */
     int32_t  uofs, vofs;      /* texture pan, 16.16                     */
     int32_t  depth;           /* D, the depth constant                  */
-    int32_t  t_core, t_dark, t_mid;   /* precomputed shading thresholds */
+    int32_t  t[5];            /* shading thresholds, near to far         */
     uint16_t core;            /* colour of the dark core                */
 } tun_p_t;
 
@@ -159,13 +195,16 @@ static void tunnel_frame(uint32_t f, uint32_t local)
     p->uofs  = (int32_t)(roll * (1024.0f / 6.2831853f) * 65536.0f * 0.25f) & 0x00FFFFFF;
     p->depth = (int32_t)((3000.0f + 600.0f * sinf(t * 0.7f)) * 65536.0f);
 
-    /* Hoisted out of the line loop: three divides per span, forty spans a row
-     * and 480 rows is 57,600 divides a frame for three numbers that never
-     * change within a frame. */
-    p->t_core = p->depth / 12;
-    p->t_dark = p->depth / 26;
-    p->t_mid  = p->depth / 60;
-    p->core   = rgb565_pack(6, 10, 16);
+    /* Hoisted out of the line loop: five divides per span over twenty-seven
+     * spans and 480 rows is 64,800 divides a frame for numbers that do not
+     * change within one. Each is the vmag at a given radius, so the bands are
+     * at r = 96, 74, 54, 38 and 20 pixels. */
+    p->t[0] = p->depth / 96;
+    p->t[1] = p->depth / 74;
+    p->t[2] = p->depth / 54;
+    p->t[3] = p->depth / 38;
+    p->t[4] = p->depth / 20;          /* inside this is the core */
+    p->core = rgb565_pack(7, 11, 17);
 }
 
 /* Exact (u, v) at one screen point, in 16.16 texture units. */
@@ -195,6 +234,7 @@ static void PV_HOT(tunnel_line)(uint32_t f, uint16_t *px, int y)
     const int dy = y - p->cy;
     const uint8_t *const tex = (const uint8_t *)s_tex;
     const int span = g_lod ? SPAN * 2 : SPAN;
+    const int ph = y & 1;                 /* the dither's phase for this row */
 
     int32_t u0, v0, u1, v1;
     tun_point(p, -p->cx, dy, &u0, &v0);
@@ -213,7 +253,7 @@ static void PV_HOT(tunnel_line)(uint32_t f, uint16_t *px, int y)
 #endif
 
         const int32_t vmag = v0 - p->vofs;
-        if (vmag > p->t_core) {
+        if (vmag > p->t[4]) {
             /* The dark core. No pops at all: the accumulators are re-seeded at
              * every span, so nothing downstream depends on them advancing. */
             pv_fill(d, 0, span, p->core);
@@ -239,28 +279,12 @@ static void PV_HOT(tunnel_line)(uint32_t f, uint16_t *px, int y)
         }
         qs_texmap_step(interp0, (uint32_t)((u1 - u0) / span), (uint32_t)((v1 - v0) / span));
 
-        if (vmag > p->t_dark) {
-            for (int i = 0; i < SPAN; i += 4) {
-                d[i + 0] = dim2(*(const uint16_t *)(tex + interp_pop_full_result(interp0)));
-                d[i + 1] = dim2(*(const uint16_t *)(tex + interp_pop_full_result(interp0)));
-                d[i + 2] = dim2(*(const uint16_t *)(tex + interp_pop_full_result(interp0)));
-                d[i + 3] = dim2(*(const uint16_t *)(tex + interp_pop_full_result(interp0)));
-            }
-        } else if (vmag > p->t_mid) {
-            for (int i = 0; i < SPAN; i += 4) {
-                d[i + 0] = dim1(*(const uint16_t *)(tex + interp_pop_full_result(interp0)));
-                d[i + 1] = dim1(*(const uint16_t *)(tex + interp_pop_full_result(interp0)));
-                d[i + 2] = dim1(*(const uint16_t *)(tex + interp_pop_full_result(interp0)));
-                d[i + 3] = dim1(*(const uint16_t *)(tex + interp_pop_full_result(interp0)));
-            }
-        } else {
-            for (int i = 0; i < SPAN; i += 4) {
-                d[i + 0] = *(const uint16_t *)(tex + interp_pop_full_result(interp0));
-                d[i + 1] = *(const uint16_t *)(tex + interp_pop_full_result(interp0));
-                d[i + 2] = *(const uint16_t *)(tex + interp_pop_full_result(interp0));
-                d[i + 3] = *(const uint16_t *)(tex + interp_pop_full_result(interp0));
-            }
-        }
+        if      (vmag <= p->t[0]) TUN_LOOP(dim0, dim0);
+        else if (vmag <= p->t[1]) TUN_LOOP(dim0, dim1);
+        else if (vmag <= p->t[2]) TUN_LOOP(dim1, dim1);
+        else if (vmag <= p->t[3]) TUN_LOOP(dim1, dim2);
+        else                      TUN_LOOP(dim2, dim2);
+
         u0 = u1; v0 = v1;
     }
 }

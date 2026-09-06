@@ -56,7 +56,7 @@ and the group now has both.
 | 16–24 | 0:27 | **kefrens** | one line buffer, never cleared: the curtain is a side effect of the beam's order |
 | 24–32 | 0:40 | **twister** | two hexagonal prisms; front faces tile the width, so no depth test |
 | 32–40 | 0:53 | **tunnel** | angle and depth computed exactly every 24 pixels, interpolator between |
-| 40–56 | 1:07 | **the plane** | a Mode-7 floor with a solid flat-shaded object and its reflection |
+| 40–56 | 1:07 | **the plane** | a Mode-7 floor with a large solid flat-shaded object turning over it |
 | 56–64 | 1:33 | **the raster split** | five different programs on one screen, re-dealt on every beat |
 | 64–80 | 1:47 | **the finale** | the floor at speed, three objects, key change at bar 72 |
 | 80–88 | 2:13 | **credits** | a scroller that is one sine lookup per row |
@@ -72,7 +72,7 @@ modelled. Over the complete run, 9,000 frames and 4,320,000 scanlines:
 | resolution / rate | **640×480 @ 59.75 Hz**, native, no doubling anywhere |
 | **scanlines the beam was shown unwritten** | **0** |
 | governor interventions | 0 |
-| frames skipped | 2 (both at scene entry, where a cut is happening anyway) |
+| frames skipped | 3 (all at scene entry, where a cut is happening anyway) |
 | audio ring low-water | 1,150 of 2,047 samples |
 | clock | 300 MHz @ 1.20 V |
 | flash | 78.7 KB — no recorded audio, no bitmaps, no baked meshes |
@@ -82,16 +82,20 @@ Per-kernel line cost, in cycles, against a budget of **9,600**:
 
 | scene | mean | worst |
 |---|---:|---:|
-| title | 2,523 | 7,420 |
-| plasma | 4,308 | 6,153 |
-| kefrens | 3,743 | 4,638 |
-| twister | 3,553 | 3,804 |
-| tunnel | 7,291 | 7,563 |
-| plane | 3,631 | 7,844 |
-| split | 3,377 | 5,220 |
-| finale | 3,514 | 6,545 |
-| credits | 3,197 | 6,929 |
-| endcard | 2,051 | 4,749 |
+| title | 1,915 | 5,626 |
+| plasma | 5,991 | 6,259 |
+| kefrens | 5,105 | 6,247 |
+| twister | 3,468 | 4,176 |
+| tunnel | 7,272 | 7,801 |
+| plane | 3,462 | 8,281 |
+| split | 4,013 | 6,281 |
+| finale | 3,265 | 6,399 |
+| credits | 2,890 | 6,356 |
+| endcard | 1,816 | 4,708 |
+
+Dithering cost the plasma about 1,700 cycles a line and the Kefrens bars about
+1,400, which is what a palette that has to be masked and a fill that writes a
+four-pixel pattern instead of one colour come to. It bought the banding.
 
 The tunnel measures 6,270 cycles a line when run on its own and 7,291 inside
 the demo. Nothing about the kernel changed; core 0 is busy with the synth and
@@ -268,6 +272,68 @@ find out where its cycles actually go.
 
 Keys in the host player: `ESC` quit · `SPACE` pause · `←/→` seek 5 s · `R`
 restart · `S` screenshot · `F` fullscreen · `L` toggle the half-resolution mode.
+
+## The second pass
+
+Azure watched it and sent seven notes. All of them were about the picture
+rather than the architecture, which is the useful kind, and six of the seven
+turned out to have one cause between them.
+
+**Banding, everywhere there was a gradient.** The DAC is five bits a channel,
+so an eight-bit ramp quantises to 32 steps and every smooth vertical gradient
+in the demo — the copper behind the title, the sky above the horizon, the
+credits — landed as finger-thick bands at 640 wide. `dither.h` adds ordered
+dithering and it costs nothing: a row of flat colour is still one fill, just of
+a four-pixel repeating pattern, and the plasma dithers by choosing between four
+pre-built palettes with a pointer.
+
+**"Garish and saturated."** The plasma swept all three channels through a full
+sine at full amplitude with the phases a third of a cycle apart, which is a hue
+wheel — every colour in the gamut, at maximum chroma, permanently. It now moves
+*luminance* through the full range with chroma at about a sixth of it, around a
+slowly drifting hue: the same sines, the same lookup, the same cost, a picture
+made of light and shade with a colour cast rather than of colour. The copper
+bars and the Kefrens bars got the same treatment.
+
+**The Kefrens bars piled up at the edges.** Two sines of amplitude 200 and 100
+about the centre is 300 either way on a screen with 308 to give, so every bar
+spent part of its cycle clamped flat against a border. They sum to 285 now.
+
+**The twisters were bland.** They were Lambert-shaded, which is correct and
+looks like painted cardboard. A flat face has one normal, so it reflects one
+direction of the world — which means it can be shaded by a single lookup into a
+*picture* of the world, indexed by that normal. There is now a small
+environment: sky, a hard horizon line, a dark floor, and a hot spot that
+rotates. The columns pick up a horizon that slides across them as they twist.
+Three table reads a face. That is what makes metal look like metal — not the
+specular power, but that it shows you the room.
+
+**The tunnel's distance shading was blocky.** Three brightness levels applied
+per 24-pixel span put hard steps across a shape whose bands follow the radius.
+There are five levels now, and the two new ones are the checkerboard between
+their neighbours — the same ordered dithering, applied to brightness instead of
+colour. It also costs nothing, because the dither phase is constant along a run
+and so is chosen once per span by hoisting the loop rather than per pixel by
+branching.
+
+**The reflections under the 3D objects read as bad shadows.** They were correct
+— the mesh mirrored about the plane, dimmed, clipped below the horizon — but a
+mirror image needs a floor that looks wet, and this floor is a lit grid. Gone,
+and the object is half again as large in their place, which is the better trade
+twice over: the span budget the reflection was spending buys the size back.
+
+**The scroller swung too far to read.** Ninety pixels of sine over 480 rows
+moved a line's left edge most of a character width between its top row and its
+bottom, and the letters sheared. Twenty-two pixels, half the speed, longer
+wavelength.
+
+One thing the round changed that was not on the list: the enlarged solids
+pushed the span-list metric past its budget, and the first instinct was to
+shave the meshes until the number came back. The right response was to render
+the worst frame and look at it — no holes, nothing visible — and then fix the
+*budget*, which had been a round ten per cent picked before anything had been
+seen. Tuning the geometry against an arbitrary threshold is how a check stops
+measuring anything.
 
 ## What went wrong, and what it cost
 

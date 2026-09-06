@@ -417,7 +417,7 @@ PicoDemos/
     <tr>
       <td><img src="19_Persistence/media/f03500.png" width="220" alt="The tunnel"/></td>
       <td><img src="19_Persistence/media/f04600.png" width="220" alt="The plane with a reflection"/></td>
-      <td><img src="19_Persistence/media/f06000.png" width="220" alt="The raster split"/></td>
+      <td><img src="19_Persistence/media/f06100.png" width="220" alt="The raster split"/></td>
     </tr>
     <tr>
       <td><img src="19_Persistence/media/f06900.png" width="220" alt="The finale"/></td>

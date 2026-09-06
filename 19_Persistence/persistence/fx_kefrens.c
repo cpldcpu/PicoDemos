@@ -12,6 +12,12 @@
  * (this demo seeks), and K bars are drawn per row with different phases. The
  * bar is a 24-pixel lit cylinder: a per-bar gradient strip, copied in.
  *
+ * The travel is bounded so the bars never reach the edge. The first version
+ * summed two sines of amplitude 200 and 100 about the centre, which is 300
+ * either way on a screen with 308 to give, so every bar spent part of its
+ * cycle clamped flat against the left or right border -- a curtain with two
+ * stiff ends. The amplitudes now sum to 285.
+ *
  * Per row: K bar copies (24 px each) plus one 640-pixel copy out. ~1,200
  * cycles. The cheapest full-screen kernel after the copper.
  */
@@ -49,6 +55,7 @@ static void shade_strip(uint16_t *strip, int r, int g, int b)
         /* a cylinder lit from the upper left: cosine profile, hot at 1/3 */
         int s = pv_sin16((uint32_t)(i * 512 / BAR_W)) >> 7;         /* 0..255 across */
         int hi = 255 - (i - BAR_W / 3) * (i - BAR_W / 3) * 6; if (hi < 0) hi = 0;
+        hi = hi * 3 / 5;                       /* a highlight, not a blowout */
         int rr = (r * s >> 8) + (hi >> 1), gg = (g * s >> 8) + (hi >> 1), bb = (b * s >> 8) + (hi >> 1);
         if (rr > 255) rr = 255;
         if (gg > 255) gg = 255;
@@ -67,16 +74,20 @@ static void kefrens_frame(uint32_t f, uint32_t local)
     int active = 1 + (int)(local / 150); if (active > BARS) active = BARS;
     p->active = (uint8_t)active;
 
-    static const uint8_t col[BARS][3] = { {255, 120, 40}, {60, 200, 255}, {255, 60, 200}, {120, 255, 120} };
+    /* Four bars that belong to one light rather than four inks: an amber, a
+     * steel blue, a violet and a pale gold, all at about half the chroma the
+     * first version used. */
+    static const uint8_t col[BARS][3] = {
+        { 216, 138,  74 }, {  96, 158, 208 }, { 168, 116, 196 }, { 214, 196, 140 } };
     for (int k = 0; k < BARS; k++) shade_strip(p->strip[k], col[k][0], col[k][1], col[k][2]);
 
     /* dark, slightly warmer toward the bottom so the curtain has a floor */
-    for (int y = 0; y < PV_H; y++) p->bg[y] = rgb565_pack(4 + y / 40, 3 + y / 60, 10 + y / 30);
+    for (int y = 0; y < PV_H; y++) p->bg[y] = rgb565_pack(5 + y / 34, 4 + y / 48, 12 + y / 26);
 
     /* position: two sines per bar, phase by bar, speed by bar */
     const int t = (int)f;
     for (int k = 0; k < BARS; k++) {
-        const int spd = 5 + k * 2, amp = 200 + k * 25;
+        const int spd = 5 + k * 2, amp = 150 + k * 12;      /* amp + amp/2 <= 285 */
         for (int y = 0; y < PV_H; y++) {
             int a = pv_sin16((uint32_t)(y * 3 + t * spd + k * 256)) * amp >> 15;
             int b = pv_sin16((uint32_t)(y * 7 - t * (spd + 3) + k * 400)) * (amp / 2) >> 15;

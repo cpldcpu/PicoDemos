@@ -21,6 +21,7 @@
 #include "beam.h"
 #include "scenes.h"
 #include "affine.h"
+#include "dither.h"
 #include "tables.h"
 #include "song.h"
 
@@ -43,7 +44,7 @@ static void split_floor_frame(uint32_t f, uint32_t local)
     cam.fog_near = 420.0f;
     cam.fog_far  = 1700.0f;
     affine_rows(&cam, f);
-    uint16_t sky[PV_H];
+    rgb8_t sky[PV_H];
     affine_sky_dusk(sky, cam.horizon, 0);
     affine_sky(sky, f);
 }

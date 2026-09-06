@@ -26,6 +26,7 @@
 #include "tables.h"
 #include "interp_compat.h"
 #include "affine.h"
+#include "dither.h"
 
 #include <string.h>
 #include <math.h>
@@ -35,8 +36,9 @@
 
 typedef struct {
     int32_t  u0[PV_H], v0[PV_H], du[PV_H], dv[PV_H];   /* 16.16 */
-    uint16_t sky[PV_H];
-    uint8_t  fog[PV_H];                                  /* 0..3 stipple, 4 = all sky */
+    uint16_t sky[PV_H];        /* packed, for the fog stipple                */
+    rgb8_t   sky8[PV_H];       /* eight-bit, so full-sky rows can be dithered */
+    uint8_t  fog[PV_H];        /* 0..3 stipple, 4 = all sky                   */
 } affine_p_t;
 
 static affine_p_t P[2];
@@ -127,19 +129,23 @@ void affine_rows(const affine_cam_t *cam, uint32_t parity)
     }
 }
 
-void affine_sky(const uint16_t *sky, uint32_t parity)
+void affine_sky(const rgb8_t *sky, uint32_t parity)
 {
-    memcpy(P[parity & 1].sky, sky, sizeof P[0].sky);
+    affine_p_t *p = &P[parity & 1];
+    memcpy(p->sky8, sky, sizeof p->sky8);
+    for (int y = 0; y < PV_H; y++) p->sky[y] = rgb565_pack(sky[y].r, sky[y].g, sky[y].b);
 }
 
-/* Standard dusk gradient: dark above, lit at the horizon. */
-void affine_sky_dusk(uint16_t *sky, int horizon, int warm)
+/* Standard dusk gradient: dark above, lit at the horizon. Kept at eight bits
+ * per channel because a sky is the single worst thing to quantise -- a smooth
+ * vertical ramp across 480 rows lands as a staircase on a five-bit DAC. */
+void affine_sky_dusk(rgb8_t *sky, int horizon, int warm)
 {
     for (int y = 0; y < PV_H; y++) {
         int d = horizon - y; if (d < 0) d = 0; if (d > 320) d = 320;
         const int e = 320 - d;
-        if (warm) sky[y] = rgb565_pack(20 + e / 2, 10 + e / 4, 24 + e / 6);
-        else      sky[y] = rgb565_pack(8 + e / 5, 10 + e / 4, 26 + e / 2);
+        if (warm) { sky[y].r = (uint8_t)(24 + e * 5 / 12); sky[y].g = (uint8_t)(14 + e / 5); sky[y].b = (uint8_t)(28 + e / 7); }
+        else      { sky[y].r = (uint8_t)(10 + e / 6);      sky[y].g = (uint8_t)(13 + e / 5); sky[y].b = (uint8_t)(30 + e * 2 / 5); }
     }
 }
 
@@ -153,7 +159,7 @@ void PV_HOT(affine_line_p)(uint32_t parity, uint16_t *px, int y)
     const int fog = p->fog[y];
     const uint32_t skyc = p->sky[y];
 
-    if (fog >= 4) { pv_fill(px, 0, PV_W, (uint16_t)skyc); return; }
+    if (fog >= 4) { pv_fill_row_dither(px, &p->sky8[y], y); return; }
 
     interp_set_accumulator(interp0, 0, (uint32_t)p->u0[y]);
     interp_set_accumulator(interp0, 1, (uint32_t)p->v0[y]);
