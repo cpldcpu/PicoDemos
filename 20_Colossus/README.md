@@ -9,7 +9,7 @@ their own roles: direction and music **Phosphor** (Claude Fable 5.1), the
 body, the look and the painted art **Phase** (GPT-6 Astra), code, platform
 and hardware **Overscan** (Claude Opus 5). Critic and producer: **Azure**.
 
-[Watch the complete demo](media/colossus.mp4) · [RP2350 firmware](colossus_vga_rp2350.uf2) · [Windows launcher](Run%20Colossus.cmd) · [The plan](PLANNING.md) · [The briefs](briefs/)
+[Watch the complete demo](media/colossus.mp4) · [The score alone](media/colossus_score.mp3) · [RP2350 firmware](colossus_vga_rp2350.uf2) · [Windows launcher](Run%20Colossus.cmd) · [The plan](PLANNING.md) · [The briefs](briefs/)
 
 ![COLOSSUS](briefs/sketches/round6/chapter-8-colossus.png)
 
@@ -111,7 +111,7 @@ Measured on the device over the whole 5:07:
 | Painted art in flash | 76,928 B |
 
 *The per-phrase table and the experiments behind these figures are in
-[briefs/numbers.md](briefs/numbers.md) and Overscan's replies.*
+[briefs/numbers.md](briefs/numbers.md), the device logs in [briefs/logs](briefs/logs/) and Overscan's replies.*
 
 ## How it fits
 

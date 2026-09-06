@@ -211,7 +211,11 @@ if ($Target -eq 'video') {
     $mp4 = Join-Path $cvMedia 'colossus.mp4'
     $render = Start-Process -FilePath $cap -ArgumentList @('--raw','--fps','60') -NoNewWindow -PassThru -RedirectStandardOutput (Join-Path $env:TEMP 'colossus_raw.bin')
     $render.WaitForExit()
-    if ($render.ExitCode -ne 0) { throw "capture --raw exited with $($render.ExitCode)" }
+    # PowerShell 5.1 can report $null for ExitCode after WaitForExit unless the
+    # handle was touched first; read it through the cached handle.
+    $null = $render.Handle
+    $code = $render.ExitCode
+    if ($null -ne $code -and $code -ne 0) { throw "capture --raw exited with $code" }
     Invoke-Checked 'ffmpeg' @('-y','-v','warning','-f','rawvideo','-pixel_format','rgb24','-video_size','320x240',
         '-framerate','60','-i',(Join-Path $env:TEMP 'colossus_raw.bin'),'-i',$wav,
         '-vf','scale=960:720:flags=neighbor','-c:v','libx264','-preset','slow','-crf','18',

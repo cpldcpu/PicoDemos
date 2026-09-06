@@ -124,3 +124,13 @@ Session.vim
 20_Colossus/colossus/assets/phase_checks
 20_Colossus/briefs/.*
 20_Colossus/briefs/sketches/round3/bar-*.png
+20_Colossus/media/*_small.mp4
+20_Colossus/media/colossus_wip*.mp4
+20_Colossus/media/phrases/
+20_Colossus/media/hashes.txt
+20_Colossus/media/*.log
+20_Colossus/colossus/assets/_*/
+20_Colossus/colossus/tools/_*/
+20_Colossus/colossus_stub*.uf2
+20_Colossus/colossus_mat_rp2350.uf2
+**/__pycache__/
