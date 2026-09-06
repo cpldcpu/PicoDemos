@@ -18,6 +18,7 @@
  */
 
 #include "demo.h"
+#include "render.h"
 #include "colossus.h"
 #include "song.h"
 #include "stub_font.h"
@@ -124,6 +125,12 @@ void CV_HOT(demo_render)(uint16_t *page, uint32_t sample)
     *p = 0;
     text(page, 8, 8, line, cv_rgb(0x80, 0x98, 0xA8));
 }
+
+/* The stub has no passes to attribute, but main.c prints the breakdown
+ * unconditionally and the platform-alone build has to link. Zeros here are
+ * the truthful answer: none of the renderer's passes ran. */
+void r_prof_read(uint32_t *out){for(int i=0;i<RP_COUNT;i++)out[i]=0;}
+const char *r_prof_name(int slot){(void)slot;return "-";}
 
 void demo_stats(demo_stats_t *out)
 {

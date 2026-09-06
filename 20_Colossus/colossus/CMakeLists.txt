@@ -85,6 +85,23 @@ if(COLOSSUS_HOST)
     else()
         message(STATUS "COLOSSUS: no SDL2, building the capture tool only")
     endif()
+
+    # render_checks.c is the renderer's regression net: 483 seek comparisons
+    # either side of every bar boundary, near/far clipping against
+    # independently specified clipped geometry, depth order independent of
+    # submission, the bloom mask, the reveal silhouette's height, and sixteen
+    # exact material-ceiling frames. It has its own main() behind HOST_BUILD
+    # and must never be linked into firmware, which is why render.cmake does
+    # not name it. Optimisation that breaks any of these is not optimisation.
+    add_executable(checks render_checks.c ${COLOSSUS_CORE_SOURCES})
+    target_include_directories(checks PRIVATE . host ${COLOSSUS_RENDER_INCLUDES})
+    target_compile_definitions(checks PRIVATE HOST_BUILD=1 ${COLOSSUS_RENDER_DEFINES})
+    target_compile_options(checks PRIVATE -O2 -Wall -Wextra -Wno-unused-parameter -fno-math-errno)
+    if(NOT WIN32)
+        target_link_libraries(checks PRIVATE m)
+    endif()
+    enable_testing()
+    add_test(NAME renderer_checks COMMAND checks)
 else()
 # ------------------------------------------------------------------ RP2350 --
     set(PICO_BOARD pico2 CACHE STRING "Pico 2 / RP2350")

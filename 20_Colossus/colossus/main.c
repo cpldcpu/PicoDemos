@@ -27,6 +27,7 @@
 
 #include "platform.h"
 #include "demo.h"
+#include "render.h"
 #include "song.h"
 #include "synth.h"
 
@@ -49,11 +50,8 @@
  * behind render_material_test(), which Phase made an explicit entry point so
  * that no hidden mode can change what demo_render() draws. Built with
  * -DCOLOSSUS_MATERIAL_TEST=ON it replaces the picture for the whole run, so
- * the telemetry below measures the ceiling and nothing else. The prototype is
- * repeated here rather than including render.h, so this file does not depend
- * on the shape of Phase's headers. */
+ * the telemetry below measures the ceiling and nothing else. */
 #if CV_MATERIAL_TEST
-void render_material_test(uint16_t *page, uint32_t sample);
 #  define CV_DRAW(page, sample) render_material_test((page), (sample))
 #else
 #  define CV_DRAW(page, sample) demo_render((page), (sample))
@@ -146,6 +144,7 @@ typedef struct {
     uint32_t miss, late;
     uint32_t hold_max;
     video_prof_t prof0;
+    uint32_t rprof0[RP_COUNT];
     uint64_t t0;
 } window_t;
 
@@ -154,6 +153,7 @@ static void window_open(window_t *w, uint64_t now)
     w->frames = 0; w->render_min = 0xFFFFFFFFu; w->render_max = 0; w->render_sum = 0;
     w->gap_max = 0; w->miss = 0; w->late = 0; w->hold_max = 0;
     video_prof(&w->prof0);
+    r_prof_read(w->rprof0);
     w->t0 = now;
 }
 
@@ -197,6 +197,27 @@ static void window_report(const char *tag, window_t *w, uint64_t now, uint32_t s
         (unsigned long)d.triangles, (unsigned long)d.fill, (unsigned long)d.particles, d.chapter);
     if (have_hash) printf(" | AHASH s=%lu %08lx", (unsigned long)hpos, (unsigned long)hval);
     printf("\n");
+
+    /* The per-pass breakdown, in cycles per frame on core 0. RP_TRI_* are
+     * nested inside "scene", so "setup" below is the scene's cost with the
+     * triangles taken out: the per-triangle work, which is what priority zero
+     * is about. Its own line, because it does not fit on that one. */
+    uint32_t rp[RP_COUNT];
+    r_prof_read(rp);
+    uint64_t total = 0, tris = 0;    /* 32 bits overflows over a phrase window */
+    printf("PROF %s t=%lu ph=%lu %s frames=%lu |",
+           tag, (unsigned long)(sample / CV_RATE), (unsigned long)(bar / 8 + 1),
+           song_section_name(song_section(bar)), (unsigned long)w->frames);
+    for (int i = 0; i < RP_COUNT; i++) {
+        const uint32_t d = rp[i] - w->rprof0[i];
+        total += d;
+        if (i >= RP_TRI_FLAT && i <= RP_TRI_FURNACE) tris += d;
+        printf(" %s=%lu", r_prof_name(i), (unsigned long)(d / n));
+    }
+    const uint32_t dscene = rp[RP_SCENE] - w->rprof0[RP_SCENE];
+    printf(" | setup=%lu total=%lu\n",
+           (unsigned long)((dscene > tris ? dscene - tris : 0) / n),
+           (unsigned long)((total - tris) / n));
 }
 
 /* ------------------------------------------------------------------ main -- */

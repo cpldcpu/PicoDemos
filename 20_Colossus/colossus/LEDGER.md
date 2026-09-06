@@ -29,7 +29,11 @@ buffers are allocated out of the heap after the static image is placed.
 | `r_shades[4][256]` (slot 2 reused for dawn chrome palette) | 2048 | 2048 | Phase | static | 396076 |
 | `body_cache[24]` × 28-byte attributed vertex | 672 | 672 | Phase | static | 396748 |
 | `body_joints[5][3]` | 60 | 60 | Phase | static | 396808 |
-| Renderer context, stats, bounds, alignment (ceiling; includes environment, dawn and curl scalars) | 256 | 88 | Phase | static | 397064 |
+| `r_sky_pal[256]`, resolved sky palette | 512 | 512 | Overscan | static | 396808+ |
+| `r_sky_dim[256]`, the same for chapter 4's aperture | 512 | 512 | Overscan | static | |
+| `r_fog_row[320]`, the floor's fog, built once a frame | 640 | 640 | Overscan | static | |
+| `r_sky_x[320]`, the fixed x to sky-texel map | 320 | 320 | Overscan | static | |
+| Renderer context, stats, bounds, profile counters, alignment (ceiling) | 256 | 204 | Overscan | static | 399048 |
 | Synth `g_sin[1024]` | 2048 | 2048 | Phosphor | static | 399112 |
 | Synth `g_oct8[12]` | 48 | 48 | Phosphor | static | 399160 |
 | Synth `g_dly[8640]` | 17280 | 17280 | Phosphor | static | 416440 |
@@ -39,7 +43,7 @@ buffers are allocated out of the heap after the static image is placed.
 | Synth `S` (device sizeof) | 772 | 772 | Phosphor | static | 436056 |
 | Synth `g_hash`, `g_mark_{seq,pos,hash}` | 16 | 16 | Phosphor | static | 436072 |
 | audio_pwm.c: DMA rings `s_left`/`s_right` (4096), block `s_tmp` (256), hot code (300), state (28) | 4680 | 4680 | Overscan | static | 440752 |
-| Renderer SRAM hot code (reservation; measured is `r_bloom` alone) | 8192 | 704 | Phase | copied code | 448944 |
+| Renderer SRAM hot code: `r_triangle` 3048, `r_background` 2192, `r_transition` 812, `r_embers` 804, `r_bloom` 716 | 7572 | 7572 | Overscan | copied code | 448324 |
 | Synth SRAM hot code `render_block` (5144) and `synth_render` (2704) | 7848 | 7848 | Phosphor | copied code | 456792 |
 | SDK, newlib and TinyUSB globals (12391) and inter-section alignment (1145) | 13536 | 13536 | Overscan | static | 470328 |
 | Two core stacks, includes all renderer scratch | 8192 | 8192 | Overscan | scratch | — |

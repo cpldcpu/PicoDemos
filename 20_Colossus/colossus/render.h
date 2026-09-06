@@ -27,4 +27,24 @@ void r_end_inscription(int y);
 void r_environment(unsigned mode);
 /* Explicit diagnostic entry point; no hidden mode affecting demo_render. */
 void render_material_test(uint16_t *page,uint32_t sample);
+
+/* ------------------------------------------------------------- profiling --
+ *
+ * Per-pass cycle counters, always compiled in, read off core 0's SysTick on
+ * the device and zero on the host. The counters are monotonic and wrap; take
+ * differences, as main.c does. Each individual pass must stay under the
+ * 24-bit counter's 56 ms at 300 MHz -- the whole frame need not.
+ *
+ * RP_TRI_* are nested inside RP_SCENE, so RP_SCENE minus their sum is the
+ * transform, pose and clip cost: the part that is charged per triangle
+ * rather than per pixel, and the reason a 70-triangle phrase cost 66 ms.
+ */
+enum {
+    RP_CLEAR, RP_SKY, RP_FLOOR, RP_SCENE,
+    RP_TRI_FLAT, RP_TRI_GOURAUD, RP_TRI_CHROME, RP_TRI_TEXTURE, RP_TRI_FURNACE,
+    RP_EMBERS, RP_BLOOM, RP_VEIL, RP_TITLES, RP_FADE,
+    RP_COUNT
+};
+void        r_prof_read(uint32_t *cycles);   /* RP_COUNT entries              */
+const char *r_prof_name(int slot);
 #endif
