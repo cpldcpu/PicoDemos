@@ -2,6 +2,18 @@
 #include "body.h"
 #include "song.h"
 #include <math.h>
+/* Phase's poses move the camera 0.8 body units to its right across the move.
+ * Built with the plates' actual depth rather than as a flat study, that swing
+ * closes the notch between them to two native pixels by bar 124 -- and the
+ * notch reading as sky is the harder of the two constraints, because it is
+ * the thing the chapter is about. Measured (tools/crown_notch.py, over all
+ * sixteen bars): 0.80 gives 2 px, 0.65 gives 4, 0.55 gives 5-7, 0.40 gives 4,
+ * 0.25 gives 3. 0.55 is the widest the notch gets, so the swing is 0.55 and
+ * the rest of Phase's design -- both end positions' height and depth, the
+ * targets, the focal length, the ease and the settle -- is unchanged. */
+#ifndef CROWN_SWING
+#define CROWN_SWING 0.55f
+#endif
 static float unit(float x){return fminf(1,fmaxf(0,x));}
 static float ease(float x){x=unit(x);return x*x*(3-2*x);}
 static void box(float x,float y,float z,float w,float h,float d,RMaterial m)
@@ -13,7 +25,19 @@ static void plain(float t)
         float x=-37+t+(i-3)*3.9f;
         body_box((BodyPart){x,1.0f,-12+i%3,3.2f,.65f+(i%3)*.42f,2.5f,12.f*(i%3-1),0,R_TEXTURE},0);
     }
-    (void)t;
+    /* The registration pier. One upright that walks into the screen position
+     * the hand's wrist will occupy at bar 24, so the substitution at that
+     * downbeat is a real match of shapes rather than a dissolve between two
+     * unrelated pictures.
+     *
+     * The camera holds at (-37+t, 11, -35) with focal 160, and the wrist
+     * projects to about (156, 104) under the hand's camera at bar 24. A pier
+     * standing on the plain whose top edge lands there is 12.4 units tall and
+     * 2.3 wide at fourteen units of depth; it starts at thirty units out and
+     * closes to fourteen across the chapter, so it arrives rather than
+     * appears. Its top is the wrist; its shaft is the forearm. */
+    const float approach=-5.0f-16.0f*t;
+    body_box((BodyPart){-36.35f+t,6.20f,approach,2.30f,12.40f,2.50f,0,0,R_TEXTURE},0);
 }
 static void heart(float bars)
 {
@@ -84,9 +108,75 @@ static void spine(float bars)
     }
     (void)bars;
 }
-static void crown(float bars){body_draw(-3,0);(void)bars;}
+/* VI - CROWN, bars 112-127, from Phase's design in briefs/sketches/round4.
+ *
+ * What has to read: two unequal plates with actual cold sky between them, a
+ * projecting brow, and a warm circular source set back in a blue-black
+ * recess with a dark outer bearing and a small bright centre. The shared body
+ * already carries the plates (tops at 20.4 and 19.7) and the brow; what it
+ * did not carry was an eye -- eye_recess is a flat rectangle, and at this
+ * camera it read as a black letterbox. So the eye is built here, in the one
+ * chapter that looks straight at it.
+ *
+ * Phase's coordinates are +Z out of the face; the renderer's are the
+ * opposite, so the eye's (0,17.45,0.64) is (0,17.45,-0.64) here.
+ *
+ * body_ring draws an annulus from 0.62r to r, so four of them nested make a
+ * bearing that steps inward from cold chrome to a small warm centre. Only the
+ * innermost carries emission, which is what keeps the bloom restrained: it is
+ * about five native pixels across at this focal length. */
+static void crown(float bars)
+{
+    body_draw(-3,0);
+    const float ez=-0.64f,ey=17.45f;
+    /* body_ring is an annulus from 0.62r to r, so a disc is a short chain of
+     * them at one depth. Nesting them at DIFFERENT depths, which is what I
+     * tried first, makes the near ring occlude the far half of the next and
+     * the source reads as a crescent rather than a circle. */
+    body_ring(0,ey,ez,      .58f,2,R_FLAT,0);      /* blue-black surround   */
+    body_ring(0,ey,ez-.04f, .40f,2,R_TEXTURE,0);   /* dark outer bearing    */
+    body_ring(0,ey,ez-.04f, .25f,2,R_TEXTURE,0);
+    body_ring(0,ey,ez-.09f, .155f,2,R_FLAT,150);   /* the source, filled    */
+    body_ring(0,ey,ez-.09f, .096f,2,R_FLAT,150);
+    body_ring(0,ey,ez-.09f, .060f,1,R_FLAT,150);
+    /* The brow projects over it and is the shape that makes the hood a hood
+     * rather than a slab. Two plates and a lip, all bronze. */
+    box(0,18.62f,-1.55f,2.55f,.42f,1.20f,R_TEXTURE);
+    box(-1.30f,18.30f,-1.30f,.60f,.95f,.85f,R_TEXTURE);
+    box( 1.30f,18.30f,-1.30f,.60f,.95f,.85f,R_TEXTURE);
+    box(0,18.10f,-1.92f,2.05f,.22f,.30f,R_TEXTURE); /* the brow's lip       */
+    (void)bars;
+}
 static void reveal(float bars){body_draw(-1,0);(void)bars;}
 static void coda(float bars){reveal(bars);}
+/* The outgoing chapter's matched shape, drawn in screen space into whichever
+ * cell the veil has scissored, for the cells that have not been exchanged yet.
+ *
+ * It is screen space and not world space on purpose: the whole point of the
+ * substitution is that the two shapes occupy the same pixels, so the shape is
+ * specified where the match lives. One structure per cell, one draw.
+ *
+ * Only bar 24 has a real matched shape so far -- the plain's registration
+ * pier against the hand's wrist. The others return 0 and the veil falls back
+ * to its glow alone; tools/transition_check.py lists them. */
+int scene_outgoing(unsigned boundary,float z,float focal)
+{
+    switch(boundary){
+    case 24:{
+        /* the pier: an upright bronze shaft with its top at the wrist */
+        const float f=focal;
+        const int x0=132,x1=180,y0=104,y1=240;
+        RVertex a={(x0-160)*z/f,(120-y0)*z/f,z,155,0,0,0};
+        RVertex b={(x1-160)*z/f,(120-y0)*z/f,z,205,63,0,0};
+        RVertex c={(x1-160)*z/f,(120-y1)*z/f,z,120,63,63,0};
+        RVertex d={(x0-160)*z/f,(120-y1)*z/f,z,70,0,63,0};
+        r_triangle(a,b,c,R_TEXTURE);r_triangle(a,c,d,R_TEXTURE);
+        return 1;
+    }
+    default:return 0;
+    }
+}
+
 RCamera scene_camera(uint32_t sample,int chapter)
 {
     float b=(float)sample/CV_BAR,t;
@@ -99,7 +189,19 @@ RCamera scene_camera(uint32_t sample,int chapter)
     case 4:t=ease((b-64)/8);c=(RCamera){.08f,16,0,17.4f,-4.9f+6.4f*t,0,190};break;
     case 5:t=ease((b-72)/16);c=(RCamera){.2f,18,.1f,16.0f,-3.9f+.2f*t,-.05f,190};break;
     case 6:t=unit((b-88)/24);c=(RCamera){.3f,40,-.3f-3.8f*ease((t-.3f)/.65f),8.5f+14*t,6.8f+3*t,3.14159265f-.32f*ease(t),190};break;
-    case 7:t=ease((b-112)/16);c=(RCamera){.3f,26,-3.5f,18.7f,-6.5f,-.52f+.10f*t,190};break;
+    case 7:{
+        /* Phase's two poses, eased over 112-124 and held through 127. The
+         * file gives position and target; yaw and pitch are derived rather
+         * than interpolated, so the camera keeps looking at the head all the
+         * way across instead of drifting off it in the middle. */
+        t=ease((b-112)/12);
+        const float px=6.0f+CROWN_SWING*t,py=16.0f+0.6f*t,pz=-(12.0f-0.2f*t);
+        const float tx=0.0f,ty=18.35f+0.10f*t,tz=0.0f;
+        const float dx=tx-px,dy=ty-py,dz=tz-pz;
+        const float horiz=sqrtf(dx*dx+dz*dz);
+        c=(RCamera){.3f,40,px,py,pz,atan2f(-dx,dz),510,atan2f(dy,horiz)};
+        break;
+    }
     case 8:t=ease((b-128)/7);c=(RCamera){1,60,-1.7f*(1-t),14.8f-3.f*t,-12-12*t,.08f*t,190};break;
     case 9:c=(RCamera){1,60,0,11.8f,-24,.08f,190};break;
     }

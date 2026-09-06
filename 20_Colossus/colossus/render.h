@@ -4,7 +4,9 @@
 #include "demo.h"
 typedef struct { float x,y,z,l,u,v,e; } RVertex;
 typedef enum { R_FLAT, R_GOURAUD, R_CHROME, R_TEXTURE, R_FURNACE } RMaterial;
-typedef struct { float near_z,far_z,cx,cy,cz,yaw,focal; } RCamera;
+/* pitch is last so every existing positional initialiser leaves it zero.
+ * Positive pitch looks up, which is the only thing a monument needs. */
+typedef struct { float near_z,far_z,cx,cy,cz,yaw,focal,pitch; } RCamera;
 void r_begin(uint16_t *page, unsigned chapter, RCamera camera);
 void r_background(uint32_t sample);
 RVertex r_transform(float x,float y,float z,float nx,float ny,float nz,float u,float v);
@@ -23,6 +25,13 @@ void scene_titles(uint32_t sample,int chapter);
 void r_transition(uint32_t sample);
 void r_portal(float x,float y,float z,float radius);
 void r_portal_reset(void);
+/* A raw screen-space scissor, for the veil's cell exchange. r_portal is the
+ * same thing derived from a world sphere; this is the rectangle directly. */
+void r_scissor(int x0,int y0,int x1,int y1);
+/* The outgoing chapter's matched shape at a boundary, in screen space, for
+ * the cells that have not yet been exchanged. Returns 0 if this boundary has
+ * no matched shape yet -- tools/transition_check.py lists which. */
+int  scene_outgoing(unsigned boundary,float z,float focal);
 void r_end_inscription(int y);
 void r_environment(unsigned mode);
 /* Explicit diagnostic entry point; no hidden mode affecting demo_render. */

@@ -7,8 +7,8 @@ and writes one `<name>.pixels.bin` and `<name>.palette.bin` per asset plus a
 manifest. It deliberately writes no C. This does that half, and nothing else:
 no resampling, no requantising, no palette decisions. Bytes in, bytes out.
 
-    python tools/pack_assets.py                     # from assets/round4
-    python tools/pack_assets.py --dir assets/round3 # or any other round
+    python tools/pack_assets.py                     # from assets/round6
+    python tools/pack_assets.py --dir assets/round4 # or any other round
 
 It checks each pixel file against the manifest's `pixel_sha256` before
 emitting, so a half-written or mismatched bin cannot silently reach flash, and
@@ -49,7 +49,7 @@ def main():
     here = os.path.dirname(os.path.abspath(__file__))
     root = os.path.dirname(here)
     ap = argparse.ArgumentParser()
-    ap.add_argument("--dir", default=os.path.join(root, "assets", "round4"))
+    ap.add_argument("--dir", default=os.path.join(root, "assets", "round6"))
     ap.add_argument("--check", action="store_true",
                     help="verify only; write nothing")
     args = ap.parse_args()

@@ -261,13 +261,22 @@ void CV_HOT(r_background)(uint32_t sample)
 }
 RVertex r_transform(float x,float y,float z,float nx,float ny,float nz,float u,float v)
 {
-    float c=cosf(r_camera.yaw),s=sinf(r_camera.yaw);
+    const float c=cosf(r_camera.yaw),s=sinf(r_camera.yaw);
     x-=r_camera.cx;y-=r_camera.cy;z-=r_camera.cz;
-    float xx=x*c+z*s,zz=-x*s+z*c;
+    float xx=x*c+z*s,zz=-x*s+z*c,yy=y;
+    float nxx=nx*c+nz*s,nzz=-nx*s+nz*c,nyy=ny;
+    /* Pitch about the camera's own X axis, after yaw. Zero for every chapter
+     * but the crown, which has to look up at a head four body units above the
+     * lens and cannot do it by moving the horizon. */
+    if(r_camera.pitch!=0){
+        const float cp=cosf(r_camera.pitch),sp=sinf(r_camera.pitch);
+        const float y2=yy*cp-zz*sp;zz=yy*sp+zz*cp;yy=y2;
+        const float n2=nyy*cp-nzz*sp;nzz=nyy*sp+nzz*cp;nyy=n2;
+    }
     /* Lighting remains in world space. Matcap normals follow the camera. */
-    float light=fmaxf(0,-nx*.4f+ny*.75f-nz*.45f);
+    const float light=fmaxf(0,-nx*.4f+ny*.75f-nz*.45f);
     (void)u;(void)v;
-    return (RVertex){xx,y,zz,35+200*light,31.5f+31*(nx*c+nz*s),31.5f-31*ny,0};
+    return (RVertex){xx,yy,zz,35+200*light,31.5f+31*nxx,31.5f-31*nyy,0};
 }
 typedef struct {float x,y,q,l,u,v,e;} Screen;
 static Screen project(RVertex a)
@@ -276,6 +285,11 @@ static Screen project(RVertex a)
     return (Screen){160+a.x*r_camera.focal*iz,120-a.y*r_camera.focal*iz,1+254*(iz-1/f)/(1/n-1/f),a.l,a.u,a.v,a.e};
 }
 void r_portal_reset(void){clip_x0=clip_y0=0;clip_x1=320;clip_y1=240;}
+void r_scissor(int x0,int y0,int x1,int y1)
+{
+    clip_x0=clamp(x0,0,CV_W);clip_x1=clamp(x1,0,CV_W);
+    clip_y0=clamp(y0,0,CV_H);clip_y1=clamp(y1,0,CV_H);
+}
 void r_portal(float x,float y,float z,float radius)
 {
     RVertex v=r_transform(x,y,z,0,0,-1,0,0);
@@ -448,45 +462,54 @@ void CV_HOT(r_transition)(uint32_t sample)
     const uint32_t t_v=prof_begin();
     static const unsigned boundaries[]={8,24,40,56,72,88,112,128,144};
     for(unsigned i=0;i<sizeof boundaries/sizeof boundaries[0];i++){
-        float dt=((float)sample-boundaries[i]*CV_BAR)/CV_RATE;
-        if(fabsf(dt)>1.5f)continue;
-        float t=1-fabsf(dt)/1.5f;t=t*t*(3-2*t);
-        if(i==8)t*=.35f; /* The coda holds the exact reveal camera/world. */
-        float z=r_camera.near_z*1.1f;
-        for(int rib=0;rib<2;rib++){
-            float x= rib?232:64,w=18*t;
-            RVertex a={(x-160)*z/r_camera.focal,120*z/r_camera.focal,z,130,0,0,0};
-            RVertex b=a,c=a,d=a;b.x+=(w*z/r_camera.focal);c.x=b.x;c.y=-120*z/r_camera.focal;d.y=c.y;
-            a.u=d.u=0;b.u=c.u=63;a.v=b.v=0;c.v=d.v=63;
-            r_triangle(a,b,c,R_TEXTURE);r_triangle(a,c,d,R_TEXTURE);
+        const float dt=((float)sample-boundaries[i]*CV_BAR)/CV_RATE;
+        if(fabsf(dt)>.5f)continue;
+
+        /* Phase's envelope, from the six-moment strip: the glow is zero at
+         * half a second either side, 0.85 of peak at a tenth, and the
+         * substitution runs from the downbeat to +0.18 s -- inside the +0.3 s
+         * the design allows. Before the downbeat nothing is exchanged, which
+         * is why the outgoing structure is only ever drawn after it: until
+         * then the chapter on screen IS the outgoing one. */
+        const float u=1-fabsf(dt)/.5f;
+        float glow=u*u*(3-2*u);
+        const float sub=dt<=0?0:(dt>=.18f?1:dt/.18f);
+        if(i==8)glow*=.35f; /* the coda holds the exact reveal camera */
+
+        /* The exchange, in small stable screen-space cells inside the local
+         * substitution silhouette. One structure per cell: a cell shows the
+         * incoming chapter (which is simply what is already on the page) or
+         * the outgoing shape, never a blend of the two, and which one is a
+         * fixed per-cell threshold so the pattern does not crawl. */
+        if(sub>0 && sub<1){
+            const int sx=128,sy=56,sw=56,sh=126,cw=14,ch=21;
+            for(int cy=0;cy<sh/ch;cy++)for(int cx=0;cx<sw/cw;cx++){
+                const float thr=(float)(hash((unsigned)(cx+cy*7+(int)i*131))&1023)/1024.f;
+                if(sub>thr)continue;               /* already exchanged */
+                r_scissor(sx+cx*cw,sy+cy*ch,sx+cx*cw+cw,sy+cy*ch+ch);
+                if(!scene_outgoing(boundaries[i],r_camera.near_z*1.15f,r_camera.focal))break;
+            }
+            r_portal_reset();
         }
-        /* The veil is a local glow, not a wash.
-         *
-         * It used to be a full-page loop -- 76,800 pixels of hash and float
-         * per frame, three million cycles, and an opacity that reached 236 of
-         * 255 warm grey, which is the frame of brown the plan forbids. It is
-         * now one ellipse of 220x120, 27% of the frame, peaking at an alpha
-         * of 0.24 and falling as (1-r^2)^2 so it has no edge. r^2 is stepped
-         * in 12.12 with reciprocals, the alpha carries four fractional bits
-         * and is dithered through Bayer, so a 61-step ramp over 110 pixels
-         * has no bands in it. */
-        const int cx=160,cy=132,ra=110,rb=60;
+
+        /* The veil itself: Phase's ellipse, centre (151,85), radii (69,110),
+         * peak alpha 0.24 falling as (1-r^2)^2, dithered through Bayer so a
+         * sixty-step ramp over a hundred pixels has no bands and no edge. */
+        const int cx=151,cy=85,ra=69,rb=110;
         const int inv_ra2=(4096*4096)/(ra*ra),inv_rb2=(4096*4096)/(rb*rb);
-        const int peak=(int)(.24f*255*16*t);
+        const int peak=(int)(.24f*255*16*glow);
         const uint16_t warm=cv_rgb(196,150,104);
         const int y0=cy-rb<0?0:cy-rb,y1=cy+rb>=CV_H?CV_H-1:cy+rb;
         const int x0=cx-ra<0?0:cx-ra,x1=cx+ra>=CV_W?CV_W-1:cx+ra;
-        for(int y=y0;y<=y1;y++){
-            const int dy=y-cy;
-            const int qy=(dy*dy*inv_rb2)>>12;
+        if(peak>0)for(int y=y0;y<=y1;y++){
+            const int dy=y-cy,qy=(dy*dy*inv_rb2)>>12;
             if(qy>=4096)continue;
             uint16_t *row=r_page+y*CV_W;
             for(int x=x0;x<=x1;x++){
-                const int dx=x-cx;
-                const int q=qy+((dx*dx*inv_ra2)>>12);
+                const int dx=x-cx,q=qy+((dx*dx*inv_ra2)>>12);
                 if(q>=4096)continue;
-                const int f=4096-q,w=(f*f)>>12;
-                const unsigned av=(unsigned)((peak*w)>>12);
+                const int f=4096-q,wq=(f*f)>>12;
+                const unsigned av=(unsigned)((peak*wq)>>12);
                 const unsigned a=(av+BAYER4(x,y))>>4;
                 if(a)row[x]=mix5(row[x],warm,a+(a>>7));
             }
