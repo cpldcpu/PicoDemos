@@ -42,6 +42,23 @@
 
 #define LED_PIN 25
 
+/* PLANNING section 8's worst case, on the device.
+ *
+ * scene_material_test.c builds the exact ceiling -- 1,500 triangles, 90,000
+ * candidate fragments, all four material paths, 256 embers and the bloom --
+ * behind render_material_test(), which Phase made an explicit entry point so
+ * that no hidden mode can change what demo_render() draws. Built with
+ * -DCOLOSSUS_MATERIAL_TEST=ON it replaces the picture for the whole run, so
+ * the telemetry below measures the ceiling and nothing else. The prototype is
+ * repeated here rather than including render.h, so this file does not depend
+ * on the shape of Phase's headers. */
+#if CV_MATERIAL_TEST
+void render_material_test(uint16_t *page, uint32_t sample);
+#  define CV_DRAW(page, sample) render_material_test((page), (sample))
+#else
+#  define CV_DRAW(page, sample) demo_render((page), (sample))
+#endif
+
 /* Ballast for measuring the boot floor: link N bytes of .bss that nothing
  * uses, bisect N until the firmware stops booting, and the last heap_free it
  * printed is the floor. See the reply. */
@@ -231,7 +248,7 @@ int main(void)
 
     /* Frame 0 exists before the DMA starts, so sample 0 is on screen when
      * sample 0 leaves the DAC. */
-    demo_render(video_back(), 0);
+    CV_DRAW(video_back(), 0);
     video_present();
     gpio_put(LED_PIN, 0);
     audio_start();
@@ -250,7 +267,7 @@ int main(void)
         if (sample >= CV_TOTAL_SAMPLES) break;
 
         const uint64_t t0 = time_us_64();
-        demo_render(video_back(), sample);
+        CV_DRAW(video_back(), sample);
         const uint32_t render = (uint32_t)(time_us_64() - t0);
 
         video_present();
@@ -294,7 +311,7 @@ int main(void)
     }
 
     window_report("PHRASE", &phr, time_us_64(), CV_TOTAL_SAMPLES - 1);
-    demo_render(video_back(), CV_TOTAL_SAMPLES - 1);
+    CV_DRAW(video_back(), CV_TOTAL_SAMPLES - 1);
     video_present();
 
     video_prof_t p; video_prof(&p);

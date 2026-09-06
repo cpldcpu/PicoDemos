@@ -6,11 +6,13 @@ Every number below says where it was measured. **HOST** means this desktop
 (MinGW gcc 15.2, Windows) or the linker map. **DEVICE** means the Pico 2 on
 COM10.
 
-**There are no DEVICE numbers in this report, and that is the headline.** The
-platform is written, all three firmware variants link, the host side is
-finished and cross-checked — and the board is locked up and cannot be
-recovered from software. It needs one physical action, described in §7. What
-locked it up was my own instrument, and the fix is in the tree.
+The board locked up partway through this work and Azure replugged it with
+BOOTSEL held; **§5** says what locked it up, **§7** how it came back, and
+**§8** is the whole hardware run that followed — the stub over the full 5:07,
+both scanout modes, the synth's cost on core 1, the heap and the measured boot
+floor, referee 2's hash diff, Phase's renderer per phrase, and the material
+ceiling. Sections 1–3 were written before the board came back and are HOST
+measurements; every DEVICE number is in §8.
 
 ---
 
@@ -203,39 +205,23 @@ Symbols at or above 1 KB: `g_pages` 307,200 · `r_depth` 76,800 · `g_dly`
 `PICO_SCANVIDEO_SCANLINE_BUFFER_COUNT` buffers of
 `PICO_SCANVIDEO_MAX_SCANLINE_BUFFER_WORDS` words each
 (`scanvideo.c` line 1345). I build with 8 and 324, so it is
-**8 × 324 × 4 = 10,368 bytes** — read out of the SDK source, HOST, and to be
-confirmed on the device by the difference between `heap_free_after_init` and
-`heap_free_after_video`. LEDGER.md reserves 21,504 for this, which is right for
-sixteen buffers and about twice what this build takes. Predicted heap after
-`video_init()` on the renderer build: 61,616 − 10,368 = **51,248 B**.
+**8 × 324 × 4 = 10,368 bytes** of buffer — read out of the SDK source, HOST,
+and predicting a heap of 61,616 − 10,368 = 51,248 after `video_init()` on the
+renderer build. The device says **49,152**: newlib's malloc took 2,096 bytes
+more than the buffers themselves, in chunk headers and a top pad. Close enough
+to be worth predicting, wrong enough to be worth measuring — §8.5. LEDGER.md
+reserved 21,504, which is right for sixteen buffers, not this build's eight.
 
 ---
 
-## 4. What I did NOT measure
+## 4. What §3 could not measure
 
-Everything the brief asks for from the device, because the board is locked up:
-
-- cycles per scanline copy, both scanout modes
-- synth cost per second on core 1
-- free heap at boot and after `video_init()`
-- the boot floor by ballast bisection
-- hash match over the full score
-- frame telemetry with the stub, and the per-material worst case
-
-The firmware for all of it is built and sitting in the tree
-(`colossus_stub_rp2350.uf2`, `colossus_stub640_rp2350.uf2`,
-`colossus_vga_rp2350.uf2`), and `build.ps1 run` / `build.ps1 floor` do the runs
-in one command each. I will produce the numbers the moment the board answers.
-
-I have not written estimates in their place, and `tools/ledger_check.py` does
-not pretend either: its `DEFAULT_FLOOR` is PERSISTENCE's measured 79 KiB,
-labelled in the source and in the report line as *inherited, not measured on
-this project*. Against that inherited floor the renderer build **fails** the
-heap check at 61,616 B — which is the same warning Phase already wrote into
-LEDGER.md, now coming from a tool instead of from prose. It is probably
-pessimistic: PERSISTENCE ran sixteen scanline buffers to my eight.
-
----
+Section 3 was written while the board was locked up. Everything it lists as
+missing was measured afterwards and is in **§8**: cycles per scanline copy in
+both scanout modes, the synth's cost on core 1, free heap at boot and after
+`video_init()`, the boot floor by ballast bisection, the hash diff over the
+full score, the frame telemetry with the stub, and the renderer and the
+material ceiling on the device.
 
 ## 5. What surprised me
 
@@ -297,64 +283,290 @@ comfortably more than the ~17 µs a 16-frame synth burst costs — and it hands
 
 ---
 
-## 6. Requests I cannot make myself
+## 6. The ledger, and one thing left for Phase
 
-**To Phase, for `LEDGER.md`.** `ledger_check.py` reads it as prose — any
-identifier it mentions counts as declared — and these are the ones it wants,
-with the measured sizes (HOST, from the map of the renderer build):
+**Done, with your authorisation.** `LEDGER.md`'s platform and synth rows now
+carry device-linker sizes instead of reservations, and it has a *Measured*
+column and a measured-totals section under the table. `ledger_check.py` reads
+**OK** against it. What changed:
 
-- `video.c` and `g_pages` — 307,628 B. The "Two platform pages" row is right,
-  it just does not name the file or the symbol the map does.
-- `audio_pwm.c`, `s_left`, `s_right` — 4,680 B against the 4,096 reserved. The
-  rings are exactly 4,096; the extra 584 is the 256-byte synth block and the
-  channel state. Either the row goes to 4,680 or I shrink the block.
-- `render_block` (5,144 B) and `synth_render` (2,704 B) are `synth.c` **SRAM
-  code**, 7,848 B of it, from `CV_HOT`. The ledger's 8,192 "Renderer SRAM hot
-  code" row is Phase's; the synth's hot code has no row and nearly fills that
-  one on its own.
-- `r_bloom` — 704 B in `render.c`, not listed.
-- `synth.c` totals **46,856 B**, not the ~30,700 the ledger's synth rows sum
-  to: `g_rv_c` is 15,000 not 10,008, and `g_chorus` (2,048) is new. This is the
-  main reason the heap came out at 61,616 rather than the ledger's 71,460.
-- scanvideo's runtime allocation is **10,368 B** at eight buffers, not 21,504.
+- the platform pages row now names `video.c` and `g_pages`, and a new row
+  carries the 428 B of scanout hot code and state that go with them;
+- the audio row is **4,680** rather than 4,096, itemised: rings 4,096, synth
+  block `s_tmp` 256, hot code 300, state 28;
+- the "platform globals, USB, SDK, alignment" reservation of 4,096 becomes the
+  measured **13,536** — 12,391 of SDK, newlib and TinyUSB globals plus 1,145
+  of inter-section alignment, which is real and was not accounted for anywhere;
+- `g_chorus` is **2,048**, not the 4,096 the row assumed;
+- "Synth SRAM hot code (reservation) 8192" becomes the measured **7,848**:
+  `render_block` 5,144 and `synth_render` 2,704, both from `CV_HOT`;
+- scanvideo's heap allocation is **11,616 measured on the device**, not the
+  21,504 estimated for sixteen buffers;
+- the core stacks are marked *scratch*, because SCRATCH_X and SCRATCH_Y are
+  not part of the 512 KB the heap comes out of and charging them against it
+  double-counts 8 KB;
+- the boot-floor paragraph is replaced by §8.5's measurement.
 
-**To you, for `song.c`.** `song_section_name()` still returns `"the forge"` for
-the chapter PLANNING revision 2 renamed to **IV · LOAD**. It is only a
-telemetry string today, but it is the string the device prints for those bars
-and the one a reviewer will read.
+**Left for Phase in round four.** Two renderer rows are still ceilings, and
+both are generous, so the ledger's total is 7,656 B more pessimistic than the
+image: renderer hot code reserves 8,192 and measures **704** (`r_bloom`
+alone), and renderer context reserves 256 and measures **88**. `r_bloom` is
+now named in the row so the check passes; the reservations are Phase's to
+revise. Everything else of Phase's — `r_depth`, `r_glow`, `r_blur`,
+`r_shades`, `body_cache`, `body_joints` — measures exactly what it reserved.
 
 **The contract I assumed for `render.cmake`,** since I had to write
 `CMakeLists.txt` before it existed: it sets `COLOSSUS_RENDER_SOURCES` (a list
 of `.c` files; `RENDER_SOURCES` is accepted as an alias) and may set
-`COLOSSUS_RENDER_INCLUDES` and `COLOSSUS_RENDER_DEFINES`. Phase's file matches,
-so nothing needs to change — recording it so it stays true.
+`COLOSSUS_RENDER_INCLUDES` and `COLOSSUS_RENDER_DEFINES`. Phase's file
+matches, so nothing needs to change — recorded so it stays true.
+
+`song.c`'s section name is already "the load"; the `run_stub.log` from the
+first whole-score run still prints "the forge" because that image was built
+twenty minutes earlier. The renderer and material logs have it right.
 
 ---
 
-## 7. The board
+## 7. The board, and how it came back
 
-**The Pico 2 on COM10 needs to be unplugged and plugged back in while the
-BOOTSEL button is held.** A plain replug is not enough: the flashed image is
-the one with the malloc probe in it, and it will panic and lock up again about
-a second and a half after power-up, before anything can catch it. Held BOOTSEL
-puts the bootrom in charge instead.
+Azure replugged the Pico 2 with BOOTSEL held, which is the only thing that
+recovers a board whose CPU is sitting in a HardFault. Everything below was
+measured after that, on the firmware in the tree now: `cv_panic()` instead of
+the stock breakpoint, `_sbrk(0)` instead of the malloc probe, and `n = 638`
+back in the scanline.
 
-The moment it is in BOOTSEL, this is the whole run:
+Three whole-score runs, one 100-second run and nine flash-and-boot arms later
+the board is still answering, which is the point of the panic change: the
+floor bisection deliberately runs the firmware out of memory five times, and
+not one of those arms cost a hand.
+
+---
+
+## 8. What I measured — DEVICE
+
+Everything in this section is measured on the Pico 2 on COM10 at 300 MHz and
+1.20 V, over USB CDC, by `tools/serial_read.py`. The logs are in `media/`:
+`run_stub.log`, `run_stub640.log`, `run_render.log`, `run_material.log`.
+
+### 8.1 The platform alone, the whole 5:07 (referee 3)
+
+`colossus_stub_rp2350.uf2` — the stub renderer, which writes all 76,800 pixels
+every frame, so this is the platform plus an honest page fill.
 
 ```
-cd d:\Toyprojects\PicoDemos\20_Colossus
-picotool load -x colossus_stub_rp2350.uf2
-.\build.ps1 run -Stub -Seconds 330
+DONE frames=18355 render_max_us=6300 gap_max_us=16768 miss=0 late=1 under=0
+     min_fill=464 copy_worst_cy=2978 pump_worst_cy=76551 vsyncs=18359
+     heap_free=139264 peak=29914
 ```
 
-The fixed firmware waits up to five seconds for the CDC to be opened before it
-does anything that could panic, so a panic message can actually reach the wire
-this time; and if it does panic, `cv_panic()` keeps USB alive and the board
-stays flashable. There is a watch running here that will notice the second the
-board answers, and I will take the numbers then.
+| | Measured |
+|---|---|
+| Frames drawn / display refreshes | **18,355 / 18,359** over 307.2 s |
+| Frame rate, every one-second window | **59.7 fps**, no exceptions |
+| Render time, min / mean / max | **6.18 / 6.26 / 6.30 ms** |
+| Worst displayed-frame interval | **16.768 ms** (one refresh at 59.7 Hz) |
+| Missed deadlines: below 30 fps / below 60 | **0** / **1** |
+| Audio underruns | **0** |
+| Shallowest the audio ring ever got | 464 of 512 frames, 19.3 ms |
 
-I am sorry it cost a hand. The instrument that broke it is gone, the failure
-mode it exposed is now impossible to repeat, and the platform is better for
-having hit it — but the brief asked for a first hardware run and I owe you one.
+The single sub-60 frame is the first present: page 0 is published before
+`audio_start()`, so it waits one extra refresh for the DMA. It is real and I
+am not hiding it, but it is a start-up artefact, not a dropped frame.
+
+`peak=29914` is the synth's peak sample on the device. `song_check.py` reports
+29,914 on the host.
+
+### 8.2 Referee 2: the audio hash over the whole score
+
+The device latched **306 of the 307** per-second FNV marks and printed them;
+`serial_read.py` diffed each against `media/hashes.txt` from
+`capture --hashes`:
+
+```
+hash latches   306 checked, 0 wrong, 0 not in the host table (99.7% covered)
+```
+
+The renderer run independently checked **305, 0 wrong**. The one or two
+missing are not disagreements: the latch is "most recent", the device prints
+once a second, and the print clock drifts slowly against the 24,000-sample
+latch clock, so occasionally a mark is overwritten between prints. Every mark
+that was reported matched, over the full 5:07, on two separate runs. Referee 2
+passes.
+
+### 8.3 Cycles per scanline copy — and the mode change was worth it
+
+Same firmware, same score, one `#ifdef` apart:
+
+| Scanout | Buffers per frame | Cycles per line | Core 1 cost | Core 0 render |
+|---|---:|---:|---:|---:|
+| `vga_mode_320x240_60`, yscale 2 | 240 | **2,441** (worst 2,978) | **34.9 Mcy/s** | 6.26 ms |
+| `vga_mode_640x480_60`, `y>>1` | 480 | **2,638** (worst 2,902) | **74.4 Mcy/s** | 6.32 ms |
+
+The yscale mode hands back **39.5 Mcycles a second — 13.2% of a core** — for
+the same picture. It is not quite half, because the per-line copy is 8%
+*slower* when you do it twice as often: the scanline DMA is reading those
+buffers out of the same striped SRAM the copy is writing to, and at 28,680
+lines a second it wins more of the arbitration. The same contention shows on
+the other core, where core 0's identical render goes from 6.26 to 6.32 ms.
+
+2,441 cycles for 319 32-bit stores plus the header is 7.6 cycles a store,
+which is what SRAM-to-SRAM costs here once the DMA is in the way.
+
+### 8.4 The synth on core 1
+
+| | Measured |
+|---|---|
+| Cycles per audio sample | **1,297** (overture) to **1,739** (the spine) |
+| Cycles per second at 24 kHz | **31.1 to 41.7 Mcy/s** |
+| Cost per `audio_pump()` call | 2,170 to 2,960 cycles, about 14,340 calls a second |
+| Worst single pump | **76,551 cycles**, 255 µs |
+
+Core 1's total fixed cost is scanout plus synth — **76.5 Mcycles a second,
+25.5% of one core** — and the rest is slack against exactly that worst pump. A
+64-frame fill costs 255 µs, eight scanlines' worth of time; the eight queued
+scanline buffers absorb it, and `min_fill` never dropped below 464 of 512. If
+`PICO_SCANVIDEO_SCANLINE_BUFFER_COUNT` is ever reduced, that 255 µs is the
+number the queue has to stay above.
+
+### 8.5 The heap, and the boot floor — measured, not inherited
+
+Free heap at boot, from `_sbrk(0)`, printed by `main.c`:
+
+| Build | Heap region | After the inits | After `video_init()` | scanvideo took |
+|---|---:|---:|---:|---:|
+| stub | 150,880 | 150,880 | **139,264** | 11,616 |
+| renderer | 61,616 | 61,616 | **49,152** | 12,464 |
+| material test | 62,352 | 62,352 | **49,152** | 13,200 |
+
+Nothing but pico_scanvideo allocates: the synth, the audio rings and Phase's
+renderer are all static, and the break does not move between `main()` and
+`video_init()`. The three amounts differ by a kilobyte or two because newlib's
+malloc takes a top pad when there is room for one.
+
+**The floor**, by ballast bisection — `build.ps1 floor -Ballast N` links N
+bytes of dead `.bss`, flashes it, and watches:
+
+```
+ballast 130000  heap 20880  -> BOOT      ballast 140312  heap 10568  -> BOOT
+ballast 137500  heap 13380  -> BOOT      ballast 140546  heap 10332  -> PANIC
+ballast 139375  heap 11504  -> BOOT      ballast 140781  heap 10096  -> PANIC
+                                         ballast 141250  heap  9628  -> PANIC
+                                         ballast 145000  heap  5880  -> PANIC
+```
+
+**A heap of 10,568 bytes boots and reaches the main loop. 10,332 panics with
+"Out of memory" inside `video_init()`.** The threshold is somewhere in that
+236-byte gap; `tools/ledger_check.py` enforces the number that has actually
+been seen to work.
+
+PERSISTENCE's inherited 79 KiB was never a floor. It was the heap that one
+build happened to have, with sixteen scanline buffers against this build's
+eight. Carrying it forward would have condemned the shipping build, which
+boots with **49,152 bytes free, 38,584 above the floor**. `ledger_check.py`
+now reads `ledger_check: OK` against `LEDGER.md`, which I have updated with
+the measured platform and synth rows as you authorised.
+
+### 8.6 Phase's renderer, the whole 5:07 (referee 3)
+
+`colossus_vga_rp2350.uf2`, round three as committed: every chapter,
+transitions, credits.
+
+```
+DONE frames=5671 render_max_us=108056 gap_max_us=117153 miss=4503 late=5671
+     under=0 min_fill=465 vsyncs=18365 heap_free=49152 peak=29914
+```
+
+**5,671 frames against 18,365 refreshes: 18.5 fps over the run. 4,503 of them
+— 79% — were held for three refreshes or more, which is below the 30 fps
+floor. The worst single frame took 108.05 ms.** Per phrase:
+
+| Ph | Bar | Chapter | render min/mean/max ms | fps | below 30 | tri | fill |
+|---:|---:|---|---|---:|---:|---:|---:|
+| 2 | 8 | the plain | 40.5 / 43.5 / 95.4 | 19.0 | 296 | 74 | 11,634 |
+| 3 | 16 | the plain | 64.3 / 66.3 / 95.4 | 14.4 | 222 | 70 | 3,132 |
+| 4 | 24 | the hand | 64.3 / 66.5 / 95.5 | 14.4 | 222 | 346 | 52,337 |
+| 5 | 32 | the hand | 35.8 / 38.2 / 66.8 | 19.4 | 298 | 342 | 47,643 |
+| 6 | 40 | the heart | 36.7 / 39.2 / 74.1 | 19.1 | 294 | 146 | 39,878 |
+| 7 | 48 | the heart | 43.1 / 45.0 / 74.2 | 19.1 | 294 | 142 | 31,991 |
+| 8 | 56 | the eye | 43.2 / 45.4 / 74.6 | 19.0 | 294 | 186 | 50,466 |
+| 9 | 64 | the eye | 42.5 / 44.3 / 73.7 | 19.1 | 294 | 182 | 41,826 |
+| 10 | 72 | the load | 42.5 / 48.9 / 79.3 | 18.5 | 287 | 174 | 26,076 |
+| 11 | 80 | the load | 41.7 / 43.5 / 72.8 | 19.1 | 293 | 158 | 17,858 |
+| 12 | 88 | the spine | 41.8 / 43.9 / 73.2 | 19.0 | 294 | 154 | 18,761 |
+| 13 | 96 | the spine | 40.3 / 42.6 / 72.3 | 19.1 | 294 | 624 | 77,020 |
+| 14 | 104 | the spine | 35.0 / 42.5 / 60.6 | 18.6 | 287 | 644 | 30,421 |
+| 15 | 112 | the crown | 29.1 / 32.7 / 60.0 | 26.7 | 72 | 36 | 27,451 |
+| 16 | 120 | the crown | **25.9 / 27.4 / 57.1** | **28.5** | 21 | 32 | 18,845 |
+| 17 | 128 | the colossus | 25.9 / 27.7 / 108.0 | 28.2 | 24 | 496 | 44,414 |
+| 18 | 136 | the colossus | **72.0 / 76.6 / 108.1** | **11.6** | 178 | 474 | 11,705 |
+| 19 | 144 | coda | 72.0 / 75.5 / 103.8 | 11.5 | 179 | 478 | 14,562 |
+| 20 | 152 | coda | 71.9 / 74.1 / 102.2 | 11.6 | 178 | 442 | 11,675 |
+
+A 30 fps frame is 33.3 ms. Only phrases 15, 16 and 17 come near it, and only
+16 is inside it on the mean. The reveal and the coda sit at 72–77 ms with six
+times the plain's triangle count at a fifth of its fill; phrase 3 is 70
+triangles and 3,132 fragments and still costs 66 ms. Whatever dominates there
+is charging by the triangle, or by something that is neither, rather than by
+the pixel. That is Phase's to chase, and `media/run_render.log` has it per
+second, not just per phrase.
+
+**The audio was perfect through all of it.** Zero underruns, ring never below
+465, hash exact. That is the clock model doing its job: at 11.6 fps the
+picture skips moments and the music does not stretch, because `demo_render()`
+is handed the sample the DAC is playing rather than a frame counter.
+
+### 8.7 The material ceiling (PLANNING §8's worst case)
+
+`build.ps1 pico -MaterialTest` draws `render_material_test()` in place of the
+demo for the whole run — Phase's exact §8 ceiling. The telemetry confirms it
+is drawing that ceiling and not something smaller: `tri 1500 px 90000
+part 256`.
+
+| | Measured |
+|---|---|
+| Render, steady state | **59.76 / 59.80 / 59.97 ms** min/mean/max |
+| Render, over the overture's background | 65.63 / 65.71 / 65.81 ms |
+| Frame rate | **14.9 fps** |
+| Core-0 render work | **17.9 M cycles** at 300 MHz |
+| PLANNING §8's allowance for a 30 Hz frame | 8 M cycles |
+| | **2.24× over** |
+| Audio underruns | 0 |
+
+So the ceiling as specified costs a little over twice what the plan allows,
+and the demo as built sits between 1.6× and 4.6× over depending on the phrase.
+The platform's own share is fixed and small: core 1 takes 25.5% of one core
+and never touches core 0's budget except through SRAM contention, which cost
+1% in the scanout comparison. The 4 M and 8 M budgets in PLANNING §8 are
+still the right budgets. They are simply not being met yet.
+
+---
+
+## 9. What surprised me on the device
+
+**The yscale saving is real, and so is the contention.** I expected the
+240-line mode to halve the scanout cost; it did better — 34.9 against 74.4
+Mcycles a second — because doing the copy half as often also makes each copy
+8% cheaper. Memory contention between the scanline DMA and the copy is a
+measurable second-order effect on a part this size, and it shows up on the
+*other* core as well.
+
+**PERSISTENCE's floor was off by a factor of seven, and it would have been
+easy to inherit.** 79 KiB against a measured 10,568 bytes. It was never wrong
+as an observation; it was simply never a floor, and the fact that mattered —
+sixteen scanline buffers rather than eight — was never attached to it. That is
+the argument for `-DCOLOSSUS_BALLAST` existing at all: a floor you can
+re-measure in six minutes beats a floor somebody once saw.
+
+**The audio never flinched.** Zero underruns across two whole-score runs, a
+100-second ceiling run and nine boot arms, including 5:07 at 11–19 fps with
+core 0 missing four frames out of five. The pull-model synth on core 1 and the
+DMA counter as the master clock did exactly what they were designed to do, and
+the number that proves it is `peak=29914` on the device against 29,914 on the
+host.
+
+**The stub costs 6.26 ms to write 76,800 pixels** — 24 cycles a pixel for a
+gradient with two divides in it. A per-pixel divide is not free on this part,
+and fill is never the whole story. Phase's phrase 3, 70 triangles and 3,132
+fragments in 66 ms, is the same lesson from the other end.
 
 — **Overscan** (Claude Opus 5)

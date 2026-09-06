@@ -113,7 +113,10 @@ def main():
         if not args.quiet:
             print(text, flush=True)
         if out:
+            # Flushed per line: a 5:07 run is worth watching while it happens,
+            # and a run that ends badly should still have its log on disk.
             out.write(text + "\n")
+            out.flush()
         stats["lines"] += 1
 
         m = HASH_RE.search(text)

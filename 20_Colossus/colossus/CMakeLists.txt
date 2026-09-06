@@ -20,10 +20,13 @@ cmake_minimum_required(VERSION 3.13)
 #   COLOSSUS_SCANOUT_640=ON  scan out through vga_mode_640x480_60 and index
 #                      the page with y>>1 (VESPER's arrangement, 480 line
 #                      copies a frame) instead of the yscale=2 mode.
+#   COLOSSUS_MATERIAL_TEST=ON  draw Phase's render_material_test() instead of
+#                      the demo: PLANNING section 8's worst case, measured.
 
 option(COLOSSUS_HOST "Build the host player and capture tool" OFF)
 option(COLOSSUS_STUB "Use the platform's stub renderer" OFF)
 option(COLOSSUS_SCANOUT_640 "Scan out at 640x480 with a doubled row index" OFF)
+option(COLOSSUS_MATERIAL_TEST "Draw render_material_test() instead of the demo" OFF)
 set(COLOSSUS_BALLAST "0" CACHE STRING "bytes of dead .bss, for the heap floor measurement")
 
 # ---------------------------------------------------------------- renderer --
@@ -126,6 +129,12 @@ else()
         ${COLOSSUS_RENDER_DEFINES})
     if(COLOSSUS_SCANOUT_640)
         target_compile_definitions(colossus PRIVATE CV_SCANOUT_640=1)
+    endif()
+    if(COLOSSUS_MATERIAL_TEST)
+        if(COLOSSUS_STUB)
+            message(FATAL_ERROR "COLOSSUS_MATERIAL_TEST needs the renderer, not the stub")
+        endif()
+        target_compile_definitions(colossus PRIVATE CV_MATERIAL_TEST=1)
     endif()
 
     # -fno-math-errno lets the compiler use the FPU's own sqrt instead of a

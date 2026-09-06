@@ -11,6 +11,8 @@
 # Switches:
 #   -Stub          ignore render.cmake; build the platform's stub renderer
 #   -Scanout640    VESPER's 480-copies-a-frame scanout, for the comparison
+#   -MaterialTest  draw Phase's render_material_test(), PLANNING section 8's
+#                  worst case, instead of the demo
 #   -Ballast N     link N dead bytes of .bss (the heap floor measurement)
 #   -Port COM10    the board
 #   -Seconds N     how long `run` listens
@@ -23,6 +25,7 @@ param(
     [string]$Target = 'host',
     [switch]$Stub,
     [switch]$Scanout640,
+    [switch]$MaterialTest,
     [int]$Ballast = 0,
     [string]$Port = 'COM10',
     [double]$Seconds = 12,
@@ -40,7 +43,8 @@ $cvMedia     = Join-Path $cvRoot 'media'
 # between them wastes minutes and eventually lies about what was built.
 $cvVariant = ''
 if ($Stub)       { $cvVariant = '_stub' }
-if ($Scanout640) { $cvVariant = $cvVariant + '640' }
+if ($Scanout640)  { $cvVariant = $cvVariant + '640' }
+if ($MaterialTest) { $cvVariant = $cvVariant + '_mat' }
 if ($Stub) { $cvHostBuild = Join-Path $cvSource 'build_host_stub' }
 else       { $cvHostBuild = Join-Path $cvSource 'build_host' }
 $cvPicoBuild = Join-Path $cvSource "build_rp2350$cvVariant"
@@ -66,6 +70,7 @@ $cvMake   = (Get-Command mingw32-make -ErrorAction Stop).Source
 
 $cvStub = if ($Stub) { 'ON' } else { 'OFF' }
 $cvS640 = if ($Scanout640) { 'ON' } else { 'OFF' }
+$cvMat  = if ($MaterialTest) { 'ON' } else { 'OFF' }
 
 if ($Target -eq 'clean') {
     foreach ($d in (Get-ChildItem -LiteralPath $cvSource -Directory -Filter 'build_*' |
@@ -101,7 +106,8 @@ if ($Target -in @('pico','all','flash','run','floor')) {
     $ExtrasPath = (Resolve-Path -LiteralPath $ExtrasPath).Path
     Invoke-Checked 'cmake' @('-S',$cvSource,'-B',$cvPicoBuild,'-G','MinGW Makefiles',
         "-DPICO_SDK_PATH=$SdkPath","-DPICO_EXTRAS_PATH=$ExtrasPath","-DCMAKE_MAKE_PROGRAM=$cvMake",
-        "-DCOLOSSUS_STUB=$cvStub","-DCOLOSSUS_SCANOUT_640=$cvS640","-DCOLOSSUS_BALLAST=$Ballast")
+        "-DCOLOSSUS_STUB=$cvStub","-DCOLOSSUS_SCANOUT_640=$cvS640",
+        "-DCOLOSSUS_MATERIAL_TEST=$cvMat","-DCOLOSSUS_BALLAST=$Ballast")
     Invoke-Checked 'cmake' @('--build',$cvPicoBuild,'-j','8')
     Copy-Item -LiteralPath (Join-Path $cvPicoBuild 'colossus.uf2') -Destination $cvUf2 -Force
     $elf = Join-Path $cvPicoBuild 'colossus.elf'

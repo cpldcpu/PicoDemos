@@ -22,11 +22,10 @@ check is what keeps it honest. And the two 4 KB core stacks live in SCRATCH_X
 and SCRATCH_Y, not in the 512 KB the heap comes out of, so they are counted
 and printed separately rather than charged against it.
 
-The floor has to be measured on this project, by linking dead .bss with
--DCOLOSSUS_BALLAST=N and bisecting N until the firmware stops booting
-(`build.ps1 floor -Ballast N`). Until that run happens, DEFAULT_FLOOR below
-carries PERSISTENCE's number and says so; do not quote it as a COLOSSUS
-measurement.
+The floor is measured on this project, not inherited: dead .bss is linked in
+with -DCOLOSSUS_BALLAST=N and N bisected until the firmware stops booting
+(`build.ps1 floor -Ballast N`). See DEFAULT_FLOOR below and section 8 of
+briefs/2026-09-06-overscan-platform-reply.md for the run that set it.
 
     python tools/ledger_check.py --map build_rp2350/colossus.elf.map
     python tools/ledger_check.py --map ... --free-heap 41728
@@ -38,16 +37,22 @@ import os
 import re
 import sys
 
-# NOT YET MEASURED ON THIS PROJECT. 79 KiB is PERSISTENCE's measured floor
-# (79 KB of heap booted, 48 KB did not), inherited here as a placeholder so
-# that nothing silently passes against a number nobody has checked. It is
-# almost certainly pessimistic for COLOSSUS: PERSISTENCE ran scanvideo with
-# PICO_SCANVIDEO_SCANLINE_BUFFER_COUNT=16 and this build uses 8, which is
-# 8 x 324 x 4 = 10,368 bytes of scanline buffers instead of about 21 KB.
-# Replace this with the ballast bisection from `build.ps1 floor` -- the
-# largest -Ballast N whose BOOT line still reaches heap_free_after_video --
-# and say in the commit which run produced it.
-DEFAULT_FLOOR = 80896        # 79 KiB, inherited from PERSISTENCE, unverified here
+# MEASURED ON THIS BOARD, 2026-09-06, by ballast bisection (build.ps1 floor):
+# a heap of 10,568 B boots and reaches the main loop; 10,332 B panics with
+# "Out of memory" inside video_init(). The true threshold is somewhere in that
+# 236-byte gap, and 10,568 is the smaller number that has actually been seen
+# to work, so that is what is enforced.
+#
+# This is a property of the platform, not of the renderer, and it is specific
+# to PICO_SCANVIDEO_SCANLINE_BUFFER_COUNT=8 and
+# PICO_SCANVIDEO_MAX_SCANLINE_BUFFER_WORDS=324 (CMakeLists.txt). Change either
+# and this number is void -- re-run the bisection.
+#
+# PERSISTENCE's inherited 79 KiB was never a floor; it was the heap that one
+# build happened to have. It ran sixteen scanline buffers, and its 48 KiB
+# failure was a different, larger allocation. Carrying it over to COLOSSUS
+# would have condemned a build with five times the margin it needs.
+DEFAULT_FLOOR = 10568        # measured: 10,568 boots, 10,332 panics
 
 # RP2350: 512 KB of striped main SRAM, then SCRATCH_X and SCRATCH_Y at the top.
 MAIN_LO, MAIN_HI = 0x20000000, 0x20080000
@@ -83,7 +88,9 @@ def parse_map(path):
                 except ValueError:
                     i += 1
                     continue
-                if size and MAIN_LO <= addr < SCRATCH_HI:
+                # .heap is crt0's minimum-heap placeholder; it sits at __end__,
+                # inside the heap region, and is not static data.
+                if size and MAIN_LO <= addr < SCRATCH_HI and parts[0] != ".heap":
                     entries.append({"section": parts[0], "addr": addr, "size": size,
                                     "obj": parts[3], "syms": []})
         else:
@@ -186,16 +193,23 @@ def main():
     ledger = load_ledger(args.ledger)
 
     if not args.quiet:
-        print(f"main SRAM     {sum(e['size'] for e in main_e):,} B "
-              f"({sum(e['size'] for e in ours):,} ours, "
-              f"{sum(e['size'] for e in theirs):,} SDK/newlib/TinyUSB)")
+        # The span to __end__ is the authoritative static figure: it includes
+        # the alignment padding between sections, which the itemised sum
+        # cannot see. The two differ by exactly that padding.
+        if "__end__" in symbols:
+            span = symbols["__end__"] - MAIN_LO
+            item = sum(e["size"] for e in main_e)
+            print(f"main SRAM     {span:,} B to __end__ "
+                  f"({item:,} itemised + {span - item:,} alignment)")
+        print(f"  of which    {sum(e['size'] for e in ours):,} ours, "
+              f"{sum(e['size'] for e in theirs):,} SDK/newlib/TinyUSB")
         print(f"scratch       {sum(e['size'] for e in scratch_e):,} B "
               f"(core stacks, SCRATCH_X/Y, not from the heap)")
         if heap is not None:
             print(f"heap region   {heap:,} B  (__end__ {symbols['__end__']:#x} .. "
                   f"__StackLimit {symbols['__StackLimit']:#x})")
-        provenance = ("inherited from PERSISTENCE, NOT measured on this project"
-                      if args.floor == DEFAULT_FLOOR else "measured on the device")
+        provenance = ("measured on this board by ballast bisection"
+                      if args.floor == DEFAULT_FLOOR else "given on the command line")
         print(f"boot floor    {args.floor:,} B ({provenance})")
         if args.free_heap is not None:
             print(f"device booted with {args.free_heap:,} B free")
