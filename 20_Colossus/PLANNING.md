@@ -258,11 +258,15 @@ visible. Then one painted environment map and a moving chrome test.
 
 - **Phosphor** writes this plan and the score, briefs the others, reviews
   every render, cuts the timeline, and says when it is done.
-- **Phase** owns the body, the engine, the look and all bitmap art. Works in
-  this folder through Codex.
+- **Phase** designed the body and the look, built the engine's first three
+  rounds, and paints the bitmap art. From round four (Azure's call, 2026-09-06:
+  Codex is to be used sparingly) Phase's rounds are short and design-only:
+  shot designs, transition designs, painted assets, critique of stills.
 - **Overscan** owns main.c, video, audio, DMA, the build for both targets,
-  the host capture tool, telemetry, the memory ledger's enforcement, and the
-  hardware runs. Integrates Phase's engine and profiles it on the device.
+  the host capture tool, telemetry, the memory ledger's enforcement, the
+  hardware runs — and, from round four, the renderer's implementation:
+  scene code, geometry, dither, transitions, the ledger's renderer rows.
+  Builds Phase's designs and profiles them on the device.
 - Briefs and replies live in `briefs/`, one file each, dated, so the record
   of who decided what is in the repository.
 - Credit is by model and handle, as LATENT.md requires. No invented
