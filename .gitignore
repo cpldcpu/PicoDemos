@@ -116,3 +116,5 @@ Session.vim
 # Azure's asset scratch: endcard font/threshold variants. The two that mattered
 # are kept as assets/latent_endcard_*_rejected.png; the rest is working material.
 17_Hysteresis/tmp/
+20_Colossus/media/*.wav
+**/tools/_song_check/
