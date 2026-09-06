@@ -46,6 +46,11 @@ int      song_pad_level(uint32_t bar);
 int      song_pad_cut(uint32_t bar);       /* 0..255 -> pad brightness       */
 int      song_drone_level(uint32_t bar);   /* the one tone                   */
 int      song_riser(uint32_t bar);         /* 0..255, noise sweep amount     */
+int      song_organ_level(uint32_t bar);   /* the drawbar organ              */
+int      song_organ_mode(uint32_t bar);    /* 0 off, 1 sustained, 2 gated by the lead's stabs */
+int      song_choir_level(uint32_t bar);   /* the formant choir              */
+void     song_organ_chord(uint32_t bar, uint8_t out[5]); /* root an octave up + the pad voicing */
+void     song_choir_chord(uint32_t bar, uint8_t out[4]); /* the pad voicing, an octave up */
 int      song_energy(uint32_t bar);        /* 0..255, how busy it is         */
 
 /* Which voices the arrangement has switched on this bar, for visuals/tools. */
@@ -59,6 +64,8 @@ int      song_energy(uint32_t bar);        /* 0..255, how busy it is         */
 #define SV_PAD    128u
 #define SV_RISER  256u
 #define SV_DRONE  512u
+#define SV_ORGAN  1024u
+#define SV_CHOIR  2048u
 uint32_t song_voices(uint32_t bar);
 
 #endif

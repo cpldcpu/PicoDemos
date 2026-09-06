@@ -118,3 +118,8 @@ Session.vim
 17_Hysteresis/tmp/
 20_Colossus/media/*.wav
 **/tools/_song_check/
+20_Colossus/**/*.ppm
+20_Colossus/colossus/assets/_host/
+20_Colossus/colossus/assets/phase_capture
+20_Colossus/colossus/assets/phase_checks
+20_Colossus/briefs/.*

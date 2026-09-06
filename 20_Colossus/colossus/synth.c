@@ -46,15 +46,26 @@
  *           cutoff the score sets per bar (song_pad_cut); sends to the reverb
  *   drone   two triangles two octaves apart with a slow vibrato, one-pole
  *           lowpassed; the tone that opens and closes the piece
+ *   organ   five notes (the root an octave up, and the pad voicing) as
+ *           drawbar organs: six harmonics from one phase accumulator each,
+ *           since (phase * k) mod 2^32 is exactly the k-th harmonic's phase;
+ *           a slow tremolo in opposite phase left and right, so it turns
+ *   choir   four notes an octave above the pad, two detuned saws each with a
+ *           shared vibrato, through three band-passes at the formants of an
+ *           open "ah" (700, 1150, 2500 Hz); a slow swell in and out
+ *   boom    a 48 Hz sine with a long tail under every crash
  *   riser   band-passed noise whose centre sweeps up
+ *   chorus  the pad and the choir go through a stereo chorus (two modulated
+ *           taps, 12.5 ms +- 4 ms, in opposite phase) before the bus
  *   delay   one 3/16 line with a 2/16 tap: echoes alternate right, left
- *   reverb  three combs a side with damping, one allpass a side, fed from
- *           the reverb bus; the sides differ in length so it has width
+ *   reverb  a hall: three long damped combs a side, one allpass a side,
+ *           fed from the reverb bus; the sides differ in length for width
  *
  * ---------------------------------------------------------------------- RAM --
  *
  * The delay line is 8,640 int16 (17.3 KB); the reverb 6 combs + 2 allpasses
- * total 4,882 int16 (9.8 KB); the sine table 2 KB; state ~600 B. About 30 KB.
+ * total 7,296 int16 (14.6 KB); the chorus 1,024 int16 (2 KB); the sine table
+ * 2 KB; state ~800 B. About 37 KB.
  */
 
 #include "synth.h"
@@ -175,6 +186,7 @@ static const envp_t ep_bass  = { 65536 / 24,    65520, 40000, 65000 };
 static const envp_t ep_lead  = { 65536 / 60,    65528, 48000, 65500 };
 static const envp_t ep_lead2 = { 65536 / 900,   65531, 54000, 65520 };
 static const envp_t ep_pad   = { 65536 / 14000, 65535, 65535, 65530 };
+static const envp_t ep_choir = { 65536 / 6000,  65535, 65535, 65531 };
 
 /* ------------------------------------------------------------------ hash ---- */
 static uint32_t          g_hash = 2166136261u;
@@ -213,19 +225,23 @@ int synth_hash_latch(uint32_t *pos, uint32_t *hash)
 
 static int16_t g_dly[DLY_LEN];
 
-/* Reverb: comb lengths are Freeverb's scaled to 24 kHz, the right side
- * 23 samples longer; allpasses 302 and 240. Mutually prime enough. */
-#define RV_C0 607
-#define RV_C1 695
-#define RV_C2 811
-#define RV_SPREAD 23
-#define RV_A0 302
-#define RV_A1 240
-#define RV_FB 55000                    /* 0.84 */
-#define RV_DAMP 26000                  /* 0.40 */
+/* Reverb: a hall. Comb lengths are Freeverb's scaled to 24 kHz and then
+ * by 1.5, the right side 37 samples longer; allpasses 449 and 341. */
+#define RV_C0 907
+#define RV_C1 1039
+#define RV_C2 1213
+#define RV_SPREAD 37
+#define RV_A0 449
+#define RV_A1 341
+#define RV_FB 59000                    /* 0.90 */
+#define RV_DAMP 23000                  /* 0.35 */
 
 static int16_t g_rv_c[6][RV_C2 + RV_SPREAD];
 static int16_t g_rv_a[2][RV_A0];
+
+/* Chorus lines: the longest tap is 300 + 96 + 1 samples, so 512 is enough. */
+#define CHORUS_LEN 512
+static int16_t g_chorus[2][CHORUS_LEN];
 static const int g_rv_len[6] = { RV_C0, RV_C1, RV_C2, RV_C0 + RV_SPREAD, RV_C1 + RV_SPREAD, RV_C2 + RV_SPREAD };
 static const int g_rv_alen[2] = { RV_A0, RV_A1 };
 
@@ -248,7 +264,7 @@ static struct {
     /* arp */
     uint32_t a_ph, a_inc;  int32_t a_env, a_lp, a_pl, a_pr;
     /* lead */
-    uint32_t l_ph[3], l_inc[3];  env_t l_env;  int32_t l_fenv;  svf_t l_fl, l_fr;
+    uint32_t l_ph[4], l_inc[4];  env_t l_env;  int32_t l_fenv;  svf_t l_fl, l_fr;
     int32_t  l_fc, l_lvl;
     /* lead2 */
     uint32_t m_ph[2], m_inc[2];  env_t m_env;  int32_t m_lp, m_lvl;
@@ -257,6 +273,15 @@ static struct {
     uint8_t  p_chord[4];  uint32_t p_lfo;
     /* drone */
     uint32_t t_ph[2], t_lfo;  int32_t t_lp, t_lvl;
+    /* organ */
+    uint32_t o_ph[5], o_inc[5], o_lfo;  int32_t o_lvl, o_gate, o_mode, o_on;
+    /* choir */
+    uint32_t v_ph[8], v_inc[8], v_lfo;  env_t v_env;  svf_t v_f[2][3];  int32_t v_lvl;
+    uint8_t  v_chord[4];
+    /* chorus */
+    int      w_w;  uint32_t w_lfo;
+    /* boom */
+    uint32_t x_ph;  int32_t x_env;
     /* riser */
     svf_t    r_f;  int32_t r_fc, r_lvl;
     /* delay */
@@ -271,6 +296,7 @@ static struct {
      * they are multiplied by an envelope first. */
     int32_t  gw_kick, gw_snare, gw_hat, gw_crash, gw_bass, gw_arp_l, gw_arp_r;
     int32_t  g_lead, gw_lead2_l, gw_lead2_r, gw_lead2_s, g_pad, gw_drone, gw_riser;
+    int32_t  gw_organ, g_choir, gw_boom;
     int32_t  gw_dly, gw_rv, mw;
 } S;
 
@@ -287,10 +313,13 @@ void synth_solo(unsigned mask) { S.solo = mask; }
 #define G_LEAD2  29000
 #define G_PAD    16000
 #define G_DRONE  14000
+#define G_ORGAN  15000
+#define G_CHOIR  11000
+#define G_BOOM   22000
 #define G_RISER  5500
 #define G_DELAY  24000
-#define G_REVERB 12000
-#define G_MASTER 45000
+#define G_REVERB 17000
+#define G_MASTER 40000
 
 /* Soft knee above 75% of scale. */
 static inline int32_t soft_clip(int32_t v)
@@ -320,7 +349,7 @@ static void trig_hat(int open)
     S.h_env = 65535; S.h_dec = open ? 65509 : 65349;
 }
 
-static void trig_crash(void) { S.c_env = 65535; }
+static void trig_crash(void) { S.c_env = 65535; S.x_ph = 0; S.x_env = 65535; }
 
 static void bass_event(int e)
 {
@@ -350,6 +379,7 @@ static void lead_event(int e)
     S.l_inc[0] = inc - (inc >> 8);            /* -7 cents */
     S.l_inc[1] = inc;
     S.l_inc[2] = inc + (inc >> 8);            /* +7 cents */
+    S.l_inc[3] = inc << 1;                    /* the octave, quieter */
     S.l_fenv = 65535;
     env_on(&S.l_env);
 }
@@ -380,6 +410,26 @@ static void pad_bar(uint32_t bar)
     env_on(&S.p_env);
 }
 
+static void organ_choir_bar(uint32_t bar)
+{
+    uint8_t o[5];
+    song_organ_chord(bar, o);
+    if (o[0]) for (int i = 0; i < 5; i++) S.o_inc[i] = note_inc(o[i]);
+
+    uint8_t v[4];
+    song_choir_chord(bar, v);
+    if (!v[0]) { env_off(&S.v_env, &ep_choir); memset(S.v_chord, 0, 4); return; }
+    if (memcmp(v, S.v_chord, 4) == 0) return;
+    memcpy(S.v_chord, v, 4);
+    for (int i = 0; i < 4; i++) {
+        const uint32_t inc = note_inc(v[i]);
+        S.v_inc[i]     = inc - (inc >> 8);    /* left bank, -7 cents  */
+        S.v_inc[4 + i] = inc + (inc >> 8);    /* right bank, +7 cents */
+    }
+    if (S.v_env.stage == 2) S.v_env.v = S.v_env.v - (S.v_env.v >> 2);
+    env_on(&S.v_env);
+}
+
 /* ------------------------------------------------------------- control ----- */
 
 static void control_tick(void)
@@ -391,7 +441,7 @@ static void control_tick(void)
     /* --- the sequencer: one row per 16th --- */
     if (pos % STEP_SAMPLES == 0) {
         const uint32_t step = pos / STEP_SAMPLES;
-        if ((step & 15) == 0) pad_bar(bar);
+        if ((step & 15) == 0) { pad_bar(bar); organ_choir_bar(bar); }
 
         const uint8_t d = song_drums(step);
         if (d & DR_KICK)  trig_kick();
@@ -402,8 +452,10 @@ static void control_tick(void)
 
         bass_event(song_bass(step));
         arp_event(song_arp(step), step);
-        lead_event(song_lead(step));
+        const int le = song_lead(step);
+        lead_event(le);
         lead2_event(song_lead2(step));
+        if (le >= 2) S.o_on = 1; else if (le == SONG_OFF) S.o_on = 0;
     }
 
     /* --- per-bar parameters, interpolated toward the next bar --- */
@@ -423,6 +475,17 @@ static void control_tick(void)
     S.p_lvl += (p_t - S.p_lvl) >> 7;
     S.t_lvl += (t_t - S.t_lvl) >> 7;
     S.r_lvl += (r_t - S.r_lvl) >> 4;
+    S.o_lvl += (song_organ_level(bar) * 257 - S.o_lvl) >> 6;
+    S.v_lvl += (song_choir_level(bar) * 257 - S.v_lvl) >> 7;
+
+    /* the organ's gate: held open, gated by the lead's stabs, or closing */
+    S.o_mode = song_organ_mode(bar);
+    if (S.o_mode == 1)      S.o_gate += (65535 - S.o_gate) >> 4;
+    else if (S.o_mode == 2) S.o_gate = S.o_on ? S.o_gate + ((65535 - S.o_gate) >> 1) : qmul(S.o_gate, 61000);
+    else                    S.o_gate = qmul(S.o_gate, 64500);
+    S.o_lfo += 118;                                     /* ~0.9 Hz tremolo  */
+    S.v_lfo += 655;                                     /* ~5 Hz vibrato    */
+    S.w_lfo += 46;                                      /* ~0.35 Hz chorus  */
 
     /* filter envelopes decay per tick (they only feed coefficients) */
     S.b_fenv = qmul(S.b_fenv, 63352);
@@ -469,6 +532,9 @@ static void control_tick(void)
     S.gw_riser = (so & SOLO_FX)    ? GW(qmul(G_RISER, S.r_lvl)) : 0;
     S.gw_dly   = (so & SOLO_FX)    ? GW(G_DELAY) : 0;
     S.gw_rv    = (so & SOLO_FX)    ? GW(G_REVERB) : 0;
+    S.gw_organ = (so & SOLO_ORGAN) ? GW(qmul(qmul(G_ORGAN, S.o_lvl), S.o_gate)) : 0;
+    S.g_choir  = (so & SOLO_CHOIR) ? qmul(G_CHOIR, S.v_lvl) : 0;
+    S.gw_boom  = (so & SOLO_KICK)  ? GW(G_BOOM) : 0;
 }
 
 /* -------------------------------------------------------------- render ------ */
@@ -482,6 +548,8 @@ static void CV_HOT(render_block)(int16_t *out, int n)
     int32_t send[CTL_DIV];         /* what goes to the delay                  */
     int32_t rvin[CTL_DIV];         /* what goes to the reverb                 */
     int32_t padb[2 * CTL_DIV];     /* the pad's oscillators before the filter */
+    int32_t wide[2 * CTL_DIV];     /* the pad and the choir, before the chorus */
+    for (int i = 0; i < 2 * n; i++) wide[i] = 0;
 
     /* --- drums: writes the bus --- */
     {
@@ -489,7 +557,8 @@ static void CV_HOT(render_block)(int16_t *out, int n)
         int32_t kenv = S.k_env, kclick = S.k_click, senvn = S.s_envn, senvt = S.s_envt;
         int32_t slo = S.s_f.lo, sband = S.s_f.band;
         int32_t hlp = S.h_lp, henv = S.h_env, cenv = S.c_env;
-        const int32_t hdec = S.h_dec;
+        uint32_t xph = S.x_ph;  int32_t xenv = S.x_env;
+        const int32_t hdec = S.h_dec, gx = S.gw_boom;
         const int32_t gk = S.gw_kick, gs = S.gw_snare, gh = S.gw_hat, gc = S.gw_crash;
         for (int i = 0; i < n; i++) {
             rng ^= rng << 13; rng ^= rng >> 17; rng ^= rng << 5;
@@ -517,7 +586,11 @@ static void CV_HOT(render_block)(int16_t *out, int n)
             henv = qmul(henv, hdec);
             cenv = qmul(cenv, 65532);
 
-            const int32_t c = mulhi(kick, gk) + mulhi(snare, gs);
+            xph += 8589934u;                                  /* 48 Hz */
+            const int32_t boom = mulhi(qmul(g_sin[xph >> 22], xenv), gx);
+            xenv = qmul(xenv, 65530);
+
+            const int32_t c = mulhi(kick, gk) + mulhi(snare, gs) + boom;
             acc[2 * i]     = c + hats - (hats >> 2);
             acc[2 * i + 1] = c + hats;
             rvin[i] = mulhi(snare, gs) >> 2;
@@ -526,6 +599,7 @@ static void CV_HOT(render_block)(int16_t *out, int n)
         S.k_env = kenv; S.k_click = kclick; S.s_envn = senvn; S.s_envt = senvt;
         S.s_f.lo = slo; S.s_f.band = sband;
         S.h_lp = hlp; S.h_env = henv; S.c_env = cenv;
+        S.x_ph = xph; S.x_env = xenv;
     }
 
     /* --- bass and arp --- */
@@ -560,8 +634,8 @@ static void CV_HOT(render_block)(int16_t *out, int n)
 
     /* --- lead: three saws, left / centre / right, two lowpasses --- */
     {
-        uint32_t p0 = S.l_ph[0], p1 = S.l_ph[1], p2 = S.l_ph[2];
-        const uint32_t i0 = S.l_inc[0], i1 = S.l_inc[1], i2 = S.l_inc[2];
+        uint32_t p0 = S.l_ph[0], p1 = S.l_ph[1], p2 = S.l_ph[2], p3 = S.l_ph[3];
+        const uint32_t i0 = S.l_inc[0], i1 = S.l_inc[1], i2 = S.l_inc[2], i3 = S.l_inc[3];
         env_t env = S.l_env;
         svf_t fl = S.l_fl, fr = S.l_fr;
         const int32_t fc = S.l_fc, g = S.g_lead;
@@ -569,16 +643,17 @@ static void CV_HOT(render_block)(int16_t *out, int n)
             const int32_t l0 = (int32_t)(p0 >> 16) - 32768;
             const int32_t l1 = ((int32_t)(p1 >> 16) - 32768) >> 1;
             const int32_t l2 = (int32_t)(p2 >> 16) - 32768;
-            p0 += i0; p1 += i1; p2 += i2;
-            svf(&fl, (l0 + l1) >> 1, fc, 40000);
-            svf(&fr, (l2 + l1) >> 1, fc, 40000);
+            const int32_t l3 = ((int32_t)(p3 >> 16) - 32768) >> 2;
+            p0 += i0; p1 += i1; p2 += i2; p3 += i3;
+            svf(&fl, (l0 + l1 + l3) >> 1, fc, 40000);
+            svf(&fr, (l2 + l1 + l3) >> 1, fc, 40000);
             const int32_t lgw = GW(qmul(env_run(&env, &ep_lead), g));
             const int32_t ll = mulhi(fl.lo, lgw), lr = mulhi(fr.lo, lgw);
             acc[2 * i] += ll; acc[2 * i + 1] += lr;
             send[i] = (ll + lr) >> 1;
-            rvin[i] += (ll + lr) >> 2;
+            rvin[i] += (ll + lr) >> 1;
         }
-        S.l_ph[0] = p0; S.l_ph[1] = p1; S.l_ph[2] = p2;
+        S.l_ph[0] = p0; S.l_ph[1] = p1; S.l_ph[2] = p2; S.l_ph[3] = p3;
         S.l_env = env; S.l_fl = fl; S.l_fr = fr;
     }
 
@@ -624,9 +699,7 @@ static void CV_HOT(render_block)(int16_t *out, int n)
             svf(&fl, padb[2 * i] >> 2, fc, 52000);
             svf(&fr, padb[2 * i + 1] >> 2, fc, 52000);
             const int32_t pgw = GW(qmul(env_run(&env, &ep_pad), g));
-            const int32_t pl = mulhi(fl.lo, pgw), pr = mulhi(fr.lo, pgw);
-            acc[2 * i] += pl; acc[2 * i + 1] += pr;
-            rvin[i] += (pl + pr) >> 1;
+            wide[2 * i] += mulhi(fl.lo, pgw); wide[2 * i + 1] += mulhi(fr.lo, pgw);
         }
         S.p_env = env; S.p_fl = fl; S.p_fr = fr;
     }
@@ -652,6 +725,92 @@ static void CV_HOT(render_block)(int16_t *out, int n)
             rvin[i] += d >> 1;
         }
         S.t_ph[0] = p0; S.t_ph[1] = p1; S.t_lp = lp;
+    }
+
+    /* --- organ: five drawbar notes, tremolo in opposite phase L/R. Skipped
+     * while its gain is zero, which is a function of state and so is safe
+     * for the pull model --- */
+    {
+        const int32_t g = S.gw_organ;
+        if (g) {
+            uint32_t ph[5], inc[5];
+            for (int k = 0; k < 5; k++) { ph[k] = S.o_ph[k]; inc[k] = S.o_inc[k]; }
+            const int32_t trem = g_sin[(S.o_lfo >> 6) & 1023];
+            const int32_t gl = g + (int32_t)(((int64_t)g * trem) >> 18);   /* +-12.5% */
+            const int32_t gr = g - (int32_t)(((int64_t)g * trem) >> 18);
+            for (int i = 0; i < n; i++) {
+                int32_t sum = 0;
+                for (int k = 0; k < 5; k++) {
+                    ph[k] += inc[k];
+                    const uint32_t p = ph[k];
+                    sum += g_sin[p >> 22] * 8 + g_sin[(p * 2u) >> 22] * 8
+                         + g_sin[(p * 3u) >> 22] * 5 + g_sin[(p * 4u) >> 22] * 4
+                         + g_sin[(p * 6u) >> 22] * 2 + g_sin[(p * 8u) >> 22] * 2;
+                }
+                sum >>= 5;
+                acc[2 * i] += mulhi(sum, gl); acc[2 * i + 1] += mulhi(sum, gr);
+                rvin[i] += mulhi(sum, g) >> 1;
+            }
+            for (int k = 0; k < 5; k++) S.o_ph[k] = ph[k];
+        }
+    }
+
+    /* --- choir: four notes a side, two saws each, into three formant
+     * band-passes; the envelope runs once and both sides read it --- */
+    {
+        const int32_t g = S.g_choir;
+        env_t env = S.v_env;
+        if (g && env.stage) {
+            int32_t gwv[CTL_DIV];
+            for (int i = 0; i < n; i++) gwv[i] = GW(qmul(env_run(&env, &ep_choir), g));
+            const int32_t vib = g_sin[(S.v_lfo >> 6) & 1023];
+            for (int side = 0; side < 2; side++) {
+                uint32_t *php = S.v_ph + 4 * side;
+                const uint32_t *pinc = S.v_inc + 4 * side;
+                uint32_t q0 = php[0], q1 = php[1], q2 = php[2], q3 = php[3];
+                const uint32_t j0 = pinc[0] + (uint32_t)(((int64_t)pinc[0] * vib) >> 23);
+                const uint32_t j1 = pinc[1] + (uint32_t)(((int64_t)pinc[1] * vib) >> 23);
+                const uint32_t j2 = pinc[2] + (uint32_t)(((int64_t)pinc[2] * vib) >> 23);
+                const uint32_t j3 = pinc[3] + (uint32_t)(((int64_t)pinc[3] * vib) >> 23);
+                svf_t f0 = S.v_f[side][0], f1 = S.v_f[side][1], f2 = S.v_f[side][2];
+                for (int i = 0; i < n; i++) {
+                    const int32_t x = ((int32_t)(q0 >> 16) + (int32_t)(q1 >> 16)
+                                     + (int32_t)(q2 >> 16) + (int32_t)(q3 >> 16) - 4 * 32768) >> 2;
+                    q0 += j0; q1 += j1; q2 += j2; q3 += j3;
+                    svf(&f0, x, 12010, 20000);               /*  700 Hz */
+                    svf(&f1, x, 19730, 16000);               /* 1150 Hz */
+                    svf(&f2, x, 42893, 16000);               /* 2500 Hz */
+                    const int32_t y = f0.band + (f1.band >> 1) + (f2.band >> 2);
+                    wide[2 * i + side] += mulhi(y, gwv[i]);
+                }
+                php[0] = q0; php[1] = q1; php[2] = q2; php[3] = q3;
+                S.v_f[side][0] = f0; S.v_f[side][1] = f1; S.v_f[side][2] = f2;
+            }
+        }
+        S.v_env = env;
+    }
+
+    /* --- chorus on the wide bus: two taps modulated in opposite phase,
+     * linearly interpolated; dry plus 5/8 wet to the bus, and to the reverb --- */
+    {
+        int w = S.w_w;
+        const int32_t lfo = g_sin[(S.w_lfo >> 6) & 1023];
+        const int32_t d[2] = { (300 << 8) + ((lfo * 96) >> 7), (300 << 8) - ((lfo * 96) >> 7) };
+        for (int i = 0; i < n; i++) {
+            for (int side = 0; side < 2; side++) {
+                int16_t *line = g_chorus[side];
+                const int32_t x = wide[2 * i + side];
+                line[w] = (int16_t)clampi(x, -32768, 32767);
+                const int idx = w - (d[side] >> 8);
+                const int32_t s0 = line[idx & (CHORUS_LEN - 1)], s1 = line[(idx - 1) & (CHORUS_LEN - 1)];
+                const int32_t tap = s0 + (((s1 - s0) * (d[side] & 255)) >> 8);
+                const int32_t wet = tap - (tap >> 2) - (tap >> 3);
+                acc[2 * i + side] += x + wet;
+                rvin[i] += (x + wet) >> 1;
+            }
+            w = (w + 1) & (CHORUS_LEN - 1);
+        }
+        S.w_w = w;
     }
 
     /* --- riser: band-passed noise, sweeping; its own noise generator --- */
@@ -784,6 +943,7 @@ void synth_reset(void)
     memset(g_dly, 0, sizeof g_dly);
     memset(g_rv_c, 0, sizeof g_rv_c);
     memset(g_rv_a, 0, sizeof g_rv_a);
+    memset(g_chorus, 0, sizeof g_chorus);
     S.solo = solo;
     S.rng  = 0x1BADF00Du;
     S.rng2 = 0x5EEDF00Du;
@@ -795,7 +955,9 @@ void synth_reset(void)
     S.b_inc = note_inc(38);
     S.a_inc = note_inc(50);
     S.a_pl = S.a_pr = 20000;
-    for (int i = 0; i < 3; i++) S.l_inc[i] = note_inc(74);
+    for (int i = 0; i < 4; i++) S.l_inc[i] = note_inc(74);
+    for (int i = 0; i < 5; i++) S.o_inc[i] = note_inc(50);
+    for (int i = 0; i < 8; i++) S.v_inc[i] = note_inc(74);
     S.m_inc[0] = S.m_inc[1] = note_inc(77);
     for (int i = 0; i < 8; i++) S.p_inc[i] = note_inc(62);
     g_hash = 2166136261u;

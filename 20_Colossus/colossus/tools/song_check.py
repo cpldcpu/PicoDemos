@@ -27,9 +27,9 @@ EXE = os.path.join(OUT, "song_harness.exe")
 
 RATE, BARS, BAR_SAMPLES = 24000, 160, 46080
 SOLO = {"kick": 1, "snare": 2, "hat": 4, "bass": 8, "arp": 16,
-        "lead": 32, "lead2": 256, "pad": 64, "drone": 512, "fx": 128}
+        "lead": 32, "lead2": 256, "pad": 64, "drone": 512, "organ": 1024, "choir": 2048, "fx": 128}
 SV = {"kick": 1, "snare": 2, "hat": 4, "bass": 8, "arp": 16,
-      "lead": 32, "lead2": 64, "pad": 128, "riser": 256, "drone": 512}
+      "lead": 32, "lead2": 64, "pad": 128, "riser": 256, "drone": 512, "organ": 1024, "choir": 2048}
 
 
 def build():
@@ -44,7 +44,7 @@ def build():
     if r.returncode: sys.exit("build failed")
 
 
-def render(name, chunk=1024, solo=1023):
+def render(name, chunk=1024, solo=4095):
     path = os.path.join(OUT, name + ".wav")
     r = subprocess.run([EXE, "--wav", path, "--chunk", str(chunk), "--solo", str(solo)],
                        capture_output=True, text=True, check=True)

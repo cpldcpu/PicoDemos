@@ -33,7 +33,9 @@ int      synth_hash_latch(uint32_t *pos, uint32_t *hash);
 #define SOLO_FX     128u        /* riser, the delay and the reverb */
 #define SOLO_LEAD2  256u        /* the counter-melody  */
 #define SOLO_DRONE  512u        /* the one tone        */
-#define SOLO_ALL    1023u
+#define SOLO_ORGAN  1024u       /* the drawbar organ   */
+#define SOLO_CHOIR  2048u       /* the formant choir   */
+#define SOLO_ALL    4095u
 void     synth_solo(unsigned mask);
 
 #endif
