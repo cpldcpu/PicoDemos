@@ -47,8 +47,9 @@ Everything below the line is AI generated.
 | **16** | **[SUSTAIN](16_Sustain)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 truecolor ray-marched world — **4:49 with no cuts anywhere**) | **Claude Opus 5** |
 | **17** | **[HYSTERESIS](17_Hysteresis)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 palette feedback field — **no pixel is a function of *t***, and the synth soundtrack is generated too) | **Claude Opus 5** |
 | **18** | **[VESPER](18_Vesper)** | Original Demo | RP2350 | VGA (320×240 solid 3D, metallic lighting, bloom and reflections), Canticle stereo synth score — **two minutes in a 60.2 KiB flash image** | **GPT-6 Astra** *(Phase)* |
+| **19** | **[PERSISTENCE](19_Persistence)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (**native 640×480, no framebuffer anywhere** — every scanline generated live for the beam, 31,500 a second) + a tracker score on the other core | **Claude Fable 5.1** *(Phosphor)* |
 
-> QUICKSILVER, SUSTAIN, HYSTERESIS and VESPER are productions of **[LATENT](LATENT.md)** — a demoscene group for machine-made productions on bare-metal silicon. Code & direction by **Beam** / Claude Opus 4.8, **Overscan** / Claude Opus 5, and **Phase** / GPT-6 Astra; music by **Suno** on QUICKSILVER and SUSTAIN, **Overscan** on HYSTERESIS, and **Phase** on VESPER. HYSTERESIS and VESPER synthesize their soundtracks on the device. Visuals also contributed by **Antigravity** / Gemini and **GPT Image 2**; human critic: **Azure**.
+> QUICKSILVER, SUSTAIN, HYSTERESIS, VESPER and PERSISTENCE are productions of **[LATENT](LATENT.md)** — a demoscene group for machine-made productions on bare-metal silicon. Code & direction by **Beam** / Claude Opus 4.8, **Overscan** / Claude Opus 5, **Phase** / GPT-6 Astra, and **Phosphor** / Claude Fable 5.1; music by **Suno** on QUICKSILVER and SUSTAIN, **Overscan** on HYSTERESIS, **Phase** on VESPER, and **Phosphor** on PERSISTENCE. HYSTERESIS, VESPER and PERSISTENCE synthesize their soundtracks on the device. Visuals also contributed by **Antigravity** / Gemini and **GPT Image 2**; human critic: **Azure**.
 
 ---
 
@@ -125,14 +126,27 @@ PicoDemos/
 │   ├── hysteresis_vga_rp2350.uf2 # Checked-in release firmware image
 │   └── README.md                # Arc, the referee, the shared score, credits
 │
-└── 18_Vesper/                   # VESPER: illuminated machinery and the Canticle stereo score
+├── 18_Vesper/                   # VESPER: illuminated machinery and the Canticle stereo score
     ├── vesper/                  # Solid 3D renderer, synth, Pico backend and SDL player
     ├── media/                   # Scene gallery, full video and release validation
     ├── music_review/            # Original/Canticle comparison and approval record
     ├── build.ps1               # Host, firmware, checks and video capture
     ├── Run Vesper.cmd          # Desktop launcher
     ├── vesper_vga_rp2350.uf2    # Release firmware image
-    └── README.md               # Direction, architecture, build and Phase / GPT-6 Astra credits
+│   └── README.md               # Direction, architecture, build and Phase / GPT-6 Astra credits
+│
+└── 19_Persistence/              # PERSISTENCE: a demo with no framebuffer — native 640×480
+    ├── persistence/             # Ten scanline kernels; core 1 owns space, core 0 owns time
+    │   ├── beam.c/.h            # the line contract, and the runner that dispatches it
+    │   ├── fx_*.c               # title, plasma, kefrens, twister, tunnel, plane, split, credits
+    │   ├── s3d.c                # solid 3D as per-row visible-boundary lists (an S-buffer)
+    │   ├── song.c / synth.c     # the tracker tune and the stereo synth, on core 0
+    │   ├── host/                # SDL player — the one place a whole frame is assembled
+    │   └── tools/               # no_framebuffer.py, audit.exe, capture, gallery, serial
+    ├── media/                   # Video, per-scene stills, piano roll, audit + device logs
+    ├── PLANNING.md              # The rule, the budget, and what the referees have to prove
+    ├── persistence_vga_rp2350.uf2  # Checked-in release firmware image
+    └── README.md                # Arc, measurements, the three referees, what went wrong
 ```
 
 ---
@@ -377,6 +391,38 @@ PicoDemos/
       <td><img src="18_Vesper/media/iris.png" width="220" alt="Mechanical iris with 28 curling blades"/></td>
       <td><img src="18_Vesper/media/swarm.png" width="220" alt="Disassembling sphere of metallic shards"/></td>
       <td><img src="18_Vesper/media/organ.png" width="220" alt="Field of 169 animated columns"/></td>
+    </tr>
+  </table>
+
+---
+
+### 11. 19_Persistence (PERSISTENCE)
+
+* **A demo with no framebuffer.** Two and a half minutes at **native 640×480**, and at no point does a frame of the picture exist anywhere in the machine. Every other production here draws 320×240 and lets the scanout double it, for a good reason: a 640×480 RGB565 frame is 614,400 bytes and the RP2350 has 524,288, so the framebuffer for the native mode *cannot exist* — by 90 KB, before the demo takes up any of it.
+* **Generator:** **Claude Fable 5.1** (scene handle **Phosphor**) — code, direction **and music**. A **[LATENT](LATENT.md)** production; critic **Azure**.
+* **Target Outputs:** Pico 2 (RP2350) + Pimoroni VGA Demo Base, 640×480 @ 59.75 Hz with 24 kHz stereo PWM audio, 300 MHz @ 1.20 V.
+* **Prebuilt Firmware:** [persistence_vga_rp2350.uf2](19_Persistence/persistence_vga_rp2350.uf2).
+* **Demo Video:** 📺 [19_Persistence/media/persistence.mp4](19_Persistence/media/persistence.mp4) (the full 2:30 @ 60 fps with soundtrack).
+* **Core Technical Milestone:** core 1 writes each of the 480 lines straight into the scanline buffer as the beam arrives — **31,500 deadlines a second**, ~9,600 cycles each — while core 0 is permitted only to prepare per-row *tables* and to synthesise the music. Solid 3D is done as per-row **visible-boundary lists** (an S-buffer, the technique invented for machines that could not afford a z-buffer, which turns out to be exactly right for one that cannot afford a framebuffer). The tunnel computes angle and depth *exactly* every 24 pixels and lets the SIO interpolator walk between, because the lookup table it would otherwise need is 614 KB.
+* **Measured on hardware, over all 9,000 frames and 4,320,000 scanlines: zero scanlines were shown to the beam unwritten.** The device detects this directly — `scanvideo` skips scanline ids when the beam has already passed, so a non-consecutive id *is* a missed line. Three referees gate the build: `no_framebuffer.py` proves from the linker map that nothing in the image is big enough or shaped like a frame; the device slip counter; and `audit.exe` over every frame and every sample.
+* **Visual Highlights:** a beam that sweeps down and burns the title into the phosphor behind it, plasma at native width, Kefrens bars from one line buffer that is never cleared, twisting prisms, a live-computed tunnel, a Mode-7 plane with a solid object and its reflection, a **raster split running five different programs at once**, and an ending where the deflection fails and the picture collapses to a line, a dot, and out.
+* **The Soundtrack:** a tracker tune in A minor at 144 BPM, ninety bars, up a tone for the last chorus, written as note tables one at a time and played by an integer stereo synth on core 0. 144 BPM against 59.75 Hz gives **1 beat = 25 frames = 10,000 samples** exactly, and the 3D objects bounce on the same table the synth reads.
+* **Screenshots Showcase (in running order):**
+  <table>
+    <tr>
+      <td><img src="19_Persistence/media/f00560.png" width="220" alt="The beam burns the title in"/></td>
+      <td><img src="19_Persistence/media/f01900.png" width="220" alt="Kefrens bars"/></td>
+      <td><img src="19_Persistence/media/f02700.png" width="220" alt="Twisters over the copper"/></td>
+    </tr>
+    <tr>
+      <td><img src="19_Persistence/media/f03500.png" width="220" alt="The tunnel"/></td>
+      <td><img src="19_Persistence/media/f04600.png" width="220" alt="The plane with a reflection"/></td>
+      <td><img src="19_Persistence/media/f06000.png" width="220" alt="The raster split"/></td>
+    </tr>
+    <tr>
+      <td><img src="19_Persistence/media/f06900.png" width="220" alt="The finale"/></td>
+      <td><img src="19_Persistence/media/f08380.png" width="220" alt="Credits"/></td>
+      <td><img src="19_Persistence/media/f08880.png" width="220" alt="Endcard"/></td>
     </tr>
   </table>
 

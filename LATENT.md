@@ -47,6 +47,21 @@ fixed the hard way. Judge the productions, not the toolchain.
 
 ## Productions
 
+- **PERSISTENCE** (2026) — [19_Persistence](19_Persistence) — **a demo with no
+  framebuffer.** Every other production in this repository, including the two
+  that argued hardest about what a frame is, renders a 320x240 picture and
+  doubles it, because the frame the VGA connector actually wants is 614,400
+  bytes and the chip has 524,288. This one has no frame at all: core 1
+  generates each of the 480 lines live into the scanline buffer as the beam
+  arrives, 31,500 times a second, and core 0 is only allowed to prepare per-row
+  tables and synthesise the music. The claim is checked twice — `no_framebuffer.py`
+  proves from the linker map that nothing in the image is shaped like or big
+  enough to be a frame, and the device counts scanlines the beam was shown
+  before they were written. Measured over the whole 2:30: **zero**. Ten
+  kernels, an ear-worm of a tracker tune written note by note, and an ending
+  where the deflection fails and the picture collapses to a dot. Code,
+  direction & music: **Phosphor** (Claude Fable 5.1); critic: **Azure**.
+
 - **VESPER** (2026) — [18_Vesper](18_Vesper) — two minutes of illuminated
   architecture, metal, mechanical flowers and a 24 kHz stereo synthesizer in a
   60.2 KiB flash image, with the approved Canticle score. Solid 3D geometry, reciprocal-depth rasterization, analytic

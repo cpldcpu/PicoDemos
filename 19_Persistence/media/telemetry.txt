@@ -1,0 +1,288 @@
+﻿opened COM10
+bytes received: 23165
+[f=  539 title    ] line  2513/ 6590 cy (mean/worst) | slips 0 | prep  1048 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.76 fps 23897 sps | AHASH s=216000 6d3853db
+
+[f=  599 title    ] line  2514/ 6151 cy (mean/worst) | slips 0 | prep  1078 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.66 fps 23897 sps | AHASH s=240000 aeafba40
+
+[f=  659 title    ] line  2523/ 6150 cy (mean/worst) | slips 0 | prep  1076 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.76 fps 23897 sps | AHASH s=264000 ed1a1d3e
+
+[f=  719 title    ] line  2515/ 7420 cy (mean/worst) | slips 0 | prep  1076 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.68 fps 23897 sps | AHASH s=288000 6e514ef9
+
+[f=  779 title    ] line  2514/ 6149 cy (mean/worst) | slips 0 | prep  1074 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.68 fps 23897 sps | AHASH s=312000 6443b6c1
+
+[f=  839 plasma   ] line  3270/ 6153 cy (mean/worst) | slips 0 | prep  1169 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.69 fps 23897 sps | AHASH s=336000 32e21618
+
+[f=  899 plasma   ] line  4283/ 6152 cy (mean/worst) | slips 0 | prep  1201 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.69 fps 23897 sps | AHASH s=360000 e9ea43f3
+
+[f=  959 plasma   ] line  4306/ 4593 cy (mean/worst) | slips 0 | prep  1102 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.70 fps 23897 sps | AHASH s=384000 ea139f16
+
+[f= 1019 plasma   ] line  4306/ 4595 cy (mean/worst) | slips 0 | prep  1110 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.76 fps 23897 sps | AHASH s=408000 5f5f55c9
+
+[f= 1079 plasma   ] line  4305/ 4577 cy (mean/worst) | slips 0 | prep  1105 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.76 fps 23897 sps | AHASH s=432000 1b54675d
+
+[f= 1139 plasma   ] line  4304/ 4576 cy (mean/worst) | slips 0 | prep  1118 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.70 fps 23897 sps | AHASH s=456000 87fb52b0
+
+[f= 1199 plasma   ] line  4308/ 4589 cy (mean/worst) | slips 0 | prep  1114 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.71 fps 23897 sps | AHASH s=480000 4263c473
+
+[f= 1259 plasma   ] line  4308/ 4614 cy (mean/worst) | slips 0 | prep  1108 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.76 fps 23897 sps | AHASH s=504000 97bc31f7
+
+[f= 1319 plasma   ] line  4307/ 4595 cy (mean/worst) | slips 0 | prep  1111 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.71 fps 23897 sps | AHASH s=528000 d8dcf573
+
+[f= 1379 plasma   ] line  4308/ 4591 cy (mean/worst) | slips 0 | prep  1110 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.71 fps 23897 sps | AHASH s=552000 5127e998
+
+[f= 1439 plasma   ] line  4308/ 4582 cy (mean/worst) | slips 0 | prep  1113 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.71 fps 23897 sps | AHASH s=576000 31dd9470
+
+[f= 1499 plasma   ] line  4306/ 4664 cy (mean/worst) | slips 0 | prep  1110 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.72 fps 23897 sps | AHASH s=600000 64fab77f
+
+[f= 1559 plasma   ] line  4305/ 4589 cy (mean/worst) | slips 0 | prep  1106 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.72 fps 23897 sps | AHASH s=624000 50d81d9d
+
+[f= 1619 kefrens  ] line  3743/ 4638 cy (mean/worst) | slips 0 | prep  1267 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.72 fps 23897 sps | AHASH s=648000 10456db4
+
+[f= 1679 kefrens  ] line  1984/ 4344 cy (mean/worst) | slips 0 | prep  1296 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.72 fps 23897 sps | AHASH s=672000 536d0b9a
+
+[f= 1739 kefrens  ] line  1367/ 4334 cy (mean/worst) | slips 0 | prep  1299 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.72 fps 23897 sps | AHASH s=696000 7fe9986a
+
+[f= 1799 kefrens  ] line  1461/ 1617 cy (mean/worst) | slips 0 | prep  1175 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.72 fps 23897 sps | AHASH s=720000 2ac60fb3
+
+[f= 1859 kefrens  ] line  1461/ 1630 cy (mean/worst) | slips 0 | prep  1170 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.72 fps 23897 sps | AHASH s=744000 78230345
+
+[f= 1919 kefrens  ] line  1558/ 1726 cy (mean/worst) | slips 0 | prep  1176 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.72 fps 23897 sps | AHASH s=768000 11e2e947
+
+[f= 1979 kefrens  ] line  1558/ 1721 cy (mean/worst) | slips 0 | prep  1179 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.72 fps 23897 sps | AHASH s=792000 1af111c3
+
+[f= 2039 kefrens  ] line  1558/ 1717 cy (mean/worst) | slips 0 | prep  1177 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.73 fps 23897 sps | AHASH s=816000 eba4619a
+
+[f= 2099 kefrens  ] line  1655/ 1876 cy (mean/worst) | slips 0 | prep  1183 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.73 fps 23897 sps | AHASH s=840000 5f024002
+
+[f= 2159 kefrens  ] line  1656/ 1880 cy (mean/worst) | slips 0 | prep  1174 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.73 fps 23897 sps | AHASH s=864000 08ae9621
+
+[f= 2219 kefrens  ] line  1656/ 1919 cy (mean/worst) | slips 0 | prep  1175 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.73 fps 23897 sps | AHASH s=888000 2fab68c0
+
+[f= 2279 kefrens  ] line  1655/ 1900 cy (mean/worst) | slips 0 | prep  1174 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.73 fps 23897 sps | AHASH s=912000 e8f234e2
+
+[f= 2339 kefrens  ] line  1656/ 1918 cy (mean/worst) | slips 0 | prep  1175 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.73 fps 23897 sps | AHASH s=936000 f88cf668
+
+[f= 2399 kefrens  ] line  1656/ 1919 cy (mean/worst) | slips 0 | prep  1181 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.73 fps 23897 sps | AHASH s=960000 75a2c4f1
+
+[f= 2459 twister  ] line  2791/ 3802 cy (mean/worst) | slips 0 | prep  1672 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.73 fps 23897 sps | AHASH s=984000 d5f01c70
+
+[f= 2519 twister  ] line  3550/ 3804 cy (mean/worst) | slips 0 | prep  1635 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.73 fps 23897 sps | AHASH s=1008000 95b8c3b9
+
+[f= 2579 twister  ] line  3550/ 3801 cy (mean/worst) | slips 0 | prep  1449 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.73 fps 23897 sps | AHASH s=1032000 7161f76e
+
+[f= 2639 twister  ] line  3553/ 3802 cy (mean/worst) | slips 0 | prep  1456 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.73 fps 23897 sps | AHASH s=1056000 96f34975
+
+[f= 2699 twister  ] line  3549/ 3801 cy (mean/worst) | slips 0 | prep  1460 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.73 fps 23897 sps | AHASH s=1080000 dc3772fd
+
+[f= 2759 twister  ] line  3550/ 3802 cy (mean/worst) | slips 0 | prep  1449 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.73 fps 23897 sps | AHASH s=1104000 c8f158a1
+
+[f= 2819 twister  ] line  3550/ 3801 cy (mean/worst) | slips 0 | prep  1459 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.73 fps 23897 sps | AHASH s=1128000 0780fc7e
+
+[f= 2879 twister  ] line  3550/ 3800 cy (mean/worst) | slips 0 | prep  1451 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.73 fps 23897 sps | AHASH s=1152000 58b766af
+
+[f= 2939 twister  ] line  3550/ 3800 cy (mean/worst) | slips 0 | prep  1453 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.73 fps 23897 sps | AHASH s=1176000 cb700e33
+
+[f= 2999 twister  ] line  3544/ 3795 cy (mean/worst) | slips 0 | prep  1457 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.73 fps 23897 sps | AHASH s=1200000 c58eedff
+
+[f= 3059 twister  ] line  3550/ 3800 cy (mean/worst) | slips 0 | prep  1449 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.73 fps 23897 sps | AHASH s=1224000 3c493321
+
+[f= 3119 twister  ] line  3550/ 3800 cy (mean/worst) | slips 0 | prep  1448 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.75 fps 23897 sps | AHASH s=1248000 38531471
+
+[f= 3179 twister  ] line  2626/ 3802 cy (mean/worst) | slips 0 | prep  1449 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.73 fps 23897 sps | AHASH s=1272000 f22329b8
+
+[f= 3239 tunnel   ] line  6511/ 7546 cy (mean/worst) | slips 0 | prep 10853 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.75 fps 23897 sps | AHASH s=1296000 b2a68946
+
+[f= 3299 tunnel   ] line  7288/ 7563 cy (mean/worst) | slips 0 | prep  1007 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.74 fps 23897 sps | AHASH s=1320000 2fe55738
+
+[f= 3359 tunnel   ] line  7273/ 7556 cy (mean/worst) | slips 0 | prep  1011 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.75 fps 23897 sps | AHASH s=1344000 4438853f
+
+[f= 3419 tunnel   ] line  7274/ 7546 cy (mean/worst) | slips 0 | prep  1011 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.75 fps 23897 sps | AHASH s=1368000 7242745c
+
+[f= 3479 tunnel   ] line  7267/ 7532 cy (mean/worst) | slips 0 | prep  1012 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.74 fps 23897 sps | AHASH s=1392000 119edf40
+
+[f= 3539 tunnel   ] line  7278/ 7537 cy (mean/worst) | slips 0 | prep  1013 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.75 fps 23897 sps | AHASH s=1416000 792b97fa
+
+[f= 3599 tunnel   ] line  7283/ 7537 cy (mean/worst) | slips 0 | prep  1014 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.74 fps 23897 sps | AHASH s=1440000 41419bc7
+
+[f= 3659 tunnel   ] line  7288/ 7553 cy (mean/worst) | slips 0 | prep  1002 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.75 fps 23897 sps | AHASH s=1464000 cac82375
+
+[f= 3719 tunnel   ] line  7278/ 7549 cy (mean/worst) | slips 0 | prep  1013 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.75 fps 23897 sps | AHASH s=1488000 c8ae9726
+
+[f= 3779 tunnel   ] line  7291/ 7544 cy (mean/worst) | slips 0 | prep  1007 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.74 fps 23897 sps | AHASH s=1512000 e2df5869
+
+[f= 3839 tunnel   ] line  7283/ 7541 cy (mean/worst) | slips 0 | prep  1006 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.74 fps 23897 sps | AHASH s=1536000 54950dc3
+
+[f= 3899 tunnel   ] line  7288/ 7552 cy (mean/worst) | slips 0 | prep  1017 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.75 fps 23897 sps | AHASH s=1560000 3017d35d
+
+[f= 3959 tunnel   ] line  7288/ 7555 cy (mean/worst) | slips 0 | prep  1006 us | lod 0 ev 0 | skip 0 | ring 1292 | 59.74 fps 23897 sps | AHASH s=1584000 2eaa7e2b
+
+[f= 4019 plane    ] line  2354/ 7543 cy (mean/worst) | slips 0 | prep 22891 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.75 fps 23897 sps | AHASH s=1608000 6f7ad76a
+
+[f= 4079 plane    ] line  3627/ 7844 cy (mean/worst) | slips 0 | prep  1196 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.75 fps 23897 sps | AHASH s=1632000 52be80db
+
+[f= 4139 plane    ] line  3628/ 4001 cy (mean/worst) | slips 0 | prep  1191 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=1656000 4bda0774
+
+[f= 4199 plane    ] line  3631/ 4001 cy (mean/worst) | slips 0 | prep  1195 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.75 fps 23897 sps | AHASH s=1680000 e8fce424
+
+[f= 4259 plane    ] line  3627/ 3977 cy (mean/worst) | slips 0 | prep  1189 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.75 fps 23897 sps | AHASH s=1704000 34c236ac
+
+[f= 4319 plane    ] line  3322/ 5338 cy (mean/worst) | slips 0 | prep  4628 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.75 fps 23897 sps | AHASH s=1728000 6fbd22af
+
+[f= 4379 plane    ] line  3389/ 5508 cy (mean/worst) | slips 0 | prep  4600 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=1752000 4cbf7bc0
+
+[f= 4439 plane    ] line  3311/ 5449 cy (mean/worst) | slips 0 | prep  4088 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=1776000 e35d8c83
+
+[f= 4499 plane    ] line  3306/ 5426 cy (mean/worst) | slips 0 | prep  4048 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=1800000 928f5b1c
+
+[f= 4559 plane    ] line  3400/ 5675 cy (mean/worst) | slips 0 | prep  4356 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=1824000 a2e3c73b
+
+[f= 4619 plane    ] line  3378/ 5736 cy (mean/worst) | slips 0 | prep  4604 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=1848000 cdcccf1e
+
+[f= 4679 plane    ] line  3311/ 5719 cy (mean/worst) | slips 0 | prep  4737 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=1872000 1a6f8774
+
+[f= 4739 plane    ] line  3466/ 5887 cy (mean/worst) | slips 0 | prep  7806 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=1896000 be44b554
+
+[f= 4799 plane    ] line  3590/ 6469 cy (mean/worst) | slips 0 | prep  8147 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.75 fps 23897 sps | AHASH s=1920000 648382fd
+
+[f= 4859 plane    ] line  3557/ 6292 cy (mean/worst) | slips 0 | prep  8159 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=1944000 1b7493f5
+
+[f= 4919 plane    ] line  3509/ 6358 cy (mean/worst) | slips 0 | prep  8337 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=1968000 eeb63957
+
+[f= 4979 plane    ] line  3459/ 6231 cy (mean/worst) | slips 0 | prep  7687 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=1992000 e0354128
+
+[f= 5039 plane    ] line  3477/ 6401 cy (mean/worst) | slips 0 | prep  7695 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2016000 50fc0e4c
+
+[f= 5099 plane    ] line  3493/ 6260 cy (mean/worst) | slips 0 | prep  7790 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2040000 5d179e74
+
+[f= 5159 plane    ] line  3334/ 6159 cy (mean/worst) | slips 0 | prep  7671 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2064000 0dd25010
+
+[f= 5219 plane    ] line  3339/ 5607 cy (mean/worst) | slips 0 | prep  3704 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2088000 d6be4cbd
+
+[f= 5279 plane    ] line  3354/ 5545 cy (mean/worst) | slips 0 | prep  3664 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.75 fps 23897 sps | AHASH s=2112000 1dc520ac
+
+[f= 5339 plane    ] line  3348/ 5504 cy (mean/worst) | slips 0 | prep  3671 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.75 fps 23897 sps | AHASH s=2136000 f174d24f
+
+[f= 5399 plane    ] line  3349/ 5500 cy (mean/worst) | slips 0 | prep  3619 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2160000 f1051fe5
+
+[f= 5459 plane    ] line  3336/ 5463 cy (mean/worst) | slips 0 | prep  3631 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2184000 249176d9
+
+[f= 5519 plane    ] line  3334/ 5556 cy (mean/worst) | slips 0 | prep  3602 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2208000 3f538571
+
+[f= 5579 plane    ] line  2704/ 5546 cy (mean/worst) | slips 0 | prep  3705 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2232000 44c40713
+
+[f= 5638 split    ] line  2559/ 5220 cy (mean/worst) | slips 0 | prep 20699 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2256000 a5795ca7
+
+[f= 5698 split    ] line  2604/ 4863 cy (mean/worst) | slips 0 | prep  2298 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2280000 e6699e0a
+
+[f= 5758 split    ] line  2630/ 4358 cy (mean/worst) | slips 0 | prep  2287 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2304000 0eae328d
+
+[f= 5818 split    ] line  2669/ 4352 cy (mean/worst) | slips 0 | prep  2283 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2328000 ff306a4f
+
+[f= 5878 split    ] line  3196/ 4873 cy (mean/worst) | slips 0 | prep  2286 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2352000 f49fd5f7
+
+[f= 5938 split    ] line  2150/ 4904 cy (mean/worst) | slips 0 | prep  2285 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2376000 80e21368
+
+[f= 5998 split    ] line  3149/ 4857 cy (mean/worst) | slips 0 | prep  2300 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2400000 353af26b
+
+[f= 6058 split    ] line  2934/ 4897 cy (mean/worst) | slips 0 | prep  2282 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2424000 9f1d9965
+
+[f= 6118 split    ] line  2953/ 4361 cy (mean/worst) | slips 0 | prep  2288 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2448000 ef95d776
+
+[f= 6178 split    ] line  3011/ 4586 cy (mean/worst) | slips 0 | prep  2290 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2472000 6a929463
+
+[f= 6238 split    ] line  3339/ 4861 cy (mean/worst) | slips 0 | prep  2291 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2496000 2065ae00
+
+[f= 6298 split    ] line  2563/ 4902 cy (mean/worst) | slips 0 | prep  2295 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2520000 09c69ed4
+
+[f= 6358 split    ] line  3377/ 4871 cy (mean/worst) | slips 0 | prep  2291 us | lod 0 ev 0 | skip 1 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2544000 52130dad
+
+[f= 6418 finale   ] line  3393/ 5806 cy (mean/worst) | slips 0 | prep 21562 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2568000 a93be0ad
+
+[f= 6478 finale   ] line  3417/ 6203 cy (mean/worst) | slips 0 | prep  7237 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2592000 6b00cf59
+
+[f= 6538 finale   ] line  3413/ 6100 cy (mean/worst) | slips 0 | prep  7090 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.75 fps 23897 sps | AHASH s=2616000 a5edab3a
+
+[f= 6598 finale   ] line  3422/ 6323 cy (mean/worst) | slips 0 | prep  7325 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2640000 8cc69dbd
+
+[f= 6658 finale   ] line  3475/ 6396 cy (mean/worst) | slips 0 | prep  7555 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2664000 ec81cc59
+
+[f= 6718 finale   ] line  3462/ 6444 cy (mean/worst) | slips 0 | prep  7793 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.75 fps 23897 sps | AHASH s=2688000 dba6168c
+
+[f= 6778 finale   ] line  3429/ 6139 cy (mean/worst) | slips 0 | prep  7517 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2712000 9235bb74
+
+[f= 6838 finale   ] line  3491/ 6275 cy (mean/worst) | slips 0 | prep  7148 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.75 fps 23897 sps | AHASH s=2736000 2b48560a
+
+[f= 6898 finale   ] line  3510/ 6459 cy (mean/worst) | slips 0 | prep  8015 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2760000 cdcfdd11
+
+[f= 6958 finale   ] line  3441/ 6482 cy (mean/worst) | slips 0 | prep  7880 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.75 fps 23897 sps | AHASH s=2784000 3a06ccb9
+
+[f= 7018 finale   ] line  3377/ 6021 cy (mean/worst) | slips 0 | prep  7207 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2808000 5a49038b
+
+[f= 7078 finale   ] line  3424/ 5827 cy (mean/worst) | slips 0 | prep  6989 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2832000 c63b06be
+
+[f= 7138 finale   ] line  3378/ 6240 cy (mean/worst) | slips 0 | prep  7395 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2856000 c5cb0a7b
+
+[f= 7198 finale   ] line  3419/ 6065 cy (mean/worst) | slips 0 | prep  7116 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.75 fps 23897 sps | AHASH s=2880000 e44553da
+
+[f= 7258 finale   ] line  3438/ 6314 cy (mean/worst) | slips 0 | prep  7318 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2904000 b963e647
+
+[f= 7318 finale   ] line  3432/ 5981 cy (mean/worst) | slips 0 | prep  7164 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2928000 d34c8851
+
+[f= 7378 finale   ] line  3406/ 5820 cy (mean/worst) | slips 0 | prep  6997 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2952000 24c606b2
+
+[f= 7438 finale   ] line  3463/ 6544 cy (mean/worst) | slips 0 | prep  7439 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=2976000 d097e39b
+
+[f= 7498 finale   ] line  3365/ 6545 cy (mean/worst) | slips 0 | prep  7422 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=3000000 6addc9b5
+
+[f= 7558 finale   ] line  3402/ 5692 cy (mean/worst) | slips 0 | prep  7008 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=3024000 f697e158
+
+[f= 7618 finale   ] line  3514/ 6428 cy (mean/worst) | slips 0 | prep  7981 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=3048000 4e6c3df8
+
+[f= 7678 finale   ] line  3498/ 6504 cy (mean/worst) | slips 0 | prep  8104 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=3072000 8a66d0a9
+
+[f= 7738 finale   ] line  3419/ 6207 cy (mean/worst) | slips 0 | prep  7456 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=3096000 e9ef4f1d
+
+[f= 7798 finale   ] line  3492/ 6409 cy (mean/worst) | slips 0 | prep  7205 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=3120000 5288e788
+
+[f= 7858 finale   ] line  3460/ 6396 cy (mean/worst) | slips 0 | prep  7596 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=3144000 fcc9b3d9
+
+[f= 7918 finale   ] line  3417/ 6405 cy (mean/worst) | slips 0 | prep  7522 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=3168000 b96ac6f1
+
+[f= 7978 finale   ] line  3376/ 6156 cy (mean/worst) | slips 0 | prep  7259 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=3192000 2b505c07
+
+[f= 8038 credits  ] line  3197/ 5865 cy (mean/worst) | slips 0 | prep  6775 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=3216000 18ca192e
+
+[f= 8098 credits  ] line  2520/ 6531 cy (mean/worst) | slips 0 | prep  7126 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.75 fps 23897 sps | AHASH s=3240000 8f252fbc
+
+[f= 8158 credits  ] line  2624/ 5394 cy (mean/worst) | slips 0 | prep  7030 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=3264000 df6c2d9d
+
+[f= 8218 credits  ] line  2628/ 5524 cy (mean/worst) | slips 0 | prep  1077 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.74 fps 23897 sps | AHASH s=3288000 471370b7
+
+[f= 8278 credits  ] line  2615/ 5507 cy (mean/worst) | slips 0 | prep  1069 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.75 fps 23897 sps | AHASH s=3312000 8ec70822
+
+[f= 8338 credits  ] line  2858/ 6302 cy (mean/worst) | slips 0 | prep  1069 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.75 fps 23897 sps | AHASH s=3336000 0d1b776c
+
+[f= 8398 credits  ] line  3064/ 6443 cy (mean/worst) | slips 0 | prep  1076 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.75 fps 23897 sps | AHASH s=3360000 c018bb26
+
+[f= 8458 credits  ] line  2878/ 6462 cy (mean/worst) | slips 0 | prep  1066 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.75 fps 23897 sps | AHASH s=3384000 1ae4c64f
+
+[f= 8518 credits  ] line  2395/ 6369 cy (mean/worst) | slips 0 | prep  1076 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.75 fps 23897 sps | AHASH s=3408000 15f97b51
+
+[f= 8578 credits  ] line  2064/ 6929 cy (mean/worst) | slips 0 | prep  1074 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.75 fps 23897 sps | AHASH s=3432000 b8836a44
+
+[f= 8638 credits  ] line  2062/ 2300 cy (mean/worst) | slips 0 | prep  1073 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.75 fps 23897 sps | AHASH s=3456000 0eeb69bf
+
+[f= 8698 credits  ] line  2062/ 2260 cy (mean/worst) | slips 0 | prep  1068 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.75 fps 23897 sps | AHASH s=3480000 7de3751b
+
+[f= 8758 credits  ] line  2063/ 2265 cy (mean/worst) | slips 0 | prep  1069 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.75 fps 23897 sps | AHASH s=3504000 ed00dc46
+
+[f= 8818 endcard  ] line  1569/ 4734 cy (mean/worst) | slips 0 | prep  1068 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.75 fps 23897 sps | AHASH s=3528000 12da52c5
+
+[f= 8878 endcard  ] line  2051/ 4716 cy (mean/worst) | slips 0 | prep  1049 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.75 fps 23897 sps | AHASH s=3552000 de0153e7
+
+[f= 8938 endcard  ] line  1312/ 4749 cy (mean/worst) | slips 0 | prep  1048 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.75 fps 23897 sps | AHASH s=3576000 eafd2b1b
+
+[f= 8998 endcard  ] line  1109/ 4743 cy (mean/worst) | slips 0 | prep  1062 us | lod 0 ev 0 | skip 2 | ring 1150 | 59.75 fps 23897 sps | AHASH s=3600000 2737acc4
+
+done: 8999 frames, late 0, lod events 0, skipped 2
+

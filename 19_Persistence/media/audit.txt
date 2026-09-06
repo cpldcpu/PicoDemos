@@ -1,0 +1,15 @@
+﻿PERSISTENCE audit -- 9000 frames, 10 cues, step 1
+
+video
+  ok    no unintended black frames
+  ok    no flat frames
+  ok    all 10 cues drew
+  ok    s3d: worst frame merged 37 slivers of 480 rows (budget 48); 21580 total
+  ok    frames are deterministic (6 probes, rendered twice)
+
+audio
+  ok    block-size independent: 1 / 32 / 1024 all hash df9dde15
+  ok    peak 29160 of 32767 (-1.0 dBFS)
+  ok    149 of 150 seconds carry sound
+
+AUDIT PASSED (0 failures)

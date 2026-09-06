@@ -22,6 +22,8 @@
 !15_Quicksilver/*.uf2
 !16_Sustain/*.uf2
 !17_Hysteresis/*.uf2
+!18_Vesper/*.uf2
+!19_Persistence/*.uf2
 **/*.bin
 !10_TheDemo/thedemo/assets/_packed/*.bin
 !11_FlashDemo/thedemo/assets/_packed/*.bin
@@ -54,6 +56,11 @@
 # Host desktop simulator preview artifacts & screenshots
 **/host/screenshots/
 **/host/_shots/
+**/host/shots/
+**/host/split/
+**/host/gallery/
+**/host/*.wav
+**/host/*.bmp
 **/host/*.mp4
 **/host/*.log
 **/host/err.txt
