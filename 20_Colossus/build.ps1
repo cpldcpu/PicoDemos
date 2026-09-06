@@ -93,7 +93,11 @@ if ($Target -in @('host','all','capture','video','check','ship')) {
     }
 }
 
-if ($Target -in @('pico','all','flash','run','floor')) {
+# `check` and `ship` build the firmware too: the ledger referee reads the ELF
+# map and `ship` copies the uf2, so both need it to exist. Azure's clean-out of
+# the build trees turned up exactly this -- `check` reported FAILED: ledger
+# with "no map", which is the tool being right about a tree that had none.
+if ($Target -in @('pico','all','flash','run','floor','check','ship')) {
     if (-not $SdkPath -or -not (Test-Path -LiteralPath $SdkPath)) {
         if (Test-Path -LiteralPath 'D:/Pico/pico-sdk') { $SdkPath = 'D:/Pico/pico-sdk' }
         else { throw 'Pass -SdkPath pointing to pico-sdk.' }
@@ -183,15 +187,18 @@ if ($Target -eq 'ship') {
     New-Item -ItemType Directory -Force -Path $cvMedia | Out-Null
     Copy-Item -LiteralPath (Join-Path $cvPicoBuild 'colossus.uf2') -Destination $cvUf2 -Force -ErrorAction SilentlyContinue
     $cap = Join-Path $cvHostBuild 'capture.exe'
-    $wav = Join-Path $cvMedia 'colossus.wav'
-    if (-not (Test-Path $wav)) { Invoke-Checked $cap @('--wav',$wav) }
+    # The WAV is 28 MB of intermediate: the MP4 carries the audio and
+    # media/colossus_score.mp3 is the score, so it goes to TEMP and is deleted
+    # rather than left in media/ for the next clean-out to find.
+    $wav = Join-Path $env:TEMP 'colossus_ship.wav'
+    Invoke-Checked $cap @('--wav',$wav)
     $mp4 = Join-Path $cvMedia 'colossus.mp4'
-    $raw = Join-Path $env:TEMP 'colossus_ship_raw.bin'
     $line = "`"$cap`" --raw --fps 30 | ffmpeg -y -v error -f rawvideo -pixel_format rgb24 " +
             "-video_size 320x240 -framerate 30 -i pipe:0 -i `"$wav`" -vf scale=960:720:flags=neighbor " +
             "-c:v libx264 -preset slow -crf 18 -pix_fmt yuv420p -c:a aac -b:a 192k " +
             "-movflags +faststart -shortest `"$mp4`""
     cmd /c $line | Out-Null
+    Remove-Item -LiteralPath $wav -Force -ErrorAction SilentlyContinue
     "ship: $cvUf2"
     "ship: $mp4"
 }
