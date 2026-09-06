@@ -108,6 +108,37 @@ static void spine(float bars)
     }
     (void)bars;
 }
+/* The eye, wherever it is seen from.
+ *
+ * body_ring is an annulus from 0.62r to r, so a disc is a short chain of them
+ * at one depth. Nesting them at DIFFERENT depths, which is what I tried
+ * first, makes the near ring occlude the far half of the next and the source
+ * reads as a crescent rather than a circle.
+ *
+ * It lives here rather than in crown() because the motion strip showed the
+ * warm source going out at bar 128: the crown drew it, the reveal did not,
+ * and the machine lost its light in the shot that reveals it. It is the same
+ * head, so it is the same eye, and at the reveal's distance it is four
+ * pixels of warm in a dark socket -- which is exactly what it should be.
+ */
+static void eye_assembly(int lod)
+{
+    const float ez=-0.64f,ey=17.45f;
+    if(lod){
+        body_ring(0,ey,ez,      .58f,lod,R_FLAT,0);    /* blue-black surround */
+        body_ring(0,ey,ez-.04f, .40f,lod,R_TEXTURE,0); /* dark outer bearing  */
+        body_ring(0,ey,ez-.04f, .25f,lod,R_TEXTURE,0);
+    }
+    /* At the reveal's distance the eye is four pixels across and the body's
+     * own recess already supplies the dark socket, so the bearing rings are
+     * 96 triangles spent on nothing: drawing them cost 2.6 ms a frame and
+     * took phrase 18 from 41 fps to 30. Only the source survives out there,
+     * which is the part that had to. */
+    body_ring(0,ey,ez-.09f, .155f,lod,R_FLAT,150);   /* the source, filled  */
+    body_ring(0,ey,ez-.09f, .096f,lod,R_FLAT,150);
+    body_ring(0,ey,ez-.09f, .060f,lod?1:0,R_FLAT,150);
+}
+
 /* VI - CROWN, bars 112-127, from Phase's design in briefs/sketches/round4.
  *
  * What has to read: two unequal plates with actual cold sky between them, a
@@ -128,17 +159,7 @@ static void spine(float bars)
 static void crown(float bars)
 {
     body_draw(-3,0);
-    const float ez=-0.64f,ey=17.45f;
-    /* body_ring is an annulus from 0.62r to r, so a disc is a short chain of
-     * them at one depth. Nesting them at DIFFERENT depths, which is what I
-     * tried first, makes the near ring occlude the far half of the next and
-     * the source reads as a crescent rather than a circle. */
-    body_ring(0,ey,ez,      .58f,2,R_FLAT,0);      /* blue-black surround   */
-    body_ring(0,ey,ez-.04f, .40f,2,R_TEXTURE,0);   /* dark outer bearing    */
-    body_ring(0,ey,ez-.04f, .25f,2,R_TEXTURE,0);
-    body_ring(0,ey,ez-.09f, .155f,2,R_FLAT,150);   /* the source, filled    */
-    body_ring(0,ey,ez-.09f, .096f,2,R_FLAT,150);
-    body_ring(0,ey,ez-.09f, .060f,1,R_FLAT,150);
+    eye_assembly(2);
     /* The brow projects over it and is the shape that makes the hood a hood
      * rather than a slab. Two plates and a lip, all bronze. */
     box(0,18.62f,-1.55f,2.55f,.42f,1.20f,R_TEXTURE);
@@ -147,7 +168,7 @@ static void crown(float bars)
     box(0,18.10f,-1.92f,2.05f,.22f,.30f,R_TEXTURE); /* the brow's lip       */
     (void)bars;
 }
-static void reveal(float bars){body_draw(-1,0);(void)bars;}
+static void reveal(float bars){body_draw(-1,0);eye_assembly(0);(void)bars;}
 static void coda(float bars){reveal(bars);}
 /* The outgoing chapter's matched shape, drawn in screen space into whichever
  * cell the veil has scissored, for the cells that have not been exchanged yet.
@@ -187,7 +208,14 @@ RCamera scene_camera(uint32_t sample,int chapter)
     case 2:t=ease((b-24)/16);c=(RCamera){1,24,-6.5f+.5f*t,5.1f+1.6f*t,-8,-.28f+.08f*t,190};break;
     case 3:t=ease((b-40)/16);c=(RCamera){.5f,26,0,10.6f,-6.4f+.3f*t,.04f,190};break;
     case 4:t=ease((b-64)/8);c=(RCamera){.08f,16,0,17.4f,-4.9f+6.4f*t,0,190};break;
-    case 5:t=ease((b-72)/16);c=(RCamera){.2f,18,.1f,16.0f,-3.9f+.2f*t,-.05f,190};break;
+    /* The eye's aperture ring is at z = -1.05 and chapter 4 ends past it, so
+     * the load has to start past it too or the camera jumps back out through
+     * the hole it just went through. It used to sit at -3.9, in front. At
+     * -0.55 the ring is half a unit behind the lens, which is what Phase's
+     * "the ring stays behind the camera" asks for and what makes this
+     * boundary a real match: the same object, continuous across the cut,
+     * rather than two pictures that happen to share a centre. */
+    case 5:t=ease((b-72)/16);c=(RCamera){.2f,18,.1f,15.4f,-0.55f+.2f*t,-.05f,190};break;
     case 6:t=unit((b-88)/24);c=(RCamera){.3f,40,-.3f-3.8f*ease((t-.3f)/.65f),8.5f+14*t,6.8f+3*t,3.14159265f-.32f*ease(t),190};break;
     case 7:{
         /* Phase's two poses, eased over 112-124 and held through 127. The
@@ -202,7 +230,25 @@ RCamera scene_camera(uint32_t sample,int chapter)
         c=(RCamera){.3f,40,px,py,pz,atan2f(-dx,dz),510,atan2f(dy,horiz)};
         break;
     }
-    case 8:t=ease((b-128)/7);c=(RCamera){1,60,-1.7f*(1-t),14.8f-3.f*t,-12-12*t,.08f*t,190};break;
+    case 8:{
+        /* The head is the same head, pulled back. The reveal now *starts* at
+         * the crown's final camera -- position, focal length, yaw and pitch --
+         * and eases to the standing shot over bars 128 to 135, so the cut is
+         * a continuation of one move rather than two compositions abutted.
+         * At t = 1 this is exactly the camera it always was, which is what
+         * render_checks' 160-180 px silhouette and the coda's held camera
+         * both depend on. */
+        t=ease((b-128)/7);
+        const float u=1-t;
+        c=(RCamera){1,60,
+            6.55f*u,
+            16.6f*u+11.8f*t,
+            -11.8f*u-24.0f*t,
+            0.5069f*u+0.08f*t,
+            510.f*u+190.f*t,
+            0.1362f*u};
+        break;
+    }
     case 9:c=(RCamera){1,60,0,11.8f,-24,.08f,190};break;
     }
     return c;

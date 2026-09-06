@@ -54,7 +54,7 @@ int main(void)
     assert(bottom-top+1>=160 && bottom-top+1<=180);
     printf("Reveal geometry height: %d px (top %d, bottom %d)\n",bottom-top+1,top,bottom);
     RCamera held=scene_camera(143*CV_BAR,8),coda=scene_camera(152*CV_BAR,9);
-    assert(held.cx==coda.cx && held.cy==coda.cy && held.cz==coda.cz && held.yaw==coda.yaw && held.focal==coda.focal);
+    assert(held.cx==coda.cx && held.cy==coda.cy && held.cz==coda.cz && held.yaw==coda.yaw && held.focal==coda.focal && held.pitch==coda.pitch);
     /* Portal scissor must never leak into the following frame or material rig. */
     begin();r_portal(0,0,3,.1f);triangle(3,255,0);begin();triangle(3,255,0);
     memcpy(reference,guarded.pixels,sizeof reference);begin();triangle(3,255,0);

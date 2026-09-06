@@ -19,6 +19,12 @@ it beats the best unrelated pair; anything at or below that is coincidence,
 however good the raw number looks. On the current build that means one of the
 nine passes, which is the truth: only bar 24 has a shape built to register.
 
+This reports; it does not gate. PLANNING allows the glow alone where no real
+shape exists, and the director has accepted that for the boundaries listed at
+the end, so a non-matching boundary is a note for the next round rather than a
+broken build. It exits zero deliberately, and `build.ps1 check` runs it for
+the report.
+
     python tools/transition_check.py
 """
 

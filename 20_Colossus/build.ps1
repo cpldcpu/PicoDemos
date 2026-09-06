@@ -21,7 +21,7 @@
 # compiles goes through here.
 
 param(
-    [ValidateSet('host','pico','all','flash','run','capture','video','floor','clean')]
+    [ValidateSet('host','pico','all','flash','run','capture','video','floor','check','ship','clean')]
     [string]$Target = 'host',
     [switch]$Stub,
     [switch]$Scanout640,
@@ -81,7 +81,7 @@ if ($Target -eq 'clean') {
     return
 }
 
-if ($Target -in @('host','all','capture','video')) {
+if ($Target -in @('host','all','capture','video','check','ship')) {
     Invoke-Checked 'cmake' @('-S',$cvSource,'-B',$cvHostBuild,'-G','MinGW Makefiles',
         '-DCOLOSSUS_HOST=ON',"-DCOLOSSUS_STUB=$cvStub",
         "-DCMAKE_PREFIX_PATH=$cvPrefix","-DCMAKE_MAKE_PROGRAM=$cvMake")
@@ -141,6 +141,59 @@ if ($Target -eq 'floor') {
     "floor: ballast $Ballast -- watching for BOOT / PANIC"
     Invoke-Checked 'python' @((Join-Path $cvSource 'tools/serial_read.py'),
         '--port',$Port,'--seconds','25')
+}
+
+if ($Target -eq 'check') {
+    # PLANNING section 10's four referees, plus the memory ledger. One
+    # command, one verdict: if this passes the production is valid, and if it
+    # does not it says which referee and why.
+    #
+    #   1  sync        every chapter boundary is a phrase boundary in the score
+    #   2  audio       song_check: block-size independent, no clipping, ends silent
+    #   -  renderer    483 seek comparisons, clipping, depth order, ceiling frames
+    #   4  film        no black or flat frame outside the permitted bars
+    #   -  ledger      every SRAM allocation declared, heap above the measured floor
+    $cvFailures = @()
+    function Referee([string]$Name, [scriptblock]$Body) {
+        Write-Host ""
+        Write-Host "=== $Name ==="
+        & $Body
+        if ($LASTEXITCODE -ne 0) { $script:cvFailures += $Name }
+    }
+    $ErrorActionPreference = 'Continue'
+    Referee 'referee 1  sync'     { python (Join-Path $cvSource 'tools/sync_check.py') }
+    Referee 'referee 2  audio'    { python (Join-Path $cvSource 'tools/song_check.py') }
+    Referee 'renderer'            { & (Join-Path $cvHostBuild 'checks.exe') }
+    Referee 'referee 4  film'     { python (Join-Path $cvSource 'tools/film_check.py') }
+    Referee 'film self-test'      { python (Join-Path $cvSource 'tools/film_check.py') --selftest }
+    Referee 'ledger'              { python (Join-Path $cvSource 'tools/ledger_check.py') }
+    # A report, not a gate: PLANNING allows the glow alone where no real
+    # matched shape exists, so this prints which boundaries have one and
+    # exits zero either way.
+    Referee 'transitions (report)' { python (Join-Path $cvSource 'tools/transition_check.py') }
+    Write-Host ""
+    if ($cvFailures.Count) {
+        Write-Host ("FAILED: " + ($cvFailures -join ', '))
+        exit 1
+    }
+    Write-Host "ALL REFEREES PASS"
+}
+
+if ($Target -eq 'ship') {
+    New-Item -ItemType Directory -Force -Path $cvMedia | Out-Null
+    Copy-Item -LiteralPath (Join-Path $cvPicoBuild 'colossus.uf2') -Destination $cvUf2 -Force -ErrorAction SilentlyContinue
+    $cap = Join-Path $cvHostBuild 'capture.exe'
+    $wav = Join-Path $cvMedia 'colossus.wav'
+    if (-not (Test-Path $wav)) { Invoke-Checked $cap @('--wav',$wav) }
+    $mp4 = Join-Path $cvMedia 'colossus.mp4'
+    $raw = Join-Path $env:TEMP 'colossus_ship_raw.bin'
+    $line = "`"$cap`" --raw --fps 30 | ffmpeg -y -v error -f rawvideo -pixel_format rgb24 " +
+            "-video_size 320x240 -framerate 30 -i pipe:0 -i `"$wav`" -vf scale=960:720:flags=neighbor " +
+            "-c:v libx264 -preset slow -crf 18 -pix_fmt yuv420p -c:a aac -b:a 192k " +
+            "-movflags +faststart -shortest `"$mp4`""
+    cmd /c $line | Out-Null
+    "ship: $cvUf2"
+    "ship: $mp4"
 }
 
 if ($Target -in @('capture','all','video')) {
