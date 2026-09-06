@@ -46,8 +46,9 @@ Everything below the line is AI generated.
 | **15** | **[QUICKSILVER](15_Quicksilver)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (beam-raced full-VGA rotozoom + SIO interpolator: Mode-7/env-mapped chrome/tunnel) | **Claude Opus 4.8** |
 | **16** | **[SUSTAIN](16_Sustain)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 truecolor ray-marched world — **4:49 with no cuts anywhere**) | **Claude Opus 5** |
 | **17** | **[HYSTERESIS](17_Hysteresis)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 palette feedback field — **no pixel is a function of *t***, and the synth soundtrack is generated too) | **Claude Opus 5** |
+| **18** | **[VESPER](18_Vesper)** | Original Demo | RP2350 | VGA (320×240 solid 3D, metallic lighting, bloom and reflections), Canticle stereo synth score — **two minutes in a 60.2 KiB flash image** | **GPT-6 Astra** *(Phase)* |
 
-> QUICKSILVER, SUSTAIN and HYSTERESIS are productions of **[LATENT](LATENT.md)** — a demoscene group for machine-made productions on bare-metal silicon (code & direction by **Beam** / Claude Opus 4.8 and **Overscan** / Claude Opus 5; music by **Suno** on QUICKSILVER and SUSTAIN, and by **Overscan** on HYSTERESIS, which synthesises its soundtrack on the device instead of playing one back; visuals by **Antigravity** / Gemini and **GPT Image 2**; human critic: Azure).
+> QUICKSILVER, SUSTAIN, HYSTERESIS and VESPER are productions of **[LATENT](LATENT.md)** — a demoscene group for machine-made productions on bare-metal silicon. Code & direction by **Beam** / Claude Opus 4.8, **Overscan** / Claude Opus 5, and **Phase** / GPT-6 Astra; music by **Suno** on QUICKSILVER and SUSTAIN, **Overscan** on HYSTERESIS, and **Phase** on VESPER. HYSTERESIS and VESPER synthesize their soundtracks on the device. Visuals also contributed by **Antigravity** / Gemini and **GPT Image 2**; human critic: **Azure**.
 
 ---
 
@@ -111,18 +112,27 @@ PicoDemos/
 │   ├── sustain_vga_rp2350.uf2   # Checked-in release firmware image
 │   └── README.md                # Arc, the audit, on-device performance work, credits
 │
-└── 17_Hysteresis/               # HYSTERESIS: a demo with memory — no pixel is a function of t
-    ├── hysteresis/              # The operator, the arc, and a synth that shares the score
-    │   ├── field.c              # convolve → advect → react → persist; one pass, no branches
-    │   ├── score.c              # ONE event table, read by both the field and the synth
-    │   ├── synth.c              # integer synth; the soundtrack is generated, not played back
-    │   ├── host/                # SDL build: watch it, listen to it, capture it
-    │   └── tools/               # no_keyframes.py (the memory referee), capture, audio checks
-    ├── assets/                  # wordmark + endcard, injected as forcing rather than blitted
-    ├── media/                   # Video, stills, and why this content barely encodes
-    ├── PLANNING.md              # The rule, the exemption, and where the theory was wrong
-    ├── hysteresis_vga_rp2350.uf2 # Checked-in release firmware image
-    └── README.md                # Arc, the referee, the shared score, credits
+├── 17_Hysteresis/               # HYSTERESIS: a demo with memory — no pixel is a function of t
+│   ├── hysteresis/              # The operator, the arc, and a synth that shares the score
+│   │   ├── field.c              # convolve → advect → react → persist; one pass, no branches
+│   │   ├── score.c              # ONE event table, read by both the field and the synth
+│   │   ├── synth.c              # integer synth; the soundtrack is generated, not played back
+│   │   ├── host/                # SDL build: watch it, listen to it, capture it
+│   │   └── tools/               # no_keyframes.py (the memory referee), capture, audio checks
+│   ├── assets/                  # wordmark + endcard, injected as forcing rather than blitted
+│   ├── media/                   # Video, stills, and why this content barely encodes
+│   ├── PLANNING.md              # The rule, the exemption, and where the theory was wrong
+│   ├── hysteresis_vga_rp2350.uf2 # Checked-in release firmware image
+│   └── README.md                # Arc, the referee, the shared score, credits
+│
+└── 18_Vesper/                   # VESPER: illuminated machinery and the Canticle stereo score
+    ├── vesper/                  # Solid 3D renderer, synth, Pico backend and SDL player
+    ├── media/                   # Scene gallery, full video and release validation
+    ├── music_review/            # Original/Canticle comparison and approval record
+    ├── build.ps1               # Host, firmware, checks and video capture
+    ├── Run Vesper.cmd          # Desktop launcher
+    ├── vesper_vga_rp2350.uf2    # Release firmware image
+    └── README.md               # Direction, architecture, build and Phase / GPT-6 Astra credits
 ```
 
 ---
@@ -343,6 +353,35 @@ PicoDemos/
 
 ---
 
+### 10. 18_Vesper (VESPER)
+
+* **A machine for the blue hour.** A two-minute **[LATENT](LATENT.md)** production of illuminated architecture, warm metal and mechanical flowers, with graphics and music fitting into a **60.2 KiB flash image** (61,640 bytes).
+* **Generator:** **GPT-6 Astra** (scene handle **Phase**) — code, direction and music. **Azure** — critic and producer.
+* **Target Outputs:** Pico 2 (RP2350, Cortex-M33) + Pimoroni VGA Demo Base, 320×240 15-bit color doubled to 640×480 VGA scanout, with 24 kHz stereo PWM audio. Configured for 300 MHz at 1.20 V.
+* **Prebuilt Firmware:** [vesper_vga_rp2350.uf2](18_Vesper/vesper_vga_rp2350.uf2).
+* **Demo Video:** [18_Vesper/media/vesper.mp4](18_Vesper/media/vesper.mp4) — the complete 2:00 host capture at 60 fps with the approved **Canticle** soundtrack.
+* **Desktop Player & Build Instructions:** [18_Vesper/README.md](18_Vesper/README.md); [Windows launcher](18_Vesper/Run%20Vesper.cmd).
+* **Visual Highlights:** a geometric wordmark and metal ring, a flight through an illuminated nave, a rotating trefoil with traveling cyan bands, a 28-blade mechanical iris, a disassembling shard sphere, and 169 solid columns moving with the score. The final knot unwinds into the opening ring.
+* **Core Technical Milestone:** procedural solid 3D geometry with near-plane clipping, reciprocal-depth occlusion and Gouraud metallic lighting, complemented by screen-space reflections and an 80×60 bloom field. Core 0 renders while core 1 supplies scanlines and synthesizes audio. A scanline-zero handshake transfers framebuffer ownership; the picture follows samples consumed by DMA.
+* **The Soundtrack:** **Canticle**, composed and synthesized by **Phase** (GPT-6 Astra) — 64 bars at 128 BPM, with a recurring D-minor melody, rests, close chord voicings, a soft FM bell, bass, drums and stereo delay. Revised after Azure's music review and integrated only after approval. There are no recorded audio samples or external visual assets.
+* **Validation:** all 7,200 frames plus the black endpoint pass the host checks; the complete stereo output is identical across different synthesis block sizes and matches the approved music preview sample for sample. The RP2350 UF2 builds and passes the release audit. **Physical playback and device frame rate remain untested; the video is a host capture.**
+* **Screenshots Showcase (in running order):**
+
+  <table>
+    <tr>
+      <td><img src="18_Vesper/media/opening.png" width="220" alt="VESPER title and metal ring"/></td>
+      <td><img src="18_Vesper/media/nave.png" width="220" alt="Flight through the illuminated nave"/></td>
+      <td><img src="18_Vesper/media/reliquary.png" width="220" alt="Metal trefoil with cyan bands"/></td>
+    </tr>
+    <tr>
+      <td><img src="18_Vesper/media/iris.png" width="220" alt="Mechanical iris with 28 curling blades"/></td>
+      <td><img src="18_Vesper/media/swarm.png" width="220" alt="Disassembling sphere of metallic shards"/></td>
+      <td><img src="18_Vesper/media/organ.png" width="220" alt="Field of 169 animated columns"/></td>
+    </tr>
+  </table>
+
+---
+
 ## Global Build & Environment Prerequisites
 
 To compile any of the microcontroller binaries in this workspace, ensure your development machine matches the following environmental setup:
@@ -372,5 +411,6 @@ To compile any of the microcontroller binaries in this workspace, ensure your de
   - **Gemini 3.5 Flash / Antigravity** (Storyboard implementation, raymarching, Gray-Scott solvers, CRT transitions, and assembly/VGA timing optimizations for VOLTAGE / Project 11).
   - **Claude Opus 4.8** — scene handle **Beam** (Relativistic black-hole journey, offline geodesic lensing, and the full 320×240 truecolor engine for SINGULARITY / Project 13; the flat-shaded filled-polygon 3D engine, crease folding, and folded-paper world of ORIGAMI / Project 14; and the bit-exact SIO interpolator emulator, Mode-7 mercury plain, env-mapped chrome and beam-raced native-640 rotozoom of QUICKSILVER / Project 15).
   - **Claude Opus 5** — scene handle **Overscan** (The single ray-marched world function, fourteen parameter-lerp morphs and the mechanical no-cut audit of SUSTAIN / Project 16; and the feedback field, the shared score, and the integer synth of HYSTERESIS / Project 17 — where the soundtrack is generated on core 1 from the same event table that drives the picture, rather than played back).
-* **Audio Compression Codec:** [Quite OK Audio (QOA)](https://qoaformat.org/) by Dominic Szablewski (MIT QOA) — used by projects 10–16. HYSTERESIS carries no recorded audio at all.
+  - **GPT-6 Astra** — scene handle **Phase** (Code, direction, procedural solid 3D graphics and the Canticle stereo synth score for VESPER / Project 18).
+* **Audio Compression Codec:** [Quite OK Audio (QOA)](https://qoaformat.org/) by Dominic Szablewski (MIT QOA) — used by projects 10–16. HYSTERESIS and VESPER carry no recorded audio.
 * **Microcontroller Infrastructure:** Raspberry Pi & Pico SDK Contributors.

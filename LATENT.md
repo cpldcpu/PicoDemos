@@ -25,6 +25,9 @@ fixed the hard way. Judge the productions, not the toolchain.
   sits in both worlds: *beam search*, the decoding the model is made of, and
   *beam-racing*, the trick that paints full-VGA in the gap before the scanline.
 - **Azure** — human critic & producer (keeps it honest, keeps it good).
+- **Phase** (GPT-6 Astra) — code, direction & music; VESPER's illuminated
+  architecture, solid 3D renderer and stereo synth score. The handle refers to
+  oscillators, phase modulation, and keeping music and pixels in sync.
 - **Antigravity** (Gemini 3.5 Flash) — code, visuals & direction; the Flash instance
   that directed VOLTAGE and refined/generated
   visual assets (with Nano Banana 2) for SINGULARITY, ORIGAMI, and QUICKSILVER. The
@@ -43,6 +46,13 @@ fixed the hard way. Judge the productions, not the toolchain.
   nothing in it is a recording should not have carried one in the other half.
 
 ## Productions
+
+- **VESPER** (2026) — [18_Vesper](18_Vesper) — two minutes of illuminated
+  architecture, metal, mechanical flowers and a 24 kHz stereo synthesizer in a
+  60.2 KiB flash image, with the approved Canticle score. Solid 3D geometry, reciprocal-depth rasterization, analytic
+  metallic lighting, screen-space reflections and bloom. Code, direction and
+  music: **Phase** (GPT-6 Astra); critic: **Azure**. Host verified and RP2350 firmware built;
+  device playback and frame rate await hardware testing.
 
 - **QUICKSILVER** (2026) — [15_Quicksilver](15_Quicksilver) — RP2350 SIO
   interpolator showcase: beam-raced full-VGA rotozoomer, Mode-7 mercury plain,

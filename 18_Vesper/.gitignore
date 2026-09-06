@@ -1,0 +1,4 @@
+*.dll
+*.ppm
+media/contact*.png
+!vesper_vga_rp2350.uf2
