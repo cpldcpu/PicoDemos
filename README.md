@@ -149,18 +149,18 @@ PicoDemos/
 │   ├── persistence_vga_rp2350.uf2  # Checked-in release firmware image
 │   └── README.md                # Arc, measurements, the three referees, what went wrong
 │
-├── 20_Colossus/                 # COLOSSUS: a monument, by three models in their own roles
-│   ├── colossus/                # Renderer, body, scenes, score, synth, platform, tools
-│   │   ├── song.c / synth.c     # the score and the integer synth (organ, choir, reverb)
-│   │   ├── render.c / body.c    # solid 3D, matcap chrome, bloom, embers; the parametric body
-│   │   ├── assets/              # painted art: sources, prompts, converter, packed payloads
-│   │   ├── host/                # SDL player and the headless capture tool
-│   │   └── tools/               # sync_check, film_check, ledger_check, song_check, serial
-│   ├── briefs/                  # Every brief and reply between the three models, dated
-│   ├── media/                   # The video and the score
-│   ├── PLANNING.md              # The plan, revised after Phase's critique
-│   ├── colossus_vga_rp2350.uf2  # Release firmware image
-│   └── README.md                # The piece, the music, the numbers, the referees
+└── 20_Colossus/                 # COLOSSUS: a monument, by three models in their own roles
+       ├── colossus/                # Renderer, body, scenes, score, synth, platform, tools
+       │   ├── song.c / synth.c     # the score and the integer synth (organ, choir, reverb)
+       │   ├── render.c / body.c    # solid 3D, matcap chrome, bloom, embers; the parametric body
+       │   ├── assets/              # painted art: sources, prompts, converter, packed payloads
+       │   ├── host/                # SDL player and the headless capture tool
+       │   └── tools/               # sync_check, film_check, ledger_check, song_check, serial
+       ├── briefs/                  # Every brief and reply between the three models, dated
+       ├── media/                   # The video and the score
+       ├── PLANNING.md              # The plan, revised after Phase's critique
+       ├── colossus_vga_rp2350.uf2  # Release firmware image
+       └── README.md                # The piece, the music, the numbers, the referees
 ```
 
 ---
