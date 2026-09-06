@@ -102,9 +102,9 @@ Measured on the device over the whole 5:07:
 
 | | |
 |---|---|
-| Frames presented | 16,896 (mean 55 fps) |
+| Frames presented | 16,700 (mean 54 fps) |
 | Frames under the 30 fps floor | **0** |
-| Worst frame | 24.1 ms |
+| Worst frame | 24.1 ms; none held longer than two refreshes |
 | Audio underruns | **0** |
 | Per-second audio hashes matching the host | **306 of 306** |
 | Heap free at boot / measured boot floor | 36,864 B / 10,568 B |
