@@ -54,13 +54,21 @@
 **/GLCache/
 
 # Host desktop simulator preview artifacts & screenshots
+# Anything image- or audio-shaped under a host/ directory is a preview the
+# tools just rendered; the media that belongs to a production lives in that
+# production's media/ directory. Naming individual scratch directories here
+# did not work -- a screenshot run into a NEW subdirectory got committed --
+# so this matches by what the file is, at any depth.
 **/host/screenshots/
 **/host/_shots/
-**/host/shots/
-**/host/split/
-**/host/gallery/
-**/host/*.wav
+**/host/**/*.bmp
+**/host/**/*.png
+**/host/**/*.ppm
+**/host/**/*.wav
 **/host/*.bmp
+**/host/*.png
+**/host/*.ppm
+**/host/*.wav
 **/host/*.mp4
 **/host/*.log
 **/host/err.txt

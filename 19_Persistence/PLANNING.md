@@ -187,6 +187,18 @@ A Pico 2 is attached, so the deadline claim is **measured**, not modelled.
    (those go through QUICKSILVER's bit-exact emulator on the host and the SIO
    on the device, and are compared the same way).
 
+#### Correction: it shipped as C, not as Python
+
+`check.py` became `tools/audit.c`, built by `tools/Makefile` into `audit.exe`.
+The reason is the one this plan should have seen: a Python referee has to be
+fed the frames, and 9,000 frames of 640×480 BGRA is eleven gigabytes through a
+pipe. Written in C it links the demo's own kernels directly, renders every
+frame in-process, and runs the whole production in under a minute — so it is
+run on every build rather than occasionally.
+
+The same argument is why it links no SDL. A referee that needs a working
+display can be defeated by a broken one.
+
 Sub-rule 1 of §2 is enforced *structurally*: there is no array in the
 firmware large enough to hold a frame, and the linker map proves it.
 
@@ -211,6 +223,37 @@ firmware large enough to hold a frame, and the linker map proves it.
    device number.
 6. Synth + tracker + the song; WAV + piano roll; device audio ring.
 7. Arc, transitions, endcard, power-off. Capture. Docs.
+
+## 9b. Corrections — where this plan was wrong
+
+Kept in place above and answered here, because a plan that is quietly edited
+after the fact stops being evidence of anything.
+
+**"A 154 KB tunnel lookup" (§3).** There is no tunnel lookup. The table would
+have been 614 KB at full resolution, and the quarter-symmetry version that
+would have fit also pins the tunnel's axis to the centre of the screen. The
+scene computes angle and depth exactly every 24 pixels instead and lets the
+interpolator walk between, which costs about 2,000 cycles a line, lets the axis
+drift, and needs no table at all. The 76,800 bytes reserved for it in the arena
+were not reclaimed until the firmware ran out of memory — twice. See `arena.h`.
+
+**"A solid object spins above it with its reflection" (§5).** The reflection
+was built and cut. It was correct — the mesh mirrored about the plane, dimmed,
+clipped below the horizon — and it read as a badly drawn shadow, because a
+mirror image needs a floor that looks wet and this floor is a lit grid. The
+object is half again as large in its place.
+
+**The cost estimates in §4 are all low**, by between a third and a factor of
+four. Every one of them counted the arithmetic and forgot the traffic: a pixel
+is not an add, it is an interpolator read, a texture load, a store and a share
+of the loop. The factor of two of headroom in the budget is why this cost
+nothing. The table of planned against measured is in the README.
+
+**"Each about 9,500 cycles" (§2.1)** is 9,600: 800 pixel clocks at 25 MHz
+against a 300 MHz core. The mode is also 59.75 Hz rather than 60, which is why
+the audio timer divides to 23,900 Hz and not 24,000 — 400 samples per *actual*
+frame. Getting that wrong would have slid the picture off the music by a frame
+every four seconds, and it did, until it was measured.
 
 ## 10. What would make this a failure
 

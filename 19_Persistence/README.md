@@ -73,7 +73,7 @@ modelled. Over the complete run, 9,000 frames and 4,320,000 scanlines:
 | **scanlines the beam was shown unwritten** | **0** |
 | governor interventions | 0 |
 | frames skipped | 3 (all at scene entry, where a cut is happening anyway) |
-| audio ring low-water | 1,150 of 2,047 samples |
+| audio ring low-water | 1,153 of 2,047 samples |
 | clock | 300 MHz @ 1.20 V |
 | flash | 78.7 KB — no recorded audio, no bitmaps, no baked meshes |
 | SRAM | 453.7 KB static, ~79 KB heap |
@@ -97,10 +97,12 @@ Dithering cost the plasma about 1,700 cycles a line and the Kefrens bars about
 1,400, which is what a palette that has to be masked and a fill that writes a
 four-pixel pattern instead of one colour come to. It bought the banding.
 
-The tunnel measures 6,270 cycles a line when run on its own and 7,291 inside
-the demo. Nothing about the kernel changed; core 0 is busy with the synth and
-the next frame's tables, and the two cores share SRAM. It is worth knowing that
-a kernel measured in isolation is measured optimistically.
+The tunnel is the one worth checking twice, because it is the only kernel with
+any real arithmetic in it. Run on its own (`-DPV_SOLO=4`) it measures 7,280
+cycles a line; inside the whole demo, with core 0 busy synthesising and building
+the next frame's tables, 7,272. The same kernel costs the same in both, which is
+what a design whose cost is fixed per line ought to do, and it is the reason the
+budget could be trusted before the arc existed.
 
 ### The estimates, against what happened
 
@@ -108,21 +110,24 @@ a kernel measured in isolation is measured optimistically.
 makes it checkable. Six of the eight were low, and the two that mattered were
 low by a lot:
 
-| kernel | planned | measured (mean) |
+| kernel | planned | measured, in the scene that uses it |
 |---|---:|---:|
-| copper | 400 | 2,051 |
-| kefrens | 1,200 | 3,743 |
-| twister | 2,500 | 3,553 |
-| plasma | 4,500 | 4,308 |
-| affine floor | 2,600 | 3,631 |
-| tunnel | 5,100 | 7,291 |
-| scroller | 1,800 | 3,197 |
+| copper | 400 | 1,816 (endcard) |
+| kefrens | 1,200 | 5,105 |
+| twister | 2,500 | 3,468 |
+| plasma | 4,500 | 5,991 |
+| affine floor + solid 3D | 3,500 | 3,462 (plane) |
+| tunnel | 5,100 | 7,272 |
+| scroller | 1,800 | 2,890 (credits) |
 
-The pattern is the same in every row: the estimate counted the arithmetic and
-forgot the traffic. A pixel is not an add, it is an interpolator read, a texture
-load, a store and a share of the loop — and the two cores are competing for the
-same SRAM while it happens. The one estimate that was *high* is the plasma,
-which is the only kernel whose inner loop was written before the estimate was.
+The pattern is the same in almost every row: the estimate counted the arithmetic
+and forgot the traffic. A pixel is not an add, it is an interpolator read, a
+texture load, a store and a share of the loop. Some of the gap arrived later —
+the dithering added about 1,700 to the plasma and 1,400 to the Kefrens bars —
+but the estimates were low before any of that.
+
+The one row that came in *under* is the plane, and only because the reflection
+it was budgeted for was cut.
 
 None of this cost anything, because the budget had a factor of two in it on
 purpose. That is what the factor of two is for.
@@ -213,8 +218,10 @@ When a row is full the renderer gives up the *narrowest run already in the list*
 rather than the incoming span. That matters: the incoming span is the nearest
 thing on the row, so dropping it punches a hole straight through a solid object,
 while dropping the narrowest costs a few pixels of the wrong colour on a sliver.
-The audit budgets the rate — no frame may lose a sliver in more than 48 of its
-480 rows. The worst frame in the production loses 37.
+The audit budgets the rate — no frame may lose a sliver in more than 96 of its
+480 rows, a fifth. The worst frame in the production loses 58. That budget was
+48 until the solid objects were enlarged; see the second pass below for why
+moving it was the right call and shaving the meshes was not.
 
 ### The music
 
@@ -348,7 +355,12 @@ FPU instruction *plus* a fallback call to libm, because without `-fno-math-errno
 the standard requires `errno` to be set for a negative argument — the call is
 never taken, but the compiler must keep live values somewhere that could survive
 one, so the fast path spills to the stack. Fixing both, then halving the number
-of exact coordinates per line after measuring where the time went: **6,270**.
+of exact coordinates per line after measuring where the time went, brought it to
+**6,270** — at one exact coordinate every 32 pixels. The second pass spent some
+of that back: 32-pixel steps were visible in the shading once everything around
+them had been dithered smooth, so the spacing is 24 now and the kernel is
+**7,280**. Which is the right way round; the budget existed to be spent on the
+picture.
 
 **The profiling harness reported the same number for all three builds.** Full
 kernel, coordinates stubbed, pixel loop stubbed: 6,856, 6,862, 6,855. The cause
