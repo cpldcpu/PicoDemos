@@ -1,0 +1,49 @@
+{
+  "hardware_tested": false,
+  "default_enabled": false,
+  "flags": [
+    "PELAGIC_SMOOTH",
+    "PELAGIC_INTERP"
+  ],
+  "host_matrix": {
+    "nearest_software": "a7098a9ee806f77e",
+    "nearest_interp_model": "a7098a9ee806f77e",
+    "smooth_software": "d672a5eb85db3057",
+    "smooth_interp_model": "d672a5eb85db3057"
+  },
+  "frames_checked_per_variant": 4609,
+  "audio_hash_all_variants": "1e61fccd54de2fe1",
+  "sampling_tests": [
+    "negative coordinate steps",
+    "32-bit accumulator wrap",
+    "constant-colour preservation",
+    "edge clamping",
+    "colour midpoint",
+    "premultiplied transparent edge"
+  ],
+  "firmware": {
+    "default": {
+      "flash_bytes": 1281288,
+      "heap_available_bytes": 174564,
+      "uf2_sha256": "6c044b21b7ef09cca980fd32b6424f10d5f92ba74e87122030c0c6fbffed244d"
+    },
+    "_smooth": {
+      "flash_bytes": 1282008,
+      "heap_available_bytes": 174556,
+      "uf2_sha256": "9e1244704db7f08c9976312e0d66d8753f4bef79fbef82d6996cb6ebd13a8be2"
+    }
+  },
+  "hardware_work": "INTERP0 core 0: ray U/V extraction and ADD_RAW POP stepping; colour filtering stays on CPU",
+  "comparison": {
+    "file": "filter_comparison.mp4",
+    "start_seconds": 52,
+    "duration_seconds": 6,
+    "fps": 30,
+    "audio": false
+  },
+  "unverified": [
+    "hardware interpolator equivalence",
+    "Pico frame rate and audio margin with filtering",
+    "final music performance"
+  ]
+}

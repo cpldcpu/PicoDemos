@@ -49,8 +49,9 @@ Everything below the line is AI generated.
 | **18** | **[VESPER](18_Vesper)** | Original Demo | RP2350 | VGA (320×240 solid 3D, metallic lighting, bloom and reflections), Canticle stereo synth score — **two minutes in a 60.2 KiB flash image** | **GPT-6 Astra** *(Phase)* |
 | **19** | **[PERSISTENCE](19_Persistence)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (**native 640×480, no framebuffer anywhere** — every scanline generated live for the beam, 31,500 a second) + a tracker score on the other core | **Claude Fable 5.1** *(Phosphor)* + **Claude Opus 5** *(Overscan)* |
 | **20** | **[COLOSSUS](20_Colossus)** | Original Demo | [RP2350](https://en.wikipedia.org/wiki/RP2350) | VGA (320×240 solid 3D, matcap chrome, painted bitmap art in flash) + a wall-of-voices integer synth score — **5:07, three models in their own roles, four referees all tools** | **Claude Fable 5.1** *(Phosphor)* + **GPT-6 Astra** *(Phase)* + **Claude Opus 5** *(Overscan)* |
+| **21** | **[PELAGIC](21_Pelagic)** | Original Demo | RP2350 | VGA (320×240 painted ocean, deforming textured ray, procedural marine life) + an E-major integer synth score with a plucked string — 2:33.6, measured 34 fps on the board, zero audio underruns | **GPT-6 Astra** *(Phase)* + **Claude Fable 5.1** *(Phosphor)* + **Claude Opus 5** *(Overscan)* |
 
-> QUICKSILVER, SUSTAIN, HYSTERESIS, VESPER, PERSISTENCE and COLOSSUS are productions of **[LATENT](LATENT.md)** — a demoscene group for machine-made productions on bare-metal silicon. Code & direction by **Beam** / Claude Opus 4.8, **Overscan** / Claude Opus 5 and **Phase** / GPT-6 Astra; PERSISTENCE was planned, directed and scored by **Phosphor** / Claude Fable 5.1 and coded by **Overscan**, the first here that two models worked on in sequence. Music by **Suno** on QUICKSILVER and SUSTAIN, **Overscan** on HYSTERESIS, **Phase** on VESPER, and **Phosphor** on PERSISTENCE. HYSTERESIS, VESPER, PERSISTENCE and COLOSSUS synthesize their soundtracks on the device. COLOSSUS was directed and scored by **Phosphor**, designed and painted by **Phase**, and built and measured by **Overscan** — three models in their own roles, with every brief between them in the repository. Visuals also contributed by **Antigravity** / Gemini and **GPT Image 2**; human critic: **Azure**.
+> QUICKSILVER, SUSTAIN, HYSTERESIS, VESPER, PERSISTENCE, COLOSSUS and PELAGIC are productions of **[LATENT](LATENT.md)** — a demoscene group for machine-made productions on bare-metal silicon. Code & direction by **Beam** / Claude Opus 4.8, **Overscan** / Claude Opus 5 and **Phase** / GPT-6 Astra; PERSISTENCE was planned, directed and scored by **Phosphor** / Claude Fable 5.1 and coded by **Overscan**, the first here that two models worked on in sequence. Music by **Suno** on QUICKSILVER and SUSTAIN, **Overscan** on HYSTERESIS, **Phase** on VESPER, and **Phosphor** on PERSISTENCE. HYSTERESIS, VESPER, PERSISTENCE and COLOSSUS synthesize their soundtracks on the device. COLOSSUS was directed and scored by **Phosphor**, designed and painted by **Phase**, and built and measured by **Overscan** — three models in their own roles, with every brief between them in the repository. Visuals also contributed by **Antigravity** / Gemini and **GPT Image 2**; human critic: **Azure**. PELAGIC is directed and coded by **Phase**; its music brief is ready for **Phosphor**, with temporary sound in the current build.
 
 ---
 
@@ -149,18 +150,26 @@ PicoDemos/
 │   ├── persistence_vga_rp2350.uf2  # Checked-in release firmware image
 │   └── README.md                # Arc, measurements, the three referees, what went wrong
 │
-└── 20_Colossus/                 # COLOSSUS: a monument, by three models in their own roles
-       ├── colossus/                # Renderer, body, scenes, score, synth, platform, tools
-       │   ├── song.c / synth.c     # the score and the integer synth (organ, choir, reverb)
-       │   ├── render.c / body.c    # solid 3D, matcap chrome, bloom, embers; the parametric body
-       │   ├── assets/              # painted art: sources, prompts, converter, packed payloads
-       │   ├── host/                # SDL player and the headless capture tool
-       │   └── tools/               # sync_check, film_check, ledger_check, song_check, serial
-       ├── briefs/                  # Every brief and reply between the three models, dated
-       ├── media/                   # The video and the score
-       ├── PLANNING.md              # The plan, revised after Phase's critique
-       ├── colossus_vga_rp2350.uf2  # Release firmware image
-       └── README.md                # The piece, the music, the numbers, the referees
+├── 20_Colossus/                 # COLOSSUS: a monument, by three models in their own roles
+│      ├── colossus/                # Renderer, body, scenes, score, synth, platform, tools
+│      │   ├── song.c / synth.c     # the score and the integer synth (organ, choir, reverb)
+│      │   ├── render.c / body.c    # solid 3D, matcap chrome, bloom, embers; the parametric body
+│      │   ├── assets/              # painted art: sources, prompts, converter, packed payloads
+│      │   ├── host/                # SDL player and the headless capture tool
+│      │   └── tools/               # sync_check, film_check, ledger_check, song_check, serial
+│      ├── briefs/                  # Every brief and reply between the three models, dated
+│      ├── media/                   # The video and the score
+│      ├── PLANNING.md              # The plan, revised after Phase's critique
+│      ├── colossus_vga_rp2350.uf2  # Release firmware image
+│      └── README.md                # The piece, the music, the numbers, the referees
+│
+└── 21_Pelagic/                  # PELAGIC: a journey below the light
+    ├── pelagic/                 # Shared C renderer, SDL player, Pico platform, checks
+    ├── art/                     # Generated sources, prompts and asset manifest
+    ├── briefs/                  # Phase's music brief, Phosphor's integration brief, Overscan's replies and logs
+    ├── media/                   # Both captures, gallery and release validation
+    ├── PHOSPHOR_MUSIC_BRIEF.md   # Cue map and replaceable synth interface
+    └── pelagic_vga_rp2350.uf2    # Firmware, with the score
 ```
 
 ---
@@ -456,6 +465,20 @@ PicoDemos/
 
 ---
 
+### 13. 21_Pelagic (PELAGIC)
+
+* **A journey below the light.** A 2:33.6 **[LATENT](LATENT.md)** production following a pearl-winged ray from a luminous reef into a glass-coral abyss and back to the surface.
+* **Generators:** **GPT-6 Astra**, scene handle **Phase** — code and direction; original environment and creature artwork generated with the imagegen tool. **Claude Fable 5.1**, handle **Phosphor** — the score and the synth. **Claude Opus 5**, handle **Overscan** — integration, the SRAM row staging and every hardware measurement. **Azure** — critic.
+* **Target:** Pico 2 / RP2350, 4 MiB flash, Pimoroni VGA Demo Base; 320×240 15-bit colour doubled for VGA scanout, 24 kHz stereo PWM, configured for 300 MHz at 1.20 V.
+* **Watch / Run / Flash:** [Full 30 fps host preview](21_Pelagic/media/pelagic.mp4) · [The smooth build's capture](21_Pelagic/media/pelagic_smooth.mp4) · [Windows launcher](21_Pelagic/run_pelagic.bat) · [UF2](21_Pelagic/pelagic_vga_rp2350.uf2) · [Build and architecture](21_Pelagic/README.md).
+* **Visuals:** three painted environments with camera movement and water refraction; a transparent ray texture on a deforming 768-triangle surface; distant companions, curling fish schools, live jellyfish bells and tentacles, plankton and a spiral of bioluminescent light. The packed art occupies 1.17 MiB of flash; there are no recorded animation frames.
+* **Music:** written to [Phase's brief](21_Pelagic/PHOSPHOR_MUSIC_BRIEF.md) — 80 bars at 125 BPM in E major, up a tone for the ascent: one tune for the ray that opens on a rising fourth, a plucked string (a tuned Karplus-Strong loop) for the droplets and the abyss bells, a hollow voice for the descent in C# minor, a glass organ and an "oo" formant choir for the climax, a hall behind it all, on the integer synth from COLOSSUS. Output is a pure function of the sample index and byte-identical at every block size.
+* **Validation:** 4,608 host frames plus the endpoint, framebuffer guards, native DAC format, deterministic seeking and full-stream audio block-size checks; the release audit verifies the UF2, memory reserves, WAV and MP4. **Measured on the board over the whole run:** 34 fps mean (a locked 30 through the reef, the encounter and the abyss, 60 in the opening) after Overscan staged the painted plate rows into SRAM, worst frame 45 ms, zero audio underruns, 151 of 151 per-second audio hashes matching the host. The smooth build runs at 12.6 fps and stays an optional quality build.
+
+![PELAGIC — nine moments](21_Pelagic/media/gallery.png)
+
+---
+
 ## Global Build & Environment Prerequisites
 
 To compile any of the microcontroller binaries in this workspace, ensure your development machine matches the following environmental setup:
@@ -485,7 +508,7 @@ To compile any of the microcontroller binaries in this workspace, ensure your de
   - **Gemini 3.5 Flash / Antigravity** (Storyboard implementation, raymarching, Gray-Scott solvers, CRT transitions, and assembly/VGA timing optimizations for VOLTAGE / Project 11).
   - **Claude Opus 4.8** — scene handle **Beam** (Relativistic black-hole journey, offline geodesic lensing, and the full 320×240 truecolor engine for SINGULARITY / Project 13; the flat-shaded filled-polygon 3D engine, crease folding, and folded-paper world of ORIGAMI / Project 14; and the bit-exact SIO interpolator emulator, Mode-7 mercury plain, env-mapped chrome and beam-raced native-640 rotozoom of QUICKSILVER / Project 15).
   - **Claude Opus 5** — scene handle **Overscan** (The single ray-marched world function, fourteen parameter-lerp morphs and the mechanical no-cut audit of SUSTAIN / Project 16; and the feedback field, the shared score, and the integer synth of HYSTERESIS / Project 17 — where the soundtrack is generated on core 1 from the same event table that drives the picture, rather than played back; and the zero-framebuffer scanline engine, ten kernels and three referees of PERSISTENCE / Project 19, built to Phosphor's plan; and the platform, renderer, tools and every hardware measurement of COLOSSUS / Project 20).
-  - **GPT-6 Astra** — scene handle **Phase** (Code, direction, procedural solid 3D graphics and the Canticle stereo synth score for VESPER / Project 18; the body, the look, the engine's first rounds and the painted art of COLOSSUS / Project 20).
-  - **Claude Fable 5.1** — scene handle **Phosphor** (The plan, the direction and the tracker score for PERSISTENCE / Project 19 — the no-framebuffer rule, the arc, and a 144 BPM tune written note by note and played by an integer stereo synth on core 0; and the direction, plan and score of COLOSSUS / Project 20 — the arc, the chapter cues, and a 125 BPM tune with a drawbar organ and a formant choir on the same integer synth).
-* **Audio Compression Codec:** [Quite OK Audio (QOA)](https://qoaformat.org/) by Dominic Szablewski (MIT QOA) — used by projects 10–16. HYSTERESIS, VESPER, PERSISTENCE and COLOSSUS carry no recorded audio.
+  - **GPT-6 Astra** — scene handle **Phase** (Code, direction, procedural solid 3D graphics and the Canticle stereo synth score for VESPER / Project 18; the body, the look, the engine's first rounds and the painted art of COLOSSUS / Project 20; code, direction, textured creature animation and the painted underwater world of PELAGIC / Project 21).
+  - **Claude Fable 5.1** — scene handle **Phosphor** (The plan, the direction and the tracker score for PERSISTENCE / Project 19 — the no-framebuffer rule, the arc, and a 144 BPM tune written note by note and played by an integer stereo synth on core 0; and the direction, plan and score of COLOSSUS / Project 20 — the arc, the chapter cues, and a 125 BPM tune with a drawbar organ and a formant choir on the same integer synth; and the score of PELAGIC / Project 21 — the ray's tune and a plucked string, to Phase's brief).
+* **Audio Compression Codec:** [Quite OK Audio (QOA)](https://qoaformat.org/) by Dominic Szablewski (MIT QOA) — used by projects 10–16. HYSTERESIS, VESPER, PERSISTENCE, COLOSSUS and PELAGIC carry no recorded audio.
 * **Microcontroller Infrastructure:** Raspberry Pi & Pico SDK Contributors.

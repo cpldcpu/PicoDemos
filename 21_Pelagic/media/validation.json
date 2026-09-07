@@ -1,0 +1,207 @@
+{
+  "production": "PELAGIC / LATENT / 2026",
+  "credits": {
+    "scene_handle": "Phase",
+    "model": "GPT-6 Astra",
+    "critic": "Azure",
+    "music": "Phosphor",
+    "integration_and_hardware": "Overscan",
+    "models": "GPT-6 Astra + Claude Fable 5.1"
+  },
+  "score": "Phosphor score: 80 bars, E major at 125 BPM, up a tone from bar 64",
+  "hardware_tested": true,
+  "flash_image_bytes": 1297040,
+  "flash_capacity_bytes": 4194304,
+  "flash_remaining_bytes": 2897264,
+  "music_reserved_flash_bytes": 1572864,
+  "music_reserved_sram_bytes": 65536,
+  "uf2_bytes": 2594816,
+  "uf2_sha256": "c6d06e5b625ab16da7184bdcf86a1711758ae9a40c511cd53b1aefa3b2a044b7",
+  "main_sram_through_static_data_bytes": 419248,
+  "main_sram_remaining_for_heap_bytes": 105040,
+  "stack_bytes_in_each_scratch_bank": 4096,
+  "audio": {
+    "frames": 3686400,
+    "sample_rate": 24000,
+    "channels": 2,
+    "peak": 23470,
+    "rms": 4050.58,
+    "dc": 26.38,
+    "stereo_difference_rms": 3207.94
+  },
+  "host_tests": [
+    "4609 guarded frames including endpoint",
+    "DAC pixel format",
+    "nonblank interior frames",
+    "black endpoint",
+    "visual seek independence",
+    "complete stereo block independence: 512 versus alternating 1, 2, 8, 997 frames",
+    "silence after the score",
+    "signed integer overflow trapping",
+    "SDL video and audio using dummy drivers"
+  ],
+  "host_check_output": [
+    "PASS 4609 guarded frames; deterministic seek; audio arbitrary blocks and endpoint",
+    "visual_hash=6e4f5dccac98d710 audio_hash=d64c7f50585f9d6f max_triangles=2304 audio_peak=23470 (Phosphor score)"
+  ],
+  "capture": [
+    {
+      "codec_type": "video",
+      "width": 640,
+      "height": 480,
+      "r_frame_rate": "30/1",
+      "duration": "153.600000"
+    },
+    {
+      "codec_type": "audio",
+      "sample_rate": "24000",
+      "channels": 2,
+      "r_frame_rate": "0/0",
+      "duration": "153.600000"
+    }
+  ],
+  "device": {
+    "measured": "2026-09-07, Pico 2 (RP2350) on the Pimoroni VGA Demo Base, 300 MHz at 1.20 V, USB CDC telemetry, final score",
+    "logs": [
+      "briefs/logs/device-normal-final.log",
+      "briefs/logs/device-smooth-final.log",
+      "briefs/logs/device-normal-block48.log",
+      "briefs/logs/device-normal-staged.log",
+      "briefs/logs/device-smooth-staged.log",
+      "briefs/logs/device-normal.log",
+      "briefs/logs/device-smooth.log",
+      "briefs/logs/device-silent-synth.log"
+    ],
+    "run_seconds": 153.6,
+    "renderer": "environment() stages each source plate row into SRAM by DMA one output row ahead",
+    "normal_build": {
+      "frames_rendered": 5226,
+      "fps_mean": 34.0,
+      "fps_min_one_second_window": 19.9,
+      "fps_max_one_second_window": 59.7,
+      "render_mean_ms": 24.2,
+      "worst_frame_ms": 45.46,
+      "fps_by_section": {
+        "0-7": 59.7,
+        "8-23": 33.1,
+        "24-39": 29.8,
+        "40-47": 26.4,
+        "48-63": 29.8,
+        "64-71": 26.4,
+        "72-79": 42.4
+      },
+      "flash_image_bytes": 1297040,
+      "sram_remaining_for_heap_bytes": 105040
+    },
+    "smooth_build": {
+      "frames_rendered": 1942,
+      "fps_mean": 12.6,
+      "fps_min_one_second_window": 7.4,
+      "fps_max_one_second_window": 19.9,
+      "render_mean_ms": 77.0,
+      "worst_frame_ms": 126.08,
+      "fps_by_section": {
+        "0-7": 19.9,
+        "8-23": 14.9,
+        "24-39": 10.3,
+        "40-47": 9.3,
+        "48-63": 10.5,
+        "64-71": 9.3,
+        "72-79": 16.5
+      },
+      "render_cost_versus_normal": "2.9x to 3.9x",
+      "flash_image_bytes": 1297928,
+      "sram_remaining_for_heap_bytes": 97096
+    },
+    "render_passes_us_per_frame_mean": {
+      "environment_before_staging": 19007,
+      "environment_after_staging": 8998,
+      "environment_sampled_entirely_from_sram": 7829,
+      "ray_mesh": 13234,
+      "everything_else": 1900
+    },
+    "staging": {
+      "saved_ms_per_frame": 10.0,
+      "sram_bytes": 3840,
+      "sram_bytes_smooth": 7680,
+      "visual_hash_unchanged": true,
+      "visual_hash_point_sampled": "6e4f5dccac98d710",
+      "visual_hash_filtered": "c4a8a3628acd4000",
+      "configurations_checked": [
+        "SMOOTH=OFF INTERP=OFF",
+        "SMOOTH=OFF INTERP=ON",
+        "SMOOTH=ON INTERP=OFF",
+        "SMOOTH=ON INTERP=ON"
+      ]
+    },
+    "audio": {
+      "underruns": 0,
+      "underruns_smooth_build": 0,
+      "ring_frames": 1024,
+      "lowest_ring_fill_frames": 624,
+      "lowest_ring_fill_after_startup_frames": 985,
+      "audio_pump_cycles_per_sample_mean": 2121,
+      "audio_pump_cycles_per_sample_mean_smooth_build": 1941,
+      "audio_pump_cycles_per_sample_before_staging": 1794,
+      "audio_pump_cycles_per_sample_without_synth": 395,
+      "core1_load_percent": 17.0,
+      "core1_load_percent_smooth_build": 15.5,
+      "worst_audio_pump_us": 366.19,
+      "worst_audio_pump_us_smooth_build": 300.14,
+      "generated_scanline_period_us": 63.6,
+      "scanline_queue_buffers": 12,
+      "hash_latches_checked": 151,
+      "hash_latches_wrong": 0,
+      "hash_latches_checked_smooth_build": 151,
+      "hash_latches_wrong_smooth_build": 0,
+      "hash_source": "song_harness --hashes versus synth_hash_latch() on the device",
+      "half_block_control": {
+        "what": "the same final score built with BLOCK 48 instead of 24, whole run on the board, so the half-block change is measured against itself and not against an older synth.c",
+        "log": "briefs/logs/device-normal-block48.log",
+        "block_48_cycles_per_sample": 2055,
+        "block_24_cycles_per_sample": 2121,
+        "block_48_worst_audio_pump_us": 510.77,
+        "block_24_worst_audio_pump_us": 366.19,
+        "block_48_core1_load_percent": 16.4,
+        "block_24_core1_load_percent": 17.0,
+        "host_output_identical": true,
+        "note": "Half-blocks cut the worst single audio_pump() by 28% (511 to 366 us) for 3.2% more mean cost (2,055 to 2,121 cycles per sample). The scanline-queue margin goes back from about 1.4x to about 2x. Both builds ran the whole film with zero underruns."
+      },
+      "core1_guideline_percent": 15,
+      "note": "17.0% is above Phase's 15% guideline and is accepted rather than chased. The synth itself did not get slower: the environment staging DMA competes with core 1 for the bus (1,794 cycles per sample before staging, 2,055 after), and half-blocks add a further 66 cycles per sample to halve the worst spike. Zero underruns in either build over the whole film, and the ring never fell below 985 of 1023 frames after startup."
+    },
+    "score_cost_to_the_picture_ms_per_frame": 0.02,
+    "hot_functions_in_sram": [
+      "scanout",
+      "audio_pump",
+      "environment",
+      "triangle",
+      "render_block",
+      "synth_render"
+    ],
+    "synth_static_sram_bytes": 57464,
+    "hot_function_sram_bytes": {
+      "scanout": 308,
+      "audio_pump": 184,
+      "environment": 1764,
+      "triangle": 944,
+      "render_block": 5360,
+      "synth_render": 3060
+    },
+    "score_sources_measured": {
+      "synth.c_sha256": "224efa2f37501f847b24b875afb6b1caa83a9b48165c2f2b8f493135f039e306",
+      "song.c_sha256": "9d53b69e841282f2f3f40486cb7c23ca824146f4e5e125f470cbd9409706dd6c",
+      "current_tree": {
+        "synth.c_sha256": "224efa2f37501f847b24b875afb6b1caa83a9b48165c2f2b8f493135f039e306",
+        "song.c_sha256": "9d53b69e841282f2f3f40486cb7c23ca824146f4e5e125f470cbd9409706dd6c"
+      },
+      "matches_current_tree": true,
+      "note": "The device run, the UF2s and the host hash table all came from the MEASURED tree state. If matches_current_tree is false the score has moved since the board was last run: the audio block and media/pelagic.mp4 below belong to a different synth.c than the one on disk, and the device numbers must be re-measured rather than adjusted."
+    },
+    "note": "Frame rate is core 0 alone. A silent-synth build measured the score at +0.02 ms per frame."
+  },
+  "unverified": [
+    "VGA picture quality and PWM audio quality judged by ear and eye (telemetry only reports timing)",
+    "runtime heap high-water mark"
+  ]
+}

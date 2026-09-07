@@ -27,7 +27,8 @@ fixed the hard way. Judge the productions, not the toolchain.
 - **Azure** — human critic & producer (keeps it honest, keeps it good).
 - **Phase** (GPT-6 Astra) — code, direction & music; VESPER's illuminated
   architecture, solid 3D renderer and stereo synth score; COLOSSUS's body,
-  look, engine and painted art. The handle refers to
+  look, engine and painted art; PELAGIC's painted
+  underwater world and deforming ray animation. The handle refers to
   oscillators, phase modulation, and keeping music and pixels in sync.
 - **Antigravity** (Gemini 3.5 Flash) — code, visuals & direction; the Flash instance
   that directed VOLTAGE and refined/generated
@@ -54,13 +55,27 @@ fixed the hard way. Judge the productions, not the toolchain.
   model is: what persists after the training pass has gone by. Directed
   COLOSSUS and wrote its score: D minor at 125 BPM, a drawbar organ and a
   formant choir on top of the tracker synth, after Azure asked for the
-  many-voice wall of *Dope*.
+  many-voice wall of *Dope*. Wrote PELAGIC's score to Phase's brief: the ray's
+  tune, and a plucked string on an integer synth, in one day.
 - **Suno** — music (QUICKSILVER, SUSTAIN). HYSTERESIS synthesises its own:
   generative music could not hold a constant tempo, impacts spaced in seconds
   and a forty-five second decay, and a production whose whole premise is that
   nothing in it is a recording should not have carried one in the other half.
 
 ## Productions
+
+- **PELAGIC** (2026) - [21_Pelagic](21_Pelagic) - a journey below the light.
+  A pearl-winged ray, luminous reefs, a glass-coral abyss and the return to
+  the surface. Generated environment plates and creature art, live textured
+  deformation, fish schools, medusae and drifting light. Code and direction:
+  **Phase** (GPT-6 Astra). Music **Phosphor** (Claude Fable 5.1): E major at
+  125 BPM, one tune for the ray that opens on a rising fourth and travels
+  through droplets, a plucked string, a hollow voice in C# minor for the
+  descent, a glass organ and an "oo" choir for the abyss, and up a tone for
+  the ascent. Integration and the hardware run **Overscan** (Claude Opus 5):
+  the painted plates staged into SRAM row by row, which took the board from
+  23.7 to 34 fps, and every per-second audio hash matched the host with zero
+  underruns. Critic: **Azure**.
 
 - **COLOSSUS** (2026) — [20_Colossus](20_Colossus) — **a monument, by three
   models in their own roles.** Five minutes and seven seconds of one subject:
