@@ -1,0 +1,54 @@
+Program Information
+ name:                   tessera
+ features:               USB stdin /
+                         stdout
+ binary start:           0x10000000
+ binary end:             0x1000e3e8
+ target chip:            RP2350
+ image type:             ARM Secure
+
+Fixed Pin Information
+ 0-4:                    Red 0-5
+ 6-10:                   Green 0-5
+ 11-15:                  Blue 0-5
+ 16:                     HSync
+ 17:                     VSync
+
+Build Information
+ sdk version:            2.2.0
+ pico_board:             pico2
+ boot2_name:             boot2_w25q080
+ build date:             Sep 11 2026
+ build attributes:       Release
+
+Metadata Block 1
+ address:                0x10000138
+ next block address:     0x1000e3d4
+ block type:             image def
+ target chip:            RP2350
+ image type:             ARM Secure
+
+Metadata Block 2
+ address:                0x1000e3d4
+ next block address:     0x10000138
+ block type:             ignored
+
+Device Information
+ type:                   RP2350
+ revision:               A2
+ package:                QFN60
+ chipid:                 0xc0792b39607fed67
+ flash devinfo:          0x0c00
+ current cpu:            ARM
+ available cpus:         ARM, RISC-V
+ default cpu:            ARM
+ secure boot:            0
+ debug enable:           1
+ secure debug enable:    1
+ boot_random:            4bd305ce:f5fdee30:d4f546c2:25caea97
+ boot type:              bootsel
+ last booted partition:  slot 0
+ reboot param 0:         0x00000001
+ reboot param 1:         0xffffffff
+ rom gitrev:             0x312e22fa
+ flash size:             16384K

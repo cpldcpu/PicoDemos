@@ -1,0 +1,1 @@
+TESSERA: 120 frames, render mean 0.40 ms, worst 1.02 ms, max 1529 triangles (HOST measurements)

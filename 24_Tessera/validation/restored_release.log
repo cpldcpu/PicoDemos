@@ -1,0 +1,13 @@
+
+BOOT TESSERA dma=1 interp=1 sys=300000000 Hz
+SELFTEST accelerator=0 (real SIO registers)
+VHASH s=0 6ad58dc5
+VHASH s=720000 71064e4a
+VHASH s=1440000 01cb53f5
+VHASH s=2160000 4e19057c
+VHASH s=2880000 448be6ea
+VHASH s=3600000 01d04637
+T t=0.9 bar=0 sec=0 dma=1 interp=1 | render ms 10.93/11.00/11.08 | fps 59.7 | spans 1739 | repeat 0 | over 0 | fields 64 firstrep 0 boot 1 | fill 987 win 987 under 0 | synth 1444 cy/pump 20.71 Mcy/s 878 cy/sample | pump worst 60.20 us peak 60.20 us | AHASH s=24000 5f7858ba | prep_us=3371 draw_us=7710 tiles=384 | missed 0 bootmiss 0
+T t=1.9 bar=1 sec=0 dma=1 interp=1 | render ms 6.75/6.86/7.01 | fps 59.7 | spans 2241 | repeat 0 | over 0 | fields 124 firstrep 0 boot 1 | fill 987 win 988 under 0 | synth 1005 cy/pump 14.41 Mcy/s 600 cy/sample | pump worst 68.39 us peak 68.39 us | AHASH s=48000 3979c739 | prep_us=3369 draw_us=3646 tiles=384 | missed 0 bootmiss 0
+T t=2.9 bar=1 sec=0 dma=1 interp=1 | render ms 7.02/7.23/7.48 | fps 59.7 | spans 3235 | repeat 0 | over 0 | fields 184 firstrep 0 boot 1 | fill 987 win 988 under 0 | synth 1020 cy/pump 14.62 Mcy/s 609 cy/sample | pump worst 41.73 us peak 68.39 us | AHASH s=72000 f1b68c0f | prep_us=3375 draw_us=4109 tiles=384 | missed 0 bootmiss 0
+T t=3.9 bar=2 sec=0 dma=1 interp=1 | render ms 7.49/7.68/7.91 | fps 59.7 | spans 4216 | repeat 0 | over 0 | fields 244 firstrep 0 boot 1 | fill 987 win 988 under 0 | synth 1360 cy/pump 19.51 Mcy/s 813 cy/sample | pump worst 59.90 us peak 68.39 us | AHASH s=96000 bb08efbb | prep_us=3369 draw_us=4548 tiles=384 | missed 0 bootmiss 0

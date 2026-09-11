@@ -1,0 +1,38 @@
+{
+  "passed": false,
+  "failures": [
+    "repeat=1",
+    "over=61",
+    "render exceeds 15 ms budget",
+    "frame-rate window below 59.5"
+  ],
+  "checked_hashes": 153,
+  "worst_render_ms": 16.53,
+  "counters": {
+    "repeat": 1,
+    "over": 61,
+    "under": 0,
+    "missed": 0
+  },
+  "frames": 9177,
+  "fps_min": 58.7,
+  "final_hash": "9ea01706",
+  "visual_hashes": {
+    "0": "6ad58dc5",
+    "720000": "71064e4a",
+    "1440000": "01cb53f5",
+    "2160000": "4e19057c",
+    "2880000": "448be6ea",
+    "3600000": "01d04637"
+  },
+  "done": [
+    "DONE frames 9177 | worst render 16.53 ms | repeat 1 | over 61 | fields 9183 firstrep 7625 boot 1 | under 0 | fill 986 | peak pump 174.63 us | synth 1766 cy/pump 1055 cy/sample | audio 3686910"
+  ],
+  "final": [
+    "FINAL missed 0 bootmiss 0 | ENDHASH s=3686400 9ea01706"
+  ],
+  "utc": "2026-09-11T15:23:27.674503+00:00",
+  "uf2_sha256": "122f56a9baf5a19554e33b7570a565a9abc36446c4a51c53cdbe6732194aaa59",
+  "pcm_sha256": "23c79ada3f60d9f8818192ac390ae1e1ebfbe14991425a992fa5883975b9a70a",
+  "port": "COM10"
+}

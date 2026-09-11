@@ -1,0 +1,140 @@
+{
+  "uf2_sha256": "63aa9098f07ccbbfdbc47086638288b0c4af265f2349cd17c648335fd7417622",
+  "flash_image_bytes": 366088,
+  "uf2_bytes": 733184,
+  "static_main_sram_bytes": 440564,
+  "heap_before_scanvideo_bytes": 83724,
+  "separate_stack_bytes": 8192,
+  "movie_bytes": 47558316,
+  "movie_sha256": "ffb7a47a93458edbcd7d82870900b125ced482e865f51d2c728092ce1e723ad5",
+  "movie_frames": 9216,
+  "negative_controls_passed": 10,
+  "runs": [
+    {
+      "passed": true,
+      "failures": [],
+      "checked_hashes": 153,
+      "worst_render_ms": 12.96,
+      "counters": {
+        "repeat": 0,
+        "over": 0,
+        "under": 0,
+        "missed": 0
+      },
+      "frames": 9179,
+      "fps_min": 59.7,
+      "final_hash": "9ea01706",
+      "visual_hashes": {
+        "0": "6ad58dc5",
+        "720000": "71064e4a",
+        "1440000": "01cb53f5",
+        "2160000": "4e19057c",
+        "2880000": "448be6ea",
+        "3600000": "01d04637"
+      },
+      "done": [
+        "DONE frames 9179 | worst render 12.96 ms | repeat 0 | over 0 | fields 9184 firstrep 0 boot 1 | under 0 | fill 986 | peak pump 92.72 us | synth 1507 cy/pump 901 cy/sample | audio 3687155"
+      ],
+      "final": [
+        "FINAL missed 0 bootmiss 0 | ENDHASH s=3686400 9ea01706"
+      ]
+    },
+    {
+      "passed": true,
+      "failures": [],
+      "checked_hashes": 153,
+      "worst_render_ms": 12.97,
+      "counters": {
+        "repeat": 0,
+        "over": 0,
+        "under": 0,
+        "missed": 0
+      },
+      "frames": 9178,
+      "fps_min": 59.7,
+      "final_hash": "9ea01706",
+      "visual_hashes": {
+        "0": "6ad58dc5",
+        "720000": "71064e4a",
+        "1440000": "01cb53f5",
+        "2160000": "4e19057c",
+        "2880000": "448be6ea",
+        "3600000": "01d04637"
+      },
+      "done": [
+        "DONE frames 9178 | worst render 12.97 ms | repeat 0 | over 0 | fields 9183 firstrep 0 boot 1 | under 0 | fill 986 | peak pump 92.96 us | synth 1508 cy/pump 901 cy/sample | audio 3687049"
+      ],
+      "final": [
+        "FINAL missed 0 bootmiss 0 | ENDHASH s=3686400 9ea01706"
+      ]
+    }
+  ],
+  "source_sha256": {
+    "tessera\\accelerator.h": "04a164b4c6da37f4c122c0f38e0aed69b5bbffa6a184f71c0ad6a8bf0491e5c1",
+    "tessera\\assets.c": "d14f4973ba371a81d0351f060ea624465e34c09ffe9f1f5f412372bd78b4a4c6",
+    "tessera\\assets.h": "b6f19772645c33ac8f5260e908886ba51118d641137c4e6033952f5d4e81d2ae",
+    "tessera\\audio_pwm.c": "9b9ad7fcf811861cf89a02e52547e3596a762b91fd5aa50d0162472b611a9bed",
+    "tessera\\CMakeLists.txt": "d665df7c737bbd726b34a79cfbe39faccc292472320945c0be95d45b70da9b88",
+    "tessera\\device.h": "311433d8f9d6208dd09c94bb81886ff9bb38047caced9cdd8486d6f31fa4fee7",
+    "tessera\\font8x8.h": "e10cd4aba00f95a692d2d1bc17e59012a3075ebc6c7c184cdaa250cd2c2b6f7c",
+    "tessera\\host\\main.c": "351ffb4258bec7267e7ec8435c5eebf3a6c4070a380c767d59da7db4d174d795",
+    "tessera\\main.c": "b583f8cb3488d7abc7f313aa49ff663ffade3c31edb4e8efdde8776fa44df50a",
+    "tessera\\render.c": "954bb8d8657adae6f4504812aae36c08335f842f27e6ada733428b8a7ae6021a",
+    "tessera\\song.c": "3938ae5a5ff3881dff4cb643a3ddd2e97858ba7dadfc40d07992a400f5d79c10",
+    "tessera\\song.h": "6aa5b11ac8a5a11c458bc845038e4c5c0d20dd6c7477778140092753eda7255f",
+    "tessera\\synth.c": "0c50e29b5c723b261c5f136afa476f76b54fa0b5dd0ea7e61eef561cfe32d4f3",
+    "tessera\\synth.h": "0184a8e8a75f08ea7cc985645fcc831369d6e92de650fcdaebf7850971c5fae5",
+    "tessera\\tessera.h": "6e9496c07043efa8a1e5e07e30fbd5747c5372b2ff54bd42c2a605ece71e8a94",
+    "tessera\\tools\\audio_audit.py": "77c89776cc779a60860d7005e5c01e636cccd68957677070c28fc63ce272ab6a",
+    "tessera\\tools\\board_run.py": "b9c3cb05df391feb89c0eae3814a797a997ecbb6c879fe83f1dfb0798eee84ca",
+    "tessera\\tools\\capture.py": "8a4715521be12733430664e0b10a0efa7c053e210b23deb94b345ea6d89bd206",
+    "tessera\\tools\\check.c": "83a209b8073fa97b1846aeee98e67f737c42687493c574d3e940db8b83f50233",
+    "tessera\\tools\\gallery.py": "43cbf133c348ed9613c78e342481691f6cde4bfa2f39644d6db38792b7a62fa1",
+    "tessera\\tools\\pack_art.py": "261f0412560ea959a4f255dfc899d92334f4f131bcd0d484f1eb590e94fd7983",
+    "tessera\\tools\\release_audit.py": "667134823f9152ac96f59894f71af909e4cb4269270df35210d9911d10aa3cfa",
+    "tessera\\tools\\score_dump.c": "5827f1f6cd1bf822c685f1f08c916c630ebb7dec018107ceb15ad1369a8be77d",
+    "tessera\\tools\\score_review.py": "42ce5ef6aaf25b6d1ef76fe84be296deb21008ec7a0a706508a66d0af623edc5",
+    "tessera\\tools\\trig_table.py": "d9ba289114b1f33f2024eb92431f7fac4565d9cfaf904720f987edd3e1f8b818",
+    "tessera\\tools\\write_report.py": "76c6c28b2aacb685204760116fc74902709587bdd09d66de09f70cedfa541f17",
+    "tessera\\trig_table.h": "c68461446e36291bba2b8cd8e9defc79b87266fd6a35688ee0b3992cc32e0cf5",
+    "tessera\\video.c": "958f0a83441fcaa7ed1a576d365077d075acfef6de0fdde4d83b951602757752"
+  },
+  "software_reference": {
+    "passed": false,
+    "failures": [
+      "repeat=1",
+      "over=61",
+      "render exceeds 15 ms budget",
+      "frame-rate window below 59.5"
+    ],
+    "checked_hashes": 153,
+    "worst_render_ms": 16.53,
+    "counters": {
+      "repeat": 1,
+      "over": 61,
+      "under": 0,
+      "missed": 0
+    },
+    "frames": 9177,
+    "fps_min": 58.7,
+    "final_hash": "9ea01706",
+    "visual_hashes": {
+      "0": "6ad58dc5",
+      "720000": "71064e4a",
+      "1440000": "01cb53f5",
+      "2160000": "4e19057c",
+      "2880000": "448be6ea",
+      "3600000": "01d04637"
+    },
+    "done": [
+      "DONE frames 9177 | worst render 16.53 ms | repeat 1 | over 61 | fields 9183 firstrep 7625 boot 1 | under 0 | fill 986 | peak pump 174.63 us | synth 1766 cy/pump 1055 cy/sample | audio 3686910"
+    ],
+    "final": [
+      "FINAL missed 0 bootmiss 0 | ENDHASH s=3686400 9ea01706"
+    ],
+    "utc": "2026-09-11T15:23:27.674503+00:00",
+    "uf2_sha256": "122f56a9baf5a19554e33b7570a565a9abc36446c4a51c53cdbe6732194aaa59",
+    "pcm_sha256": "23c79ada3f60d9f8818192ac390ae1e1ebfbe14991425a992fa5883975b9a70a",
+    "port": "COM10"
+  }
+}

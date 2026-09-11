@@ -1,0 +1,32 @@
+{
+  "passed": null,
+  "complete": false,
+  "development_capture": true,
+  "note": "Partial development capture; this is not a validation pass.",
+  "visual_hashes_seen": 9,
+  "visual_hashes_match": {
+    "0": true,
+    "240000": true,
+    "480000": true,
+    "720000": true,
+    "960000": true,
+    "1200000": true,
+    "1440000": true,
+    "1680000": true,
+    "1920000": true
+  },
+  "counters": {
+    "repeat": 624,
+    "over": 624,
+    "under": 0,
+    "missed": 0
+  },
+  "fps_windows": 40,
+  "fps_min": 29.8,
+  "worst_render_ms": 27.6,
+  "utc": "2026-09-11T16:12:07.080117+00:00",
+  "uf2_sha256": "05fed4601b86ee82f7e4d3b9f019569968f8b831d5389a361992d1bdda30eb60",
+  "host_pcm_sha256": "89066da76badb2faa3183a2141d702c5e9af0dc17628a5ce736722c60ef70896",
+  "host_final_hash": "70bfe60c",
+  "port": "COM10"
+}

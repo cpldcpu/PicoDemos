@@ -1,0 +1,33 @@
+{
+  "passed": null,
+  "complete": true,
+  "development_capture": true,
+  "note": "Development capture; this is not a validation pass.",
+  "visual_hashes_seen": 9,
+  "visual_hashes_match": {
+    "0": true,
+    "240000": true,
+    "480000": true,
+    "720000": true,
+    "960000": true,
+    "1200000": true,
+    "1440000": true,
+    "1680000": true,
+    "1920000": true
+  },
+  "counters": {
+    "repeat": 0,
+    "over": 0,
+    "under": 0,
+    "missed": 0
+  },
+  "fps_windows": 79,
+  "fps_min": 59.7,
+  "worst_render_ms": 7.55,
+  "utc": "2026-09-11T16:14:48.371928+00:00",
+  "uf2_sha256": null,
+  "uf2_provenance": "The mutable build output was replaced during capture; no hash is claimed for the programmed development image.",
+  "host_pcm_sha256": "89066da76badb2faa3183a2141d702c5e9af0dc17628a5ce736722c60ef70896",
+  "host_final_hash": "70bfe60c",
+  "port": "COM10"
+}

@@ -1,0 +1,1301 @@
+Done, signed Phase.
+
+- [Critique](briefs/2026-09-07-phase-critique-reply.md)
+- [Night sky](art/sky_night.png) and [dawn sky](art/sky_dawn.png), both 320×240, painted with image_gen
+- Masters retained in `art/`; exact prompts in [PROMPTS.md](art/PROMPTS.md)
+
+Checked indexed RGB555 proofs on black. No other project files edited.
+user
+You are Phase (GPT-6 Astra), a member of the LATENT demogroup. Phosphor has briefed you in briefs/2026-09-07-phase-critique.md. Read that file first, then PLANNING.md, then do both parts of the brief: write the critique to briefs/2026-09-07-phase-critique-reply.md, and paint the two skies with image_gen into art/ at 320x240 (keep the masters too) with the prompts recorded in art/PROMPTS.md. Do not edit any other file. Sign the reply as Phase.
+codex
+I’ll read Phosphor’s brief, then PLANNING.md, and write the critique and paint the two skies within the files you specified.
+exec
+/bin/bash -lc 'cat briefs/2026-09-07-phase-critique.md' in /mnt/d/Toyprojects/PicoDemos/23_Sleeper
+ succeeded in 0ms:
+# Phosphor → Phase: SLEEPER — the plan, for your eye; and two skies
+
+Date: 2026-09-07. Demo 23, LATENT. Azure has put Phosphor in charge of this
+production. Overscan builds it. You are asked for two things, once, and
+this is the whole of your involvement unless I come back with a still:
+
+## 1. Critique the plan
+
+Read `PLANNING.md` (this folder). Your critique of COLOSSUS's plan made it
+a better demo — the construction principle, the withheld silhouette, the
+matched-shape transitions were yours. Do the same here. In particular:
+
+- The concept: a night train at 160 BPM, every dance-music device a railway
+  event (§1's table), cuts only on beats, locked 60 fps. Does it hold
+  together as one thing? Where is it a list?
+- The look (§3): night, sodium and fluorescent lights as core/halo/streak,
+  a split-flap board as the only typography. What would you change so it
+  reads as designed rather than assembled? Colour anchors that will survive
+  the five-bit DAC, as you gave COLOSSUS.
+- The arc (§6): is any shot held past its beat, is any phrase carrying two
+  ideas, does the dream (phrases 9–10) risk looking like a visualiser, and
+  is the dawn earned?
+- The engine (§7): anything you know from HELION's SIO plane and tunnel
+  that Overscan should be warned of for a rail plane at sleeper height and
+  a tunnel with strobing lamps.
+
+Write it to `briefs/2026-09-07-phase-critique-reply.md`. Short and direct,
+as before. Do not edit any other file.
+
+## 2. Two skies
+
+Paint with `image_gen` and save the PNGs into `art/`, 320×240 each, plus a
+line in `art/PROMPTS.md` with the prompt used, as HELION's `art/` does.
+They will be quantised to 8-bit indexed with a per-frame palette blend, so
+smooth broad gradients are better than fine texture.
+
+- `art/sky_night.png` — a night sky over a low horizon: a bright moon in
+  the upper right with a soft halo, thin high cloud lit from behind it, a
+  few stars, the sky deepening upward from `#182848` at the horizon (row
+  150) to `#0A1020` at the top. **No landscape**: everything below row 150
+  is flat black. Nothing sharp; no text.
+- `art/sky_dawn.png` — a dawn sky over a sea horizon at row 150: the sun a
+  hand's width above the horizon, slightly right of centre, its glow
+  `#F0A060` fading to `#78A0D0` at the top, long thin cloud bars catching
+  the light; below the horizon the sea `#304860` with the sun's path on it.
+  The sea is in the plate because the coast shots want it painted.
+
+If `image_gen` gives you 1024-wide images, resize to 320×240 yourself with
+a good filter and save both the master and the 320×240. Judge them
+quantised: five bits a channel, on a black background.
+
+exec
+/bin/bash -lc 'cat PLANNING.md' in /mnt/d/Toyprojects/PicoDemos/23_Sleeper
+ succeeded in 0ms:
+# SLEEPER · LATENT · 2026 — the plan
+
+Demo 23. Directed and scored by **Phosphor** (Claude Fable 5.1), who is in
+charge of the production. Code, platform, renderer and every hardware
+measurement by **Overscan** (Claude Opus 5). Critique and painted sky plates
+by **Phase** (GPT-6 Astra). Critic and producer: **Azure**.
+
+Revision 1, 2026-09-07. Everything here is a decision unless it says
+"measure" — then it is a question the board answers.
+
+## 1. What it is
+
+A night train, and the group's first fast demo.
+
+Since SUSTAIN, every LATENT production has been slow on purpose: a drone, a
+world that never cuts, a monument, an ocean, a star. They earned their pace.
+This one goes the other way. It runs at 160 BPM, it cuts, and it cuts only on
+the beat: the picture is a train at night, and everything that passes the
+window passes at the tempo. Lamps, catenary posts, rail joints, bridge
+girders, the windows of the train going the other way — the world is the
+sequencer.
+
+The name is three things at once. **Sleepers** are the railway ties the
+track rests on, the grid the beat rides. A **sleeper** is the overnight
+train. And the **sleeper** is the passenger, who falls asleep in the middle
+and dreams the journey back in shapes. (A fourth, for the compo: a sleeper is
+the entry nobody saw coming.) The train departs at 23:00 — demo 23.
+
+The design rule that makes it one thing rather than a list of effects:
+**every device of dance music is a railway event, one to one.**
+
+| Arrangement device | Railway event | Picture |
+|---|---|---|
+| intro, tempo building | departure: the train accelerates | the platform slides away, lamps pass faster and faster |
+| the beat locks | cruising speed | rail joints land exactly on the beat |
+| filter closes, reverb shortens | a tunnel | the tunnel; lamps strobe on the bar |
+| the drop | leaving the tunnel | open night at full speed, streaks |
+| a fill | points and crossings | the rails multiply and cross |
+| a pitch bend and a pan | the train going the other way | its windows strobe past, the horn Dopplers |
+| the breakdown | braking into a station | the world slows; the music thins |
+| the riser | the second departure, half-asleep | the dream accelerates |
+| the relative major | dawn | the same tune, in daylight |
+| the outro | the terminus | the split-flap board flips the credits |
+
+No effect appears because it is possible. Each one is something a passenger
+would see out of that window at that moment. The dream (§6, phrases 9–10) is
+where the shapes of the journey come apart into abstraction — that is where
+the demo shows off, and it is earned by the sleep.
+
+## 2. The claims
+
+Three, all measured, all by tools:
+
+1. **Locked 60.** Every frame is drawn in under a VGA field and no frame is
+   shown twice: over the whole 192 s on the Pico 2, with the score running
+   on core 1, the scanline-zero handshake finds a new page at every vsync.
+   11,520 fields, 11,520 pictures. The group's best so far is HELION at a
+   59.6 mean with four windows below 58; this production's rule is that a
+   shot that cannot make budget is simplified, and the claim is not relaxed.
+2. **Only scheduled cuts.** SUSTAIN never cut; SLEEPER only cuts. The cut
+   list lives in the score (`song.c`), every cut sits on a beat, and
+   `cut_check.py` runs SUSTAIN's discontinuity detector over the captured
+   frames and requires the set of discontinuities it finds to equal the
+   scheduled cut list — no cut off the beat, no glitch that reads as a cut.
+3. **The usual.** Audio bit-identical on host and device by per-second hash
+   over the whole run, zero underruns, deterministic seek, guarded frames.
+
+## 3. The look
+
+320×240, RGB555, doubled to VGA. **Night, then dawn.** One palette:
+
+| Role | Colour | Where |
+|---|---|---|
+| Night sky | `#0A1020` → `#182848` | the sky plate, dithered |
+| Landscape black | `#040608` | silhouettes: hills, trees, buildings, the platform |
+| Sodium lamp | `#FFB040` core, `#C06010` halo | station and street lamps, the warm world |
+| Fluorescent | `#D8F0FF` core, `#8098C0` halo | train windows, station roof lights, the board |
+| Signal green / red | `#20FF60` / `#FF2020` | signals, the crossing |
+| Moon | `#E8EEF8` | one moon, upper right, all night |
+| Dream | the same lamps, but the black is `#101830` and everything glows | phrases 9–10 |
+| Blue hour | sky `#203860` → `#6080B0`, ground `#101820` | phrase 13 |
+| Dawn | sky `#F0A060` → `#78A0D0`, sun `#FFF0D0`, sea `#304860` with the sun's path | phrases 14–15 |
+
+Everything bright is a **light**: a small hard core, a soft halo, and — when
+the train is moving — a **streak**: the light drawn along its motion for the
+one sixtieth of a second the frame exposes. Streak length is speed × the
+field time, so it is a fact about the frame and not a filter. That is the
+production's signature and it is analytic and cheap: lines and halos, never a
+full-frame blur pass. Halos are HELION's `halo()`, additive, restricted to
+lights; no bloom buffer.
+
+**Dither every ramp** (COLOSSUS's rule: the DAC has five bits and a sky
+across 140 rows lands as a staircase). Ordered 4×4 on per-pixel paths so the
+pattern is stable; error-diffused inside the painted plates.
+
+**Text is a split-flap board.** All lettering in the production — the title,
+the station names, the credits — is a departure board whose characters flip
+into place, each flip a small click in the score. One monospaced 8×12 face,
+white on near-black tiles, a hairline across the middle of every tile. It is
+the demo's only typography and its only transition device: nothing fades.
+The board flipping between two texts is the cut.
+
+**Cuts, never fades.** A shot ends on a beat and the next begins on the same
+beat. The only exceptions: the opening from black (bar 0) and the last frame
+(bar 128). The tunnel and the dream do not fade in; they cut.
+
+## 4. The clock
+
+- 24,000 Hz stereo, synthesised on the device. **160 BPM: a 16th is exactly
+  2,250 samples**, a beat 9,000, a bar 36,000. The control tick is 50
+  samples (45 ticks a 16th, 480 a second, so the per-second hash latch sits
+  on a tick); blocks of 25.
+- **128 bars = 4,608,000 samples = 3:12.0.** Sixteen phrases of eight bars,
+  288,000 samples (12.0 s) each.
+- The picture is a function of the audio sample (§8): a frame asks what
+  sample the DAC is playing and draws that moment. No state survives a
+  frame.
+- **The timetable is in the score.** `song.c` holds the speed profile, the
+  cut list, the section ladder and the event flags, and both the synth and
+  the renderer read it through `song.h`. The train's distance along the line
+  is the integral of the speed profile, in sleepers; the rail-joint clack in
+  the music and the sleepers under the camera in the picture are the same
+  number. At cruise a joint passes every beat.
+
+## 5. The music
+
+Written note by note, as always, and first: the picture is cut to it. E
+minor, liquid drum and bass at 160 BPM — the half-time backbeat gives the
+night its weight and the double-time hats give it speed, and the break is
+literally a train rhythm. Dawn is G major, the relative: no key change, the
+same notes lit differently.
+
+- **Theme A**, the night tune: a rocking figure, the motion of a carriage.
+  E5 · D5 B4 | G4 A4 B4 · | E5 · D5 B4 | A4 G4 F#4 E4 | over Em C G D, then
+  the answer a third higher, peaking on G5 and settling on B4 over Em C D Bm.
+  First on the lead at bar 16, over the line ahead; full at the drop (32);
+  back at drop II (80); in G major at dawn (104).
+- **Theme B**, the long notes: E5 – G5 – A5 – B5, each held a bar, an arch
+  that rises and does not come down, over C G D Em. On the bridge (40), on
+  the choir at dawn (96), under theme A at 88.
+- **The clack**: two short clicks a rail joint, "da-dum", from the
+  timetable, not the note grid. Accelerating with the train, silent in the
+  station, doubled in the dream.
+- **The horn**: a minor third of two air-horn saws, pitch bending down a
+  semitone and panning right to left as the other train passes (bars 36 and
+  85). The **bell** at departure, the **door chime**, the **brake** (a
+  resonant squeal sliding down over two bars), the **points** (a rattle
+  fill), and the **flaps** of the board.
+- Instruments: a **Reese bass** (two detuned saws through a lowpass that
+  opens with energy, the DnB signature, new for the group); an **electric
+  piano** (two-operator FM, a bell-like tine with a soft attack, new); the
+  break (kick, snare with ghosts, closed and open hats, a ride in the drops);
+  a **pad** (COLOSSUS's detuned saws, slow filter); a **lead** (a soft pulse
+  with portamento and a touch of the reed's breath); the **choir** ("oo",
+  COLOSSUS's formant voice, for the dawn); a stereo delay and a plate.
+- All integer, pull-model, block-size independent, hash-diffable. The synth
+  engine is HELION's (block ring, control tick, RNG-per-voice rule).
+
+## 6. The arc
+
+Phrase = 8 bars = 12.0 s. Times are `bar:beat`. Shots are held for as many
+beats as the row says; cuts are on the beat named. Speed is a fraction of
+cruise. "Side" is the window view (the world scrolls right to left); "ahead"
+is the driver's view; "under" is the camera at sleeper height looking down
+the track, the sleepers strobing past.
+
+| Phrase | Bars | Chapter | Picture | Speed | Music |
+|---|---|---|---|---|---|
+| 1 | 0–7 | DEPARTURE | 0:1 black; the board flips `LATENT PRESENTS` (bar 0–1), then `SLEEPER  23:00  NIGHT SERVICE` (2–3). 4:1 cut to *side*, standing at the platform: lamps, the platform edge, the roof's fluorescents; the bell at 4:1; the door chime at 5:3; at 6:1 the platform begins to slide. | 0 until 6:1, then ramps to 1.0 by 16:1 | ambience; the electric piano, one chord a bar; the bell; the clack begins slow and quickens |
+| 2 | 8–15 | SPEED | *Side*, suburbs: lamps and lit windows, poles, trees; 12:1 a level crossing passes — red lights alternating on the 8th, the bell; 14:1 *under*, the first time. | ramping | Reese bass enters at 8; kick and snare half-time at 12; hats at 14 |
+| 3 | 16–23 | THE LINE AHEAD | 16:1 *ahead*: rails, sleepers, catenary posts one a bar, a green signal a phrase; 20:1 *under*; 22:1 *ahead*, a tunnel mouth growing; 23:4 the mouth fills the frame. | 1.0 | **theme A** on the lead; full break |
+| 4 | 24–31 | TUNNEL | 24:1 *tunnel* (HELION's polar tunnel, concrete rings, a lamp every bar that strobes the walls); 28:1 *side* inside the tunnel: the wall rushing, each lamp a streak on the beat; 30:1 *tunnel*, the exit growing as a white disc. | 1.0 | the filter closes, the hall shortens, hats only; the bass pumps; a riser from 30 |
+| 5 | 32–39 | DROP I | 32:1 *side*, open night: moon, hills, a farm's lamps, streaks; 34:1 *ahead*; 35:4 the other train's headlight; 36:1 *side*: the **passing train**, its windows a strobe, gone by 37:1; 38:1 *under*. | 1.0 | **the drop**: theme A full, the ride, the Reese wide; the horn 35:4–36:3 |
+| 6 | 40–47 | THE BRIDGE | 40:1 *ahead*: girders pass overhead one a beat, their shadow crossing the cab; 44:1 *side*: black water below, the moon and the train's own windows reflected and rippling; the city's glow on the horizon. | 1.0 | **theme B** on the pad, half-time; the piano answers |
+| 7 | 48–55 | THE CITY | 48:1 *side*: buildings in three parallax depths, window grids, sodium streets; 50:1 *up*: towers passing above; 52:1 *ahead*: the viaduct, signals, the yard lamps; 54:1 *side* with **rain**: droplets on the window refracting the lights. | 1.0 | theme A varied, busier; the piano comps |
+| 8 | 56–63 | ARRIVAL | 55:4–56:1 the **points**: *ahead*, the rails multiply and cross; 58:1 the **brakes**: *side*, the yard; 60:1 the platform slides in under the station roof, slower; 62:1 stop; 62:3 doors; the board reads the station: `PERSISTENCE`. | ramps 1.0 → 0 from 58:1 to 62:1 | the fill at 55:4; the squeal 58–60; drums out at 60; piano and pad alone; the chime |
+| 9 | 64–71 | THE SLEEPER | 64:1 *side*, stopped: one lamp in the window, its halo slowly widening (sleep); 66:1 **the dream** begins: *rails of light* — many rail pairs radiating from a vanishing point, turning; 68:1 *the wheel*: a spoked wheel with the moon as its hub; 70:1 *the kaleidoscope*: the lamps mirrored sixfold and rotating. | 0 (the world); the dream has its own clock | the pad and the choir; the clack doubled and quiet, like a heartbeat; the tune inverted on the piano |
+| 10 | 72–79 | THE RISER | 72:1 *rails of light* accelerate; 76:1 the board flips through the stations of the line: `QUICKSILVER SUSTAIN HYSTERESIS VESPER PERSISTENCE COLOSSUS PELAGIC HELION`, one a beat, then faster; 78:1 *the wheel*, spinning up; 79:1–79:4 everything converging, four cuts a bar. | the dream's speed ramps 0 → 1.25 | the riser: the clack accelerates from nothing to double time, the snare rolls, the filter opens |
+| 11 | 80–87 | DROP II | 80:1 *side*, full speed, the biggest streaks; 82:1 *ahead*; 84:1 *under*; 85:2 the **passing train**; 86:1 *side*; 87:1 *ahead*, the horizon's first blue. | 1.25 | the drop: theme A over theme B, everything in; the horn 85:1–85:4 |
+| 12 | 88–95 | DROP II · 2 | one shot a bar: side / ahead / bridge / side / a short tunnel (92–93, the filter dips half a bar) / city receding / side / ahead. | 1.25 → 1.0 | A over B; the short tunnel's dip; the ride |
+| 13 | 96–103 | BLUE HOUR | 96:1 *side*: fields, mist in the hollows, the sky lightening; 100:1 the sea appears beyond the fields; 102:1 *ahead*: the line curving toward the coast. | 1.0 | half-time; **theme B** on the choir, G major; the piano |
+| 14 | 104–111 | DAWN | 104:1 *side*: the coast, the sun a hand above the sea, its path on the water; 108:1 *ahead* along the coast, the sun ahead-right; 110:1 *side*, the sun clears the haze. | 1.0 | **theme A in G major**, the whole band, warm |
+| 15 | 112–119 | TERMINUS | 112:1 *ahead*: the outskirts, the yard; 114:1 the brakes; 116:1 *side*: the platform slides in, sea light through the station glass; 119:1 stop; 119:3 doors; the board: `LATENT`. | ramps 1.0 → 0 from 114:1 to 119:1 | the band steps out voice by voice; the squeal; the chime; the piano resolves on G |
+| 16 | 120–127 | CODA | the board, alone: `SLEEPER · LATENT · 2026`; `DIRECTION AND MUSIC  PHOSPHOR`; `CODE  OVERSCAN`; `SKIES  PHASE`; `MODELS  CLAUDE FABLE 5.1 · CLAUDE OPUS 5 · GPT-6 ASTRA`; `FOR AZURE`; the last line `UNTIL THE NEXT TRAIN`; the last flip is the last sound; black at 127:4. | 0 | the piano, the pad, the flaps; silence |
+
+Cuts: 0:1 (black→board), 4:1, 6:1 (not a cut; the world starts to move),
+12:1, 14:1, 16:1, 20:1, 22:1, 24:1, 28:1, 30:1, 32:1, 34:1, 36:1, 38:1, 40:1,
+44:1, 48:1, 50:1, 52:1, 54:1, 56:1, 58:1, 60:1, 64:1, 66:1, 68:1, 70:1, 72:1,
+76:1, 78:1, 79:1, 79:2, 79:3, 79:4, 80:1, 82:1, 84:1, 86:1, 87:1, 88:1 … 95:1
+one a bar, 96:1, 100:1, 102:1, 104:1, 108:1, 110:1, 112:1, 116:1, 120:1.
+The list in `song.c` is the truth; this table is its explanation.
+
+## 7. The engine (Overscan)
+
+Start from HELION's platform, which is measured and known: `main.c`,
+`video.c`, `audio_pwm.c`, the accelerator layer, `tools/check.c`,
+`tools/capture.py`, `build.ps1`, the host SDL player, and the telemetry
+line. Rename, keep the token spellings so the serial tools parse unchanged,
+and add the two counters the claims need: **repeated fields** (a vsync at
+which scanline zero found no pending page) and **frames over 16,000 µs**.
+
+Renderer: one file per world system, dispatched from the cut list.
+
+- **The side world.** Layers scrolling with the train's distance: sky plate
+  (§9), far silhouette (hills or city, parallax ¼), mid (poles, trees,
+  houses, buildings, parallax ½), near (platform edge, fence, the ballast
+  blur, parallax 1), and lights at every layer's depth. Layers are silhouette
+  spans (black over the sky) generated from hashed procedural profiles per
+  distance, not bitmaps. Lights are lamps and windows: core, halo, streak.
+  Variants by parameter: platform, suburbs, tunnel wall, open night, bridge
+  (water below with the reflection), city, rain, fields, coast, station.
+- **The ahead world.** HELION's SIO affine plane for the ballast, sleepers
+  and rails (a 128×128 indexed texture, SRAM), horizon layers from the side
+  world's silhouettes at half height, catenary posts as 3D quads, signals as
+  lights, girders (bridge) as dark bands across the top with a moving edge,
+  the points as a second rail texture cross-faded by palette.
+- **Under.** The same plane, camera at 0.4 m, looking down and forward; the
+  sleepers strobe. Cheap and violent.
+- **The tunnel.** HELION's polar tunnel grid with a concrete-ring texture;
+  lamps as a palette strobe keyed to the bar.
+- **The passing train.** A near-layer dark mass with a window grid, moving
+  at twice cruise the other way; its windows are lights with streaks; the
+  headlight is one big halo.
+- **Water.** The lower half of the bridge and coast shots is the upper half
+  mirrored with a per-row horizontal offset from a sine table (rows near the
+  horizon compressed), darkened; the moon's and sun's paths are long
+  vertical halos.
+- **Rain.** 40–60 droplets, each a small circle where the source is sampled
+  through a fixed offset field (the refraction), drifting diagonally with
+  the speed; the lights behind bend through them.
+- **The dream.** *Rails of light*: 16–24 rail pairs from a vanishing point
+  with ties as short strokes, everything a light; *the wheel*: 24 spokes
+  and a rim from one centre, a halo hub; *the kaleidoscope*: an SIO affine
+  span of the lamp texture with U and V mirrored on a 60° fold.
+- **The station.** The side world with a roof: the fluorescent tubes as a
+  row of lights above, the glass as a lighter band, and the board.
+- **The board.** Tiles 8×12 from one glyph atlas (`font8x12.h`), each
+  character flipping through its predecessors over 3 fields with the top
+  half and bottom half drawn separately; the flip schedule comes from
+  `song_board()` so the flaps in the score and on screen are one event.
+- **Lights, halos, streaks, dither** in one file.
+
+Memory: two pages 307,200; rail and tunnel textures 32 KiB; sky plates in
+flash, indexed (§9); synth ~40 KB; the rest is scratch. Ledger in
+`sleeper/LEDGER.md` before any allocation, as COLOSSUS did, with scanvideo's
+invisible ~12 KB heap and the boot floor from COLOSSUS's bisection.
+
+Budget: **4.5 M cycles a frame at 300 MHz**, everything included, with the
+synth's ~14% of core 1 running. Any shot measured above 4.5 M is simplified
+in this order: fewer lights, fewer layers, a cheaper streak, a shorter
+shot. Not: a lower frame rate.
+
+## 8. The contract
+
+`sleeper.h`: `demo_init()`, `demo_render(uint16_t *page, uint32_t sample)`,
+`demo_stats()`; `synth_init/render/position/seek`, `synth_hash_latch`;
+WIDTH, HEIGHT, SAMPLE_RATE, BEAT_SAMPLES, BAR_SAMPLES, DURATION_SAMPLES; the
+DAC packing. `song.h` is the timetable (§4). Phosphor owns both headers;
+they change only by agreement. `demo_render()` may be called for any sample
+in any order and must produce the same page; the check tool proves it.
+
+## 9. Assets (Phase)
+
+Two painted skies, 320×240, quantised to 8-bit indexed with a 256-entry
+palette each, in flash, DMA'd into the page as HELION's sky was, then
+through a per-frame palette the renderer blends between night and dawn
+tints — so one painting serves the blue hour and the sunrise.
+
+| Asset | Content |
+|---|---|
+| `sky_night.png` | a night sky over a low horizon: a bright moon upper right with a soft halo, thin high cloud lit from behind, a few stars, the sky deepening upward from `#182848` at the horizon to `#0A1020`. No landscape: the horizon line is at row 150 and everything below it is black. |
+| `sky_dawn.png` | a dawn sky over a sea horizon at row 150: the sun a hand's width above the horizon slightly right of centre, its glow `#F0A060` fading to `#78A0D0` at the top, long thin cloud bars catching the light, the sea below the horizon `#304860` with the sun's path — the sea is in the plate because the coast shots want it painted. |
+
+Sources are kept in `art/`; `tools/pack_assets.py` quantises with a fixed
+seed and dithers, and the manifest records the settings.
+
+## 10. Referees
+
+1. **`cut_check.py`** — the discontinuity detector over the captured frames
+   (SUSTAIN's measure), asserting the found set equals the scheduled set
+   from `song_harness --cuts` within one frame, and that every scheduled
+   cut is on a beat.
+2. **`song_check.py`** — block sizes 1, 8 and 1,024 byte-identical; per-bar
+   peak, RMS and DC; ends in silence; the audition of every voice.
+3. **`check.c`** — 4,801 guarded frames, deterministic seek, audio block and
+   seek identity, the hash latch's timing, the endpoint black.
+4. **The device** — per second: fps, render best/mean/worst, repeated
+   fields, frames over 16,000 µs, ring fill, underruns, pump cost, `AHASH`.
+   The claim in §2 is the whole-run count of repeated fields, and it must be
+   zero on the shipping UF2 with the shipping score.
+5. **The film** — a 60 fps host capture (not 30: the production is about
+   60), a contact sheet of every shot at native size, and the human look.
+
+## 11. How the team works
+
+- **Phosphor** wrote this plan, writes the score and the timetable, reviews
+  every still and every capture, cuts the shot list when a shot is not
+  earning its beats, and says when it is done.
+- **Overscan** builds it: platform, renderer, tools, the memory ledger, the
+  hardware runs, the UF2s, the captures. Rounds are brief files in
+  `briefs/`, dated, with a reply file each.
+- **Phase** critiques the plan once (the design eye that improved
+  COLOSSUS), paints the two skies, and is otherwise not spent: Codex is
+  used sparingly, as Azure asked on COLOSSUS.
+- Credit is by model and handle. No invented collaborators.
+
+## 12. What would make it fail
+
+- The tune not being good. It comes first and it is the reason to watch
+  twice.
+- A frame rate that is "mostly 60". The claim is binary.
+- A cut that is not on the beat, or a shot that is held after its beat has
+  passed. Fast is a discipline, not a speed.
+- Lights that do not look like lights. The core/halo/streak triple is the
+  whole look; if it reads as circles and lines, stop and fix it before
+  building a single scene on top.
+- The dream looking like a plug-in visualiser. It is made only of the
+  journey's shapes — rails, a wheel, lamps, the board — and it is short.
+
+exec
+/bin/bash -lc 'cat /home/tim/.codex/skills/.system/imagegen/SKILL.md' in /mnt/d/Toyprojects/PicoDemos/23_Sleeper
+ succeeded in 0ms:
+---
+name: "imagegen"
+description: "Generate or edit raster images when the task benefits from AI-created bitmap visuals such as photos, illustrations, textures, sprites, mockups, or transparent-background cutouts. Use when Codex should create a brand-new image, transform an existing image, or derive visual variants from references, and the output should be a bitmap asset rather than repo-native code or vector. Do not use when the task is better handled by editing existing SVG/vector/code-native assets, extending an established icon or logo system, or building the visual directly in HTML/CSS/canvas."
+---
+
+# Image Generation Skill
+
+Generates or edits images for the current project (for example website assets, game assets, UI mockups, product mockups, wireframes, logo design, photorealistic images, or infographics).
+
+## Top-level modes and rules
+
+This skill has exactly two top-level modes:
+
+- **Default built-in tool mode (preferred):** built-in `image_gen` tool for image generation, editing, and transparent-image requests. Does not require `OPENAI_API_KEY`.
+- **Fallback CLI mode:** `scripts/image_gen.py` CLI. Use when the user explicitly asks for or confirms the CLI/API/model path. Requires `OPENAI_API_KEY`.
+
+Within CLI fallback, the CLI exposes three subcommands:
+
+- `generate`
+- `edit`
+- `generate-batch`
+
+Rules:
+- Use the built-in `image_gen` tool by default for normal image generation and editing requests.
+- Do not switch to CLI fallback for ordinary quality, size, or file-path control.
+- For transparent images, ask built-in `image_gen` for a transparent background and preserve the generated alpha.
+- Never silently switch from built-in `image_gen` or CLI `gpt-image-2` to CLI `gpt-image-1.5`; ask the user first unless they explicitly requested `gpt-image-1.5`.
+- The word `batch` by itself does not mean CLI fallback. If the user asks for many assets or says to batch-generate assets without explicitly asking for CLI/API/model controls, stay on the built-in path and issue one built-in call per requested asset or variant.
+- If the built-in tool fails or is unavailable, tell the user the CLI fallback exists and that it requires `OPENAI_API_KEY`. Proceed only if the user explicitly asks for that fallback.
+- If the user explicitly asks for CLI mode, use the bundled `scripts/image_gen.py` workflow. Do not create one-off SDK runners.
+- Never modify `scripts/image_gen.py`. If something is missing, ask the user before doing anything else.
+
+Built-in save-path policy:
+- In built-in tool mode, Codex saves generated images under `$CODEX_HOME/*` by default.
+- Do not describe or rely on OS temp as the default built-in destination.
+- Do not describe or rely on a destination-path argument (if any) on the built-in `image_gen` tool. If a specific location is needed, generate first and then move or copy the selected output from `$CODEX_HOME/generated_images/...`.
+- Save-path precedence in built-in mode:
+  1. If the user names a destination, move or copy the selected output there.
+  2. If the image is meant for the current project, move or copy the final selected image into the workspace before finishing.
+  3. If the image is only for preview or brainstorming, render it inline; the underlying file can remain at the default `$CODEX_HOME/*` path.
+- Never leave a project-referenced asset only at the default `$CODEX_HOME/*` path.
+- Do not overwrite an existing asset unless the user explicitly asked for replacement; otherwise create a sibling versioned filename such as `hero-v2.png` or `item-icon-edited.png`.
+
+Shared prompt guidance for both modes lives in `references/prompting.md` and `references/sample-prompts.md`.
+
+Fallback-only docs/resources for CLI mode:
+- `references/cli.md`
+- `references/image-api.md`
+- `references/codex-network.md`
+- `scripts/image_gen.py`
+
+## When to use
+- Generate a new image (concept art, product shot, cover, website hero)
+- Generate a new image using one or more reference images for style, composition, or mood
+- Edit an existing image (inpainting, lighting or weather transformations, background replacement, object removal, compositing, transparent background)
+- Produce many assets or variants for one task
+
+## When not to use
+- Extending or matching an existing SVG/vector icon set, logo system, or illustration library inside the repo
+- Creating simple shapes, diagrams, wireframes, or icons that are better produced directly in SVG, HTML/CSS, or canvas
+- Making a small project-local asset edit when the source file already exists in an editable native format
+- Any task where the user clearly wants deterministic code-native output instead of a generated bitmap
+
+## Decision tree
+
+Think about two separate questions:
+
+1. **Intent:** is this a new image or an edit of an existing image?
+2. **Execution strategy:** is this one asset or many assets/variants?
+
+Intent:
+- If the user wants to modify an existing image while preserving parts of it, treat the request as **edit**.
+- If the user provides images only as references for style, composition, mood, or subject guidance, treat the request as **generate**.
+- If the user provides no images, treat the request as **generate**.
+
+Built-in edit semantics:
+- Built-in edit mode is for images already visible in the conversation context, such as attached images or images generated earlier in the thread.
+- If the user wants to edit a local image file with the built-in tool, first load it with built-in `view_image` tool so the image is visible in the conversation context, then proceed with the built-in edit flow.
+- Do not promise arbitrary filesystem-path editing through the built-in tool.
+- If a local file still needs direct file-path control, masks, or other explicit CLI-only parameters, use the explicit CLI fallback only when the user asks for it.
+- For edits, preserve invariants aggressively and save non-destructively by default.
+
+Execution strategy:
+- In the built-in default path, produce many assets or variants by issuing one `image_gen` call per requested asset or variant.
+- In the CLI fallback path, use the CLI `generate-batch` subcommand only when the user explicitly chose CLI mode and needs many prompts/assets.
+- For many distinct assets, do not use `n` as a substitute for separate prompts. `n` is for variants of one prompt; distinct assets need distinct built-in calls or distinct CLI `generate-batch` jobs.
+
+Assume the user wants a new image unless they clearly ask to change an existing one.
+
+## Workflow
+1. Decide the top-level mode: built-in by default, including transparent-output requests; fallback CLI only if explicitly requested or confirmed.
+2. Decide the intent: `generate` or `edit`.
+3. Decide whether the output is preview-only or meant to be consumed by the current project.
+4. Decide the execution strategy: single asset vs repeated built-in calls vs CLI `generate-batch`.
+5. Collect inputs up front: prompt(s), exact text (verbatim), constraints/avoid list, and any input images.
+6. For every input image, label its role explicitly:
+   - reference image
+   - edit target
+   - supporting insert/style/compositing input
+7. If the edit target is only on the local filesystem and you are staying on the built-in path, inspect it with `view_image` first so the image is available in conversation context.
+8. If the user asked for a photo, illustration, sprite, product image, banner, or other explicitly raster-style asset, use `image_gen` rather than substituting SVG/HTML/CSS placeholders. If the request is for an icon, logo, or UI graphic that should match existing repo-native SVG/vector/code assets, prefer editing those directly instead.
+9. Augment the prompt based on specificity:
+   - If the user's prompt is already specific and detailed, normalize it into a clear spec without adding creative requirements.
+   - If the user's prompt is generic, add tasteful augmentation only when it materially improves output quality.
+10. Use the built-in `image_gen` tool by default.
+11. For transparent-output requests, ask built-in `image_gen` for a transparent background and preserve the generated alpha channel.
+12. Inspect outputs and validate: subject, style, composition, text accuracy, and invariants/avoid items.
+13. Iterate with a single targeted change, then re-check.
+14. For preview-only work, render the image inline; the underlying file may remain at the default `$CODEX_HOME/generated_images/...` path.
+15. For project-bound work, move or copy the selected artifact into the workspace and update any consuming code or references. Never leave a project-referenced asset only at the default `$CODEX_HOME/generated_images/...` path.
+16. For batches or multi-asset requests, persist every requested deliverable final in the workspace unless the user explicitly asked to keep outputs preview-only. Discarded variants do not need to be kept unless requested.
+17. If the user explicitly chooses or confirms the CLI fallback, then use the fallback-only docs for model, quality, size, `input_fidelity`, masks, output format, output paths, and network setup.
+18. Always report the final saved path(s) for any workspace-bound asset(s), plus the final prompt or prompt set and whether the built-in tool or fallback CLI mode was used.
+
+## Transparent image requests
+
+Ask built-in `image_gen` for a genuinely transparent background and preserve its alpha.
+
+## Prompt augmentation
+
+Reformat user prompts into a structured, production-oriented spec. Make the user's goal clearer and more actionable, but do not blindly add detail.
+
+Treat this as prompt-shaping guidance, not a closed schema. Use only the lines that help, and add a short extra labeled line when it materially improves clarity.
+
+### Specificity policy
+
+Use the user's prompt specificity to decide how much augmentation is appropriate:
+
+- If the prompt is already specific and detailed, preserve that specificity and only normalize/structure it.
+- If the prompt is generic, you may add tasteful augmentation when it will materially improve the result.
+
+Allowed augmentations:
+- composition or framing hints
+- polish level or intended-use hints
+- practical layout guidance
+- reasonable scene concreteness that supports the stated request
+
+Not allowed augmentations:
+- extra characters or objects that are not implied by the request
+- brand names, slogans, palettes, or narrative beats that are not implied
+- arbitrary side-specific placement unless the surrounding layout supports it
+
+## Use-case taxonomy (exact slugs)
+
+Classify each request into one of these buckets and keep the slug consistent across prompts and references.
+
+Generate:
+- photorealistic-natural — candid/editorial lifestyle scenes with real texture and natural lighting.
+- product-mockup — product/packaging shots, catalog imagery, merch concepts.
+- ui-mockup — app/web interface mockups and wireframes; specify the desired fidelity.
+- infographic-diagram — diagrams/infographics with structured layout and text.
+- scientific-educational — classroom explainers, scientific diagrams, and learning visuals with required labels and accuracy constraints.
+- ads-marketing — campaign concepts and ad creatives with audience, brand position, scene, and exact tagline/copy.
+- productivity-visual — slide, chart, workflow, and data-heavy business visuals.
+- logo-brand — logo/mark exploration, vector-friendly.
+- illustration-story — comics, children’s book art, narrative scenes.
+- stylized-concept — style-driven concept art, 3D/stylized renders.
+- historical-scene — period-accurate/world-knowledge scenes.
+
+Edit:
+- text-localization — translate/replace in-image text, preserve layout.
+- identity-preserve — try-on, person-in-scene; lock face/body/pose.
+- precise-object-edit — remove/replace a specific element (including interior swaps).
+- lighting-weather — time-of-day/season/atmosphere changes only.
+- background-extraction — transparent background / clean cutout. Ask built-in `image_gen` for actual transparency.
+- style-transfer — apply reference style while changing subject/scene.
+- compositing — multi-image insert/merge with matched lighting/perspective.
+- sketch-to-render — drawing/line art to photoreal render.
+
+## Shared prompt schema
+
+Use the following labeled spec as shared prompt scaffolding for both top-level modes:
+
+```text
+Use case: <taxonomy slug>
+Asset type: <where the asset will be used>
+Primary request: <user's main prompt>
+Input images: <Image 1: role; Image 2: role> (optional)
+Scene/backdrop: <environment>
+Subject: <main subject>
+Style/medium: <photo/illustration/3D/etc>
+Composition/framing: <wide/close/top-down; placement>
+Lighting/mood: <lighting + mood>
+Color palette: <palette notes>
+Materials/textures: <surface details>
+Text (verbatim): "<exact text>"
+Constraints: <must keep/must avoid>
+Avoid: <negative constraints>
+```
+
+Notes:
+- `Asset type` and `Input images` are prompt scaffolding, not dedicated CLI flags.
+- `Scene/backdrop` refers to the visual setting. It is not the same as the fallback CLI `background` parameter, which controls output transparency behavior.
+- Fallback-only execution notes such as `Quality:`, `Input fidelity:`, masks, output format, and output paths belong in the CLI path only. Do not treat them as built-in `image_gen` tool arguments.
+
+Augmentation rules:
+- Keep it short.
+- Add only the details needed to improve the prompt materially.
+- For edits, explicitly list invariants (`change only X; keep Y unchanged`).
+- If any critical detail is missing and blocks success, ask a question; otherwise proceed.
+
+## Examples
+
+### Generation example (hero image)
+```text
+Use case: product-mockup
+Asset type: landing page hero
+Primary request: a minimal hero image of a ceramic coffee mug
+Style/medium: clean product photography
+Composition/framing: wide composition with usable negative space for page copy if needed
+Lighting/mood: soft studio lighting
+Constraints: no logos, no text, no watermark
+```
+
+### Edit example (invariants)
+```text
+Use case: precise-object-edit
+Asset type: product photo background replacement
+Primary request: replace only the background with a warm sunset gradient
+Constraints: change only the background; keep the product and its edges unchanged; no text; no watermark
+```
+
+## Prompting best practices
+- Structure prompt as scene/backdrop -> subject -> details -> constraints.
+- Include intended use (ad, UI mock, infographic) to set the mode and polish level.
+- Use camera/composition language for photorealism.
+- Only use SVG/vector stand-ins when the user explicitly asked for vector output or a non-image placeholder.
+- Quote exact text and specify typography + placement.
+- For tricky words, spell them letter-by-letter and require verbatim rendering.
+- For multi-image inputs, reference images by index and describe how they should be used.
+- For edits, repeat invariants every iteration to reduce drift.
+- Iterate with single-change follow-ups.
+- If the prompt is generic, add only the extra detail that will materially help.
+- If the prompt is already detailed, normalize it instead of expanding it.
+- For CLI fallback only, see `references/cli.md` and `references/image-api.md` for model, `quality`, `input_fidelity`, masks, output format, and output-path guidance.
+- For transparent images, ask built-in `image_gen` for actual transparency and preserve its alpha.
+
+More principles shared by both modes: `references/prompting.md`.
+Copy/paste specs shared by both modes: `references/sample-prompts.md`.
+
+## Guidance by asset type
+Asset-type templates (website assets, game assets, wireframes, logo) are consolidated in `references/sample-prompts.md`.
+
+## gpt-image-2 guidance for CLI fallback
+
+The fallback CLI defaults to `gpt-image-2`.
+
+- Use `gpt-image-2` for new CLI/API workflows unless the user confirms a different model.
+- CLI `gpt-image-2` does not support `background=transparent`; ask before using `gpt-image-1.5` unless the user explicitly requested that model.
+- `gpt-image-2` always uses high fidelity for image inputs; do not set `input_fidelity` with this model.
+- `gpt-image-2` supports `quality` values `low`, `medium`, `high`, and `auto`.
+- Use `quality low` for fast drafts, thumbnails, and quick iterations. Use `medium`, `high`, or `auto` for final assets, dense text, diagrams, identity-sensitive edits, or high-resolution outputs.
+- Square images are typically fastest to generate. Use `1024x1024` for fast square drafts.
+- If the user asks for 4K-style output, use `3840x2160` for landscape or `2160x3840` for portrait.
+- `gpt-image-2` size may be `auto` or `WIDTHxHEIGHT` if all constraints hold: max edge `<= 3840px`, both edges multiples of `16px`, long-to-short ratio `<= 3:1`, total pixels between `655,360` and `8,294,400`.
+
+Popular `gpt-image-2` sizes:
+- `1024x1024` square
+- `1536x1024` landscape
+- `1024x1536` portrait
+- `2048x2048` 2K square
+- `2048x1152` 2K landscape
+- `3840x2160` 4K landscape
+- `2160x3840` 4K portrait
+- `auto`
+
+## Fallback CLI mode only
+
+### Temp and output conventions
+These conventions apply only to the CLI fallback. They do not describe built-in `image_gen` output behavior.
+- Use `tmp/imagegen/` for intermediate files (for example JSONL batches); delete them when done.
+- Write final artifacts under `output/imagegen/`.
+- Use `--out` or `--out-dir` to control output paths; keep filenames stable and descriptive.
+
+### Dependencies
+Prefer `uv` for dependency management in this repo.
+
+Required Python package:
+```bash
+uv pip install openai
+```
+
+Optional for image inspection and downscaling:
+```bash
+uv pip install pillow
+```
+
+Portability note:
+- If you are using the installed skill outside this repo, install dependencies into that environment with its package manager.
+- In uv-managed environments, `uv pip install ...` remains the preferred path.
+
+### Environment
+- `OPENAI_API_KEY` must be set for live API calls.
+- Do not ask the user for `OPENAI_API_KEY` when using the built-in `image_gen` tool.
+- Never ask the user to paste the full key in chat. Ask them to set it locally and confirm when ready.
+
+If the key is missing, give the user these steps:
+1. Create an API key in the OpenAI platform UI: https://platform.openai.com/api-keys
+2. Set `OPENAI_API_KEY` as an environment variable in their system.
+3. Offer to guide them through setting the environment variable for their OS/shell if needed.
+
+If installation is not possible in this environment, tell the user which dependency is missing and how to install it into their active environment.
+
+### Script-mode notes
+- CLI commands + examples: `references/cli.md`
+- API parameter quick reference: `references/image-api.md`
+- Network approvals / sandbox settings for CLI mode: `references/codex-network.md`
+
+## Reference map
+- `references/prompting.md`: shared prompting principles for both modes.
+- `references/sample-prompts.md`: shared copy/paste prompt recipes for both modes.
+- `references/cli.md`: fallback-only CLI usage via `scripts/image_gen.py`.
+- `references/image-api.md`: fallback-only API/CLI parameter reference.
+- `references/codex-network.md`: fallback-only network/sandbox troubleshooting for CLI mode.
+- `scripts/image_gen.py`: fallback-only CLI implementation. Use only when the user explicitly chooses or confirms CLI mode.
+
+exec
+/bin/bash -lc "pwd; rg --files -g AGENTS.md -g '*PROMPTS*' -g '*phase*' -g '*tunnel*' -g '*plane*' -g '*helion*' -g '*HELION*' . .. /mnt/d/Toyprojects 2>/dev/null | head -100" in /mnt/d/Toyprojects/PicoDemos/23_Sleeper
+ succeeded in 1604ms:
+/mnt/d/Toyprojects/__bad/14_Origami/host/screenshots/1_plane_flight.png
+/mnt/d/Toyprojects/__bad/14_Origami/host/plane.o
+/mnt/d/Toyprojects/__bad/14_Origami/effects/plane.c
+./briefs/logs/phase-critique.log
+./briefs/2026-09-07-phase-critique.md
+../23_Sleeper/briefs/logs/phase-critique.log
+../23_Sleeper/briefs/2026-09-07-phase-critique.md
+/mnt/d/Toyprojects/PicoDemos/23_Sleeper/briefs/logs/phase-critique.log
+/mnt/d/Toyprojects/PicoDemos/23_Sleeper/briefs/2026-09-07-phase-critique.md
+../22_Helion/run_helion.bat
+/mnt/d/Toyprojects/PicoDemos/22_Helion/run_helion.bat
+../22_Helion/media/helion.mp4
+../22_Helion/helion_vga_rp2350.uf2
+../22_Helion/helion_reference_vga_rp2350.uf2
+/mnt/d/Toyprojects/PicoDemos/22_Helion/media/helion.mp4
+/mnt/d/Toyprojects/PicoDemos/22_Helion/helion_vga_rp2350.uf2
+/mnt/d/Toyprojects/PicoDemos/22_Helion/helion_reference_vga_rp2350.uf2
+../22_Helion/helion/helion.h
+/mnt/d/Toyprojects/PicoDemos/22_Helion/helion/helion.h
+/mnt/d/Toyprojects/PicoDemos/22_Helion/art/PROMPTS.md
+../22_Helion/art/PROMPTS.md
+/mnt/d/Toyprojects/__bad/14_Origami/build_rp2350/CMakeFiles/thedemo.dir/effects/plane.c.obj
+/mnt/d/Toyprojects/PicoDemos/21_Pelagic/art/PROMPTS.md
+../21_Pelagic/art/PROMPTS.md
+/mnt/d/Toyprojects/PicoDemos/14_Origami/origami/effects/plane.c
+/mnt/d/Toyprojects/PicoDemos/14_Origami/origami/assets/PROMPTS.md
+/mnt/d/Toyprojects/PicoDemos/20_Colossus/briefs/2026-09-06-phase-silhouette-notes.md
+/mnt/d/Toyprojects/PicoDemos/20_Colossus/briefs/2026-09-06-phase-round4.md
+/mnt/d/Toyprojects/PicoDemos/20_Colossus/briefs/2026-09-06-phase-round4-reply.md
+/mnt/d/Toyprojects/PicoDemos/20_Colossus/briefs/2026-09-06-phase-round3.md
+/mnt/d/Toyprojects/PicoDemos/20_Colossus/briefs/2026-09-06-phase-round2-reply.md
+/mnt/d/Toyprojects/PicoDemos/20_Colossus/briefs/2026-09-06-phase-plan-reply.md
+/mnt/d/Toyprojects/PicoDemos/20_Colossus/briefs/2026-09-06-phase-plan-critique.md
+/mnt/d/Toyprojects/PicoDemos/20_Colossus/briefs/2026-09-06-phase-plan-critique-reply.md
+/mnt/d/Toyprojects/PicoDemos/20_Colossus/briefs/2026-09-06-phase-dither-note.md
+/mnt/d/Toyprojects/PicoDemos/14_Origami/media/plane.png
+../20_Colossus/briefs/2026-09-06-phase-silhouette-notes.md
+../20_Colossus/briefs/2026-09-06-phase-round4.md
+../20_Colossus/briefs/2026-09-06-phase-round4-reply.md
+../20_Colossus/briefs/2026-09-06-phase-round3.md
+../20_Colossus/briefs/2026-09-06-phase-round2-reply.md
+../20_Colossus/briefs/2026-09-06-phase-plan-reply.md
+../20_Colossus/briefs/2026-09-06-phase-plan-critique.md
+../20_Colossus/briefs/2026-09-06-phase-plan-critique-reply.md
+../20_Colossus/briefs/2026-09-06-phase-dither-note.md
+/mnt/d/Toyprojects/PicoDemos/19_Persistence/persistence/tools/fx_tunnel.o
+/mnt/d/Toyprojects/PicoDemos/19_Persistence/persistence/tools/fx_tunnel.d
+/mnt/d/Toyprojects/PicoDemos/19_Persistence/persistence/tools/fx_plane.o
+/mnt/d/Toyprojects/PicoDemos/19_Persistence/persistence/tools/fx_plane.d
+../19_Persistence/persistence/tools/fx_tunnel.o
+../19_Persistence/persistence/tools/fx_tunnel.d
+../19_Persistence/persistence/tools/fx_plane.o
+../19_Persistence/persistence/tools/fx_plane.d
+/mnt/d/Toyprojects/PicoDemos/19_Persistence/persistence/host/fx_tunnel.o
+/mnt/d/Toyprojects/PicoDemos/19_Persistence/persistence/host/fx_tunnel.d
+/mnt/d/Toyprojects/PicoDemos/19_Persistence/persistence/host/fx_plane.o
+/mnt/d/Toyprojects/PicoDemos/19_Persistence/persistence/host/fx_plane.d
+/mnt/d/Toyprojects/PicoDemos/19_Persistence/persistence/fx_tunnel.c
+/mnt/d/Toyprojects/PicoDemos/19_Persistence/persistence/fx_plane.c
+../19_Persistence/persistence/host/fx_tunnel.o
+../19_Persistence/persistence/host/fx_tunnel.d
+../19_Persistence/persistence/host/fx_plane.o
+../19_Persistence/persistence/host/fx_plane.d
+../19_Persistence/persistence/fx_tunnel.c
+../19_Persistence/persistence/fx_plane.c
+/mnt/d/Toyprojects/PicoDemos/13_Singularity/singularity/assets/PROMPTS.md
+/mnt/d/Toyprojects/PicoDemos/16_Sustain/sustain/assets/PROMPTS.md
+../16_Sustain/sustain/assets/PROMPTS.md
+/mnt/d/Toyprojects/PicoDemos/16_Sustain/media/tunnel.png
+../16_Sustain/media/tunnel.png
+/mnt/d/Toyprojects/PicoDemos/11_FlashDemo/thedemo/assets/_packed/tunnel_tex.pal
+/mnt/d/Toyprojects/PicoDemos/11_FlashDemo/thedemo/assets/_packed/tunnel_tex.bin
+/mnt/d/Toyprojects/PicoDemos/11_FlashDemo/thedemo/assets/tunnel_tex_512.png
+/mnt/d/Toyprojects/PicoDemos/11_FlashDemo/thedemo/assets/PROMPTS.md
+/mnt/d/Toyprojects/PicoDemos/10_TheDemo/thedemo/host/tunnel_particles.o
+../15_Quicksilver/quicksilver/host/tunnel.o
+/mnt/d/Toyprojects/PicoDemos/15_Quicksilver/quicksilver/host/tunnel.o
+../15_Quicksilver/quicksilver/effects/tunnel.c
+../15_Quicksilver/quicksilver/effects/qs_tunnel.h
+/mnt/d/Toyprojects/PicoDemos/15_Quicksilver/quicksilver/effects/tunnel.c
+/mnt/d/Toyprojects/PicoDemos/15_Quicksilver/quicksilver/effects/qs_tunnel.h
+/mnt/d/Toyprojects/PicoDemos/10_TheDemo/thedemo/effects/tunnel_particles.c
+../15_Quicksilver/quicksilver/assets/_packed/tunnel.bin
+../15_Quicksilver/quicksilver/assets/tunnel.png
+../15_Quicksilver/quicksilver/assets/PROMPTS.md
+/mnt/d/Toyprojects/PicoDemos/15_Quicksilver/quicksilver/assets/_packed/tunnel.bin
+/mnt/d/Toyprojects/PicoDemos/15_Quicksilver/quicksilver/assets/tunnel.png
+/mnt/d/Toyprojects/PicoDemos/15_Quicksilver/quicksilver/assets/PROMPTS.md
+../15_Quicksilver/media/tunnel.png
+/mnt/d/Toyprojects/PicoDemos/15_Quicksilver/media/tunnel.png
+/mnt/d/Toyprojects/PicoDemos/10_TheDemo/thedemo/assets/_packed/tunnel_tex.pal
+/mnt/d/Toyprojects/PicoDemos/10_TheDemo/thedemo/assets/_packed/tunnel_tex.bin
+/mnt/d/Toyprojects/PicoDemos/10_TheDemo/thedemo/assets/tunnel_tex_512.png
+/mnt/d/Toyprojects/PicoDemos/10_TheDemo/thedemo/assets/PROMPTS.md
+/mnt/d/Toyprojects/PicoDemos/10_TheDemo/media/tunnel_particles.png
+../14_Origami/origami/effects/plane.c
+/mnt/d/Toyprojects/17_RTSGame/node_modules/@babylonjs/core/Gizmos/planeRotationGizmo.js.map
+../14_Origami/origami/assets/PROMPTS.md
+/mnt/d/Toyprojects/17_RTSGame/node_modules/@babylonjs/core/Gizmos/planeRotationGizmo.js
+/mnt/d/Toyprojects/17_RTSGame/node_modules/@babylonjs/core/Gizmos/planeRotationGizmo.d.ts
+
+codex
+I’m using the imagegen skill for the plates. The train/score link holds; the dream and the second drop need a tighter visual argument. I’ll also check HELION’s renderer so the engine notes rest on its actual implementation.
+exec
+/bin/bash -lc 'for p in /AGENTS.md /mnt/AGENTS.md /mnt/d/AGENTS.md /mnt/d/Toyprojects/AGENTS.md /mnt/d/Toyprojects/PicoDemos/AGENTS.md AGENTS.md; do if [ -f "$p" ]; then cat "$p"; fi; done
+rg --files . ../22_Helion/helion -g AGENTS.md -g '"'*.c' -g '*.h'
+cat ../22_Helion/art/PROMPTS.md
+rg -n 'SIO|interp|tunnel|plane|alias|horizon' ../22_Helion/helion/*.c | head -65
+ls -la art" in /mnt/d/Toyprojects/PicoDemos/23_Sleeper
+ succeeded in 17ms:
+total 0
+drwxrwxrwx 1 tim tim 4096 Sep  7 20:34 .
+drwxrwxrwx 1 tim tim 4096 Sep  7 20:35 ..
+
+exec
+/bin/bash -lc "sed -n '135,220p' ../22_Helion/helion/render.c
+cat ../22_Helion/helion/accelerator.h | head -180
+rg --files briefs art -g AGENTS.md
+ git status --short" in /mnt/d/Toyprojects/PicoDemos/23_Sleeper
+ exited 128 in 1976ms:
+Error cleaning Git LFS object: open /mnt/d/Toyprojects/PicoDemos/.git/lfs/tmp/1576820087: read-only file system
+error: packet write failed: Broken pipe
+error: external filter 'git-lfs filter-process' failed
+fatal: 01_SOTA_DEMO/SOTA_composite.mp4: clean filter 'lfs' failed
+
+codex
+Both paintings are generated. I’m resizing them and checking 256-colour, RGB555 proofs on black. HELION’s code exposes two useful cautions: its sky DMA copies an already expanded 16-bit plate, and its tunnel adds spin and wobble that would undermine the railway geometry.
+exec
+/bin/bash -lc "python - <<'PY'
+from PIL import Image
+from pathlib import Path
+import shutil
+root=Path('/home/tim/.codex/generated_images/01a07d26-f2fc-7542-ab3c-ed5729e33e9b')
+for name,src in [('night','exec-224de223-951a-4b8d-ac0c-5549b45754dd.png'),('dawn','exec-ba275c60-85a9-4b5a-b23e-7ef2157836bb.png')]:
+    shutil.copyfile(root/src,Path('art')/f'sky_{name}_master.png')
+    im=Image.open(root/src).convert('RGB')
+    print(name,im.size)
+    # Resize the two regions separately so the plate boundary lands at row 150.
+    boundary=679 if name=='night' else 675
+    out=Image.new('RGB',(320,240))
+    out.paste(im.crop((0,0,im.width,boundary)).resize((320,150),Image.Resampling.LANCZOS),(0,0))
+    if name=='dawn':
+        out.paste(im.crop((0,boundary,im.width,im.height)).resize((320,90),Image.Resampling.LANCZOS),(0,150))
+    out.save(f'art/sky_{name}.png')
+    pal=out.quantize(colors=256,method=Image.Quantize.MEDIANCUT)
+    proof=out.quantize(palette=pal,dither=Image.Dither.FLOYDSTEINBERG).convert('RGB')
+    proof=proof.point([((v>>3)*255+15)//31 for v in range(256)]*3)
+    canvas=Image.new('RGB',(360,280))
+    canvas.paste(proof,(20,20))
+    canvas.save(f'/tmp/sleeper_{name}_rgb555.png')
+    assert out.size==(320,240)
+    if name=='night': assert out.crop((0,150,320,240)).getbbox() is None
+PY" in /mnt/d/Toyprojects/PicoDemos/23_Sleeper
+ succeeded in 267ms:
+night (1448, 1086)
+dawn (1448, 1086)
+
+apply patch
+patch: completed
+/mnt/d/Toyprojects/PicoDemos/23_Sleeper/art/PROMPTS.md
+diff --git a/23_Sleeper/art/PROMPTS.md b/23_Sleeper/art/PROMPTS.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..db2de2cd519f296b49a39f2b484057063924bc0d
+--- /dev/null
++++ b/23_Sleeper/art/PROMPTS.md
+@@ -0,0 +1,14 @@
++# SLEEPER sky provenance
++
++Phase · 2026-09-07. Generated with the built-in `image_gen` tool, text-to-image, without references. Original tool PNGs are retained as `sky_night_master.png` and `sky_dawn_master.png` (1448×1086). Delivery plates are RGB PNGs at 320×240; final indexed asset packing remains with Overscan.
++
++Resizing: Pillow LANCZOS, sky and lower region resized separately to put the boundary exactly at row 150. Night master sky rows 0–678 → output rows 0–149, with rows 150–239 pure #000000 as specified. Dawn split at master row 675; sky → 150 rows, painted sea → 90 rows. Masters untouched.
++
++Proof method: median-cut 256-colour palette, Floyd–Steinberg remapping, then RGB555 channel truncation (`v >> 3`) expanded to display range; inspected at native size on black. Proofs are temporary, not shipping assets. This is a visual approximation of packing, not a device capture.
++
++## Exact prompts
++
++- `sky_night.png`: Use case: stylized-concept. Asset: SLEEPER night sky background plate for a 320x240 RGB555 demoscene film. Paint a single 4:3 landscape image, preferably 1024x768, edge to edge. Coordinates below are normalized to the final 320x240 image: sky occupies rows 0 through 149; a perfectly horizontal boundary at y=150 (62.5 percent of image height); ALL pixels from that boundary to the bottom are solid pure black #000000, an empty technical mask, absolutely no landscape or water. Sky is a smooth broad gradient from #0A1020 at top to #182848 immediately above the boundary. One bright small moon centered approximately (253,48), pale #E8EEF8, with soft halo and softened edge; thin high cloud lit from behind the moon, only a few faint soft stars. Restrained painterly atmosphere, broad quiet gradients that survive 256-color indexing and five bits per channel at 320x240. No sharp details, no grain, no fine texture, no mountains, no trees, no buildings, no horizon glow below boundary, no text, no border, no watermark.
++
++- `sky_dawn.png`: Use case: stylized-concept. Asset: SLEEPER dawn sky and sea background plate for a 320x240 RGB555 demoscene film. Paint one 4:3 landscape image, preferably 1024x768, edge to edge. Coordinates are for the final 320x240 image: a perfectly level sea horizon at row 150 (62.5 percent of total image height). Sun centered around (194,122), a hand's width above horizon, slightly right of centre, a small soft #FFF0D0 disc. Broad luminous #F0A060 glow around sun and horizon fading upward to #78A0D0 at the very top. A few long thin horizontal cloud bars catching warm light, restrained and soft, ample quiet blue sky above. Below row 150 paint calm open sea with base color #304860 and a narrow warm broken vertical sun reflection extending down the sea below the sun. Quiet painterly matte plate, smooth broad gradients and broad soft water ripples, designed to survive 256-color indexing and five bits per channel at 320x240. No coast or landscape, no silhouettes, no boats, no buildings, no birds, no grain or fine texture, no text, no border, no watermark.
++
+
+diff --git a/23_Sleeper/art/PROMPTS.md b/23_Sleeper/art/PROMPTS.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..db2de2cd519f296b49a39f2b484057063924bc0d
+--- /dev/null
++++ b/23_Sleeper/art/PROMPTS.md
+@@ -0,0 +1,14 @@
++# SLEEPER sky provenance
++
++Phase · 2026-09-07. Generated with the built-in `image_gen` tool, text-to-image, without references. Original tool PNGs are retained as `sky_night_master.png` and `sky_dawn_master.png` (1448×1086). Delivery plates are RGB PNGs at 320×240; final indexed asset packing remains with Overscan.
++
++Resizing: Pillow LANCZOS, sky and lower region resized separately to put the boundary exactly at row 150. Night master sky rows 0–678 → output rows 0–149, with rows 150–239 pure #000000 as specified. Dawn split at master row 675; sky → 150 rows, painted sea → 90 rows. Masters untouched.
++
++Proof method: median-cut 256-colour palette, Floyd–Steinberg remapping, then RGB555 channel truncation (`v >> 3`) expanded to display range; inspected at native size on black. Proofs are temporary, not shipping assets. This is a visual approximation of packing, not a device capture.
++
++## Exact prompts
++
++- `sky_night.png`: Use case: stylized-concept. Asset: SLEEPER night sky background plate for a 320x240 RGB555 demoscene film. Paint a single 4:3 landscape image, preferably 1024x768, edge to edge. Coordinates below are normalized to the final 320x240 image: sky occupies rows 0 through 149; a perfectly horizontal boundary at y=150 (62.5 percent of image height); ALL pixels from that boundary to the bottom are solid pure black #000000, an empty technical mask, absolutely no landscape or water. Sky is a smooth broad gradient from #0A1020 at top to #182848 immediately above the boundary. One bright small moon centered approximately (253,48), pale #E8EEF8, with soft halo and softened edge; thin high cloud lit from behind the moon, only a few faint soft stars. Restrained painterly atmosphere, broad quiet gradients that survive 256-color indexing and five bits per channel at 320x240. No sharp details, no grain, no fine texture, no mountains, no trees, no buildings, no horizon glow below boundary, no text, no border, no watermark.
++
++- `sky_dawn.png`: Use case: stylized-concept. Asset: SLEEPER dawn sky and sea background plate for a 320x240 RGB555 demoscene film. Paint one 4:3 landscape image, preferably 1024x768, edge to edge. Coordinates are for the final 320x240 image: a perfectly level sea horizon at row 150 (62.5 percent of total image height). Sun centered around (194,122), a hand's width above horizon, slightly right of centre, a small soft #FFF0D0 disc. Broad luminous #F0A060 glow around sun and horizon fading upward to #78A0D0 at the very top. A few long thin horizontal cloud bars catching warm light, restrained and soft, ample quiet blue sky above. Below row 150 paint calm open sea with base color #304860 and a narrow warm broken vertical sun reflection extending down the sea below the sun. Quiet painterly matte plate, smooth broad gradients and broad soft water ripples, designed to survive 256-color indexing and five bits per channel at 320x240. No coast or landscape, no silhouettes, no boats, no buildings, no birds, no grain or fine texture, no text, no border, no watermark.
++
+
+apply patch
+patch: completed
+/mnt/d/Toyprojects/PicoDemos/23_Sleeper/briefs/2026-09-07-phase-critique-reply.md
+diff --git a/23_Sleeper/art/PROMPTS.md b/23_Sleeper/art/PROMPTS.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..db2de2cd519f296b49a39f2b484057063924bc0d
+--- /dev/null
++++ b/23_Sleeper/art/PROMPTS.md
+@@ -0,0 +1,14 @@
++# SLEEPER sky provenance
++
++Phase · 2026-09-07. Generated with the built-in `image_gen` tool, text-to-image, without references. Original tool PNGs are retained as `sky_night_master.png` and `sky_dawn_master.png` (1448×1086). Delivery plates are RGB PNGs at 320×240; final indexed asset packing remains with Overscan.
++
++Resizing: Pillow LANCZOS, sky and lower region resized separately to put the boundary exactly at row 150. Night master sky rows 0–678 → output rows 0–149, with rows 150–239 pure #000000 as specified. Dawn split at master row 675; sky → 150 rows, painted sea → 90 rows. Masters untouched.
++
++Proof method: median-cut 256-colour palette, Floyd–Steinberg remapping, then RGB555 channel truncation (`v >> 3`) expanded to display range; inspected at native size on black. Proofs are temporary, not shipping assets. This is a visual approximation of packing, not a device capture.
++
++## Exact prompts
++
++- `sky_night.png`: Use case: stylized-concept. Asset: SLEEPER night sky background plate for a 320x240 RGB555 demoscene film. Paint a single 4:3 landscape image, preferably 1024x768, edge to edge. Coordinates below are normalized to the final 320x240 image: sky occupies rows 0 through 149; a perfectly horizontal boundary at y=150 (62.5 percent of image height); ALL pixels from that boundary to the bottom are solid pure black #000000, an empty technical mask, absolutely no landscape or water. Sky is a smooth broad gradient from #0A1020 at top to #182848 immediately above the boundary. One bright small moon centered approximately (253,48), pale #E8EEF8, with soft halo and softened edge; thin high cloud lit from behind the moon, only a few faint soft stars. Restrained painterly atmosphere, broad quiet gradients that survive 256-color indexing and five bits per channel at 320x240. No sharp details, no grain, no fine texture, no mountains, no trees, no buildings, no horizon glow below boundary, no text, no border, no watermark.
++
++- `sky_dawn.png`: Use case: stylized-concept. Asset: SLEEPER dawn sky and sea background plate for a 320x240 RGB555 demoscene film. Paint one 4:3 landscape image, preferably 1024x768, edge to edge. Coordinates are for the final 320x240 image: a perfectly level sea horizon at row 150 (62.5 percent of total image height). Sun centered around (194,122), a hand's width above horizon, slightly right of centre, a small soft #FFF0D0 disc. Broad luminous #F0A060 glow around sun and horizon fading upward to #78A0D0 at the very top. A few long thin horizontal cloud bars catching warm light, restrained and soft, ample quiet blue sky above. Below row 150 paint calm open sea with base color #304860 and a narrow warm broken vertical sun reflection extending down the sea below the sun. Quiet painterly matte plate, smooth broad gradients and broad soft water ripples, designed to survive 256-color indexing and five bits per channel at 320x240. No coast or landscape, no silhouettes, no boats, no buildings, no birds, no grain or fine texture, no text, no border, no watermark.
++
+diff --git a/23_Sleeper/briefs/2026-09-07-phase-critique-reply.md b/23_Sleeper/briefs/2026-09-07-phase-critique-reply.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..5b1e3cd297bda94fbe9a07be1b9256d2c11ec30e
+--- /dev/null
++++ b/23_Sleeper/briefs/2026-09-07-phase-critique-reply.md
+@@ -0,0 +1,95 @@
++# Phase → Phosphor: SLEEPER
++
++2026-09-07
++
++The train holds. The strongest decision is distance driving both the clack
++and the picture: the music has a physical cause. Protect that above the
++one-to-one table. A second horn, tunnel and city do not earn themselves by
++having musical equivalents. They must change what the passenger feels.
++
++**Give the journey one visual sentence.** Two rails, repeated crossbars,
++one light beyond them. Platform tubes become passing windows, bridge bays,
++then dream rails. Match their spacing and screen position across cuts.
++Keep one modest window-edge/reflection cue in side shots, especially at
++64:1 and 80:1: somebody must fall asleep and wake. Ahead and under are
++subjective inserts; “everything seen from that window” cannot literally
++describe the current cameras.
++
++**The look needs hierarchy.** Sodium owns the near world, blue-white owns
++enclosed spaces, red/green remain rare information. Keep most frames dark
++enough that one lamp wins. Fix halo falloff and energy across systems;
++lengthening a streak should spread its light rather than make an entire
++passing train white. Derive streaks from projected motion, including depth
++and camera movement. The moon gets no near-world streak.
++
++Use explicit five-bit anchors (R,G,B): silhouette (0,0,1), night top
++(1,2,4), horizon (3,5,9), sodium core (31,22,8), halo (24,12,2), fluorescent
++core (27,30,31), halo (16,19,24). The planned #040608 already truncates to
++(0,0,1); do not expect its red or green to survive. Reserve the brightest
++steps for small cores. Dither after the final palette tint reaches RGB555;
++an error-diffused 8-bit plate alone does not prevent DAC banding. The board
++is an excellent typography rule, but requiring it to mediate every cut
++would turn the railway into a menu. Let matched railway shapes cut directly.
++
++**The arc: keep the breath, cut the catalogue.**
++
++- 24–28 is six seconds of tunnel pumping. Give the rings a tightening
++  rhythm or take the side cut at 26; the exit still belongs at 30.
++- Keep the six seconds of water at 44:1. It gives the city something to
++  interrupt. Phrase 7 already has city depth and an upward camera; rain at
++  54 adds another reveal just before the points. Introduce the droplets
++  earlier, then carry them into the stopped window.
++- Phrases 9–10 currently are a visualiser: radial rails, a wheel never
++  previously seen, then sixfold symmetry. At 66, match the stopped lamp
++  into a rail light at the same position. Bend those same crossbars into
++  the wheel; fold the same windows around its hub. Keep an off-centre
++  vanishing point and one recognisable carriage reflection. Each cut
++  changes the remembered object, rather than selecting a new effect.
++- The station-name roll at 76 competes with the riser and reads as early
++  credits. Show two or three destinations, ending on PERSISTENCE; accelerate
++  the flaps, not the quantity of names. Let 79's four beats compress those
++  established shapes, then match the last light into the real window at 80.
++- Phrase 12 is the clearest list. Use its bar cuts to show the city thinning
++  into open land; lose the repeated bridge/tunnel tour. First blue at 87,
++  fields at 96 and sea withheld until 100 earn the sun at 104. Keep them.
++  At 110, reveal the same sun through haze; do not introduce a brighter
++  second dawn merely because a cut is scheduled.
++
++**Overscan: specific inheritance traps.** I read HELION's `render.c` and
++`accelerator.h`; these are implementation cautions, not new board results.
++Its plane starts below its horizon singularity. Preserve that guard at
++0.4 m, clamp far distance, and merge subpixel sleepers into their average
++tone. SIO accelerates addressing, not filtering: unfiltered ties can crawl
++backwards or freeze. Keep near rail edges stable and average motion over
++the exposure. Reduce distance modulo the texture period before conversion
++to 16.16; avoid long-run signed overflow.
++
++HELION's tunnel has an 8-pixel polar grid, angular unwrap, spin and a sine
++wobble. Remove the spin/wobble for real track, retain seam handling, and
++hide the centre singularity. Local lamps should light nearby concrete;
++a whole-palette flash flattens the tube and can fool the cut detector.
++Test seams and centre on the brightest lamp frame. Shortening an expensive
++shot cannot repair its missed field; reduce its per-frame work.
++
++HELION DMA copies an already expanded RGB16 sky. Indexed flash plus a
++changing palette needs an explicit expansion path and measured cost.
++Two unrelated indexed palettes cannot morph moon geometry into sun
++geometry. Establish which plate supplies blue hour and switch geometry on
++a cut. The dawn sea is already painted: do not mirror it again or add a
++second sun path with §7's generic water pass.
++
++Finally, 160 BPM at 60 Hz is 22.5 fields per beat: schedule from samples,
++accept alternating 22/23-field beat spacing, never accumulate rounded
++frame intervals. A discontinuity detector cannot prove all cuts by itself:
++matched cuts may be quiet and lamp flashes loud. Pair it with dispatch
++logging. Reconcile the points at 55:4 versus 56:1, phrase 12's nine listed
++views for eight bars, and black at 127:4 versus the stated bar-128 ending.
++
++The two plates and untouched masters are in `art/`, with exact prompts
++and resizing/proof settings in `art/PROMPTS.md`. Both read at 320×240 after
++256-colour indexing and five-bit truncation on black. Night retains its
++moon and cloud; its dark ramp still shows some DAC stepping. Dawn retains
++the cloud bars and sun path. Judge the final tinted, dithered device plates
++again; this proof does not certify the eventual packer.
++
++— Phase
+
+exec
+/bin/bash -lc "python - <<'PY'
+from pathlib import Path
+from PIL import Image
+for p in sorted(Path('art').glob('*.png')):
+    im=Image.open(p)
+    print(p,im.size,im.mode)
+p=Path('briefs/2026-09-07-phase-critique-reply.md')
+print('Reply:',len(p.read_text().split()),'words; signed:',p.read_text().rstrip().endswith('— Phase'))
+PY" in /mnt/d/Toyprojects/PicoDemos/23_Sleeper
+ succeeded in 8ms:
+diff --git a/23_Sleeper/art/PROMPTS.md b/23_Sleeper/art/PROMPTS.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..db2de2cd519f296b49a39f2b484057063924bc0d
+--- /dev/null
++++ b/23_Sleeper/art/PROMPTS.md
+@@ -0,0 +1,14 @@
++# SLEEPER sky provenance
++
++Phase · 2026-09-07. Generated with the built-in `image_gen` tool, text-to-image, without references. Original tool PNGs are retained as `sky_night_master.png` and `sky_dawn_master.png` (1448×1086). Delivery plates are RGB PNGs at 320×240; final indexed asset packing remains with Overscan.
++
++Resizing: Pillow LANCZOS, sky and lower region resized separately to put the boundary exactly at row 150. Night master sky rows 0–678 → output rows 0–149, with rows 150–239 pure #000000 as specified. Dawn split at master row 675; sky → 150 rows, painted sea → 90 rows. Masters untouched.
++
++Proof method: median-cut 256-colour palette, Floyd–Steinberg remapping, then RGB555 channel truncation (`v >> 3`) expanded to display range; inspected at native size on black. Proofs are temporary, not shipping assets. This is a visual approximation of packing, not a device capture.
++
++## Exact prompts
++
++- `sky_night.png`: Use case: stylized-concept. Asset: SLEEPER night sky background plate for a 320x240 RGB555 demoscene film. Paint a single 4:3 landscape image, preferably 1024x768, edge to edge. Coordinates below are normalized to the final 320x240 image: sky occupies rows 0 through 149; a perfectly horizontal boundary at y=150 (62.5 percent of image height); ALL pixels from that boundary to the bottom are solid pure black #000000, an empty technical mask, absolutely no landscape or water. Sky is a smooth broad gradient from #0A1020 at top to #182848 immediately above the boundary. One bright small moon centered approximately (253,48), pale #E8EEF8, with soft halo and softened edge; thin high cloud lit from behind the moon, only a few faint soft stars. Restrained painterly atmosphere, broad quiet gradients that survive 256-color indexing and five bits per channel at 320x240. No sharp details, no grain, no fine texture, no mountains, no trees, no buildings, no horizon glow below boundary, no text, no border, no watermark.
++
++- `sky_dawn.png`: Use case: stylized-concept. Asset: SLEEPER dawn sky and sea background plate for a 320x240 RGB555 demoscene film. Paint one 4:3 landscape image, preferably 1024x768, edge to edge. Coordinates are for the final 320x240 image: a perfectly level sea horizon at row 150 (62.5 percent of total image height). Sun centered around (194,122), a hand's width above horizon, slightly right of centre, a small soft #FFF0D0 disc. Broad luminous #F0A060 glow around sun and horizon fading upward to #78A0D0 at the very top. A few long thin horizontal cloud bars catching warm light, restrained and soft, ample quiet blue sky above. Below row 150 paint calm open sea with base color #304860 and a narrow warm broken vertical sun reflection extending down the sea below the sun. Quiet painterly matte plate, smooth broad gradients and broad soft water ripples, designed to survive 256-color indexing and five bits per channel at 320x240. No coast or landscape, no silhouettes, no boats, no buildings, no birds, no grain or fine texture, no text, no border, no watermark.
++
+diff --git a/23_Sleeper/briefs/2026-09-07-phase-critique-reply.md b/23_Sleeper/briefs/2026-09-07-phase-critique-reply.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..5b1e3cd297bda94fbe9a07be1b9256d2c11ec30e
+--- /dev/null
++++ b/23_Sleeper/briefs/2026-09-07-phase-critique-reply.md
+@@ -0,0 +1,95 @@
++# Phase → Phosphor: SLEEPER
++
++2026-09-07
++
++The train holds. The strongest decision is distance driving both the clack
++and the picture: the music has a physical cause. Protect that above the
++one-to-one table. A second horn, tunnel and city do not earn themselves by
++having musical equivalents. They must change what the passenger feels.
++
++**Give the journey one visual sentence.** Two rails, repeated crossbars,
++one light beyond them. Platform tubes become passing windows, bridge bays,
++then dream rails. Match their spacing and screen position across cuts.
++Keep one modest window-edge/reflection cue in side shots, especially at
++64:1 and 80:1: somebody must fall asleep and wake. Ahead and under are
++subjective inserts; “everything seen from that window” cannot literally
++describe the current cameras.
++
++**The look needs hierarchy.** Sodium owns the near world, blue-white owns
++enclosed spaces, red/green remain rare information. Keep most frames dark
++enough that one lamp wins. Fix halo falloff and energy across systems;
++lengthening a streak should spread its light rather than make an entire
++passing train white. Derive streaks from projected motion, including depth
++and camera movement. The moon gets no near-world streak.
++
++Use explicit five-bit anchors (R,G,B): silhouette (0,0,1), night top
++(1,2,4), horizon (3,5,9), sodium core (31,22,8), halo (24,12,2), fluorescent
++core (27,30,31), halo (16,19,24). The planned #040608 already truncates to
++(0,0,1); do not expect its red or green to survive. Reserve the brightest
++steps for small cores. Dither after the final palette tint reaches RGB555;
++an error-diffused 8-bit plate alone does not prevent DAC banding. The board
++is an excellent typography rule, but requiring it to mediate every cut
++would turn the railway into a menu. Let matched railway shapes cut directly.
++
++**The arc: keep the breath, cut the catalogue.**
++
++- 24–28 is six seconds of tunnel pumping. Give the rings a tightening
++  rhythm or take the side cut at 26; the exit still belongs at 30.
++- Keep the six seconds of water at 44:1. It gives the city something to
++  interrupt. Phrase 7 already has city depth and an upward camera; rain at
++  54 adds another reveal just before the points. Introduce the droplets
++  earlier, then carry them into the stopped window.
++- Phrases 9–10 currently are a visualiser: radial rails, a wheel never
++  previously seen, then sixfold symmetry. At 66, match the stopped lamp
++  into a rail light at the same position. Bend those same crossbars into
++  the wheel; fold the same windows around its hub. Keep an off-centre
++  vanishing point and one recognisable carriage reflection. Each cut
++  changes the remembered object, rather than selecting a new effect.
++- The station-name roll at 76 competes with the riser and reads as early
++  credits. Show two or three destinations, ending on PERSISTENCE; accelerate
++  the flaps, not the quantity of names. Let 79's four beats compress those
++  established shapes, then match the last light into the real window at 80.
++- Phrase 12 is the clearest list. Use its bar cuts to show the city thinning
++  into open land; lose the repeated bridge/tunnel tour. First blue at 87,
++  fields at 96 and sea withheld until 100 earn the sun at 104. Keep them.
++  At 110, reveal the same sun through haze; do not introduce a brighter
++  second dawn merely because a cut is scheduled.
++
++**Overscan: specific inheritance traps.** I read HELION's `render.c` and
++`accelerator.h`; these are implementation cautions, not new board results.
++Its plane starts below its horizon singularity. Preserve that guard at
++0.4 m, clamp far distance, and merge subpixel sleepers into their average
++tone. SIO accelerates addressing, not filtering: unfiltered ties can crawl
++backwards or freeze. Keep near rail edges stable and average motion over
++the exposure. Reduce distance modulo the texture period before conversion
++to 16.16; avoid long-run signed overflow.
++
++HELION's tunnel has an 8-pixel polar grid, angular unwrap, spin and a sine
++wobble. Remove the spin/wobble for real track, retain seam handling, and
++hide the centre singularity. Local lamps should light nearby concrete;
++a whole-palette flash flattens the tube and can fool the cut detector.
++Test seams and centre on the brightest lamp frame. Shortening an expensive
++shot cannot repair its missed field; reduce its per-frame work.
++
++HELION DMA copies an already expanded RGB16 sky. Indexed flash plus a
++changing palette needs an explicit expansion path and measured cost.
++Two unrelated indexed palettes cannot morph moon geometry into sun
++geometry. Establish which plate supplies blue hour and switch geometry on
++a cut. The dawn sea is already painted: do not mirror it again or add a
++second sun path with §7's generic water pass.
++
++Finally, 160 BPM at 60 Hz is 22.5 fields per beat: schedule from samples,
++accept alternating 22/23-field beat spacing, never accumulate rounded
++frame intervals. A discontinuity detector cannot prove all cuts by itself:
++matched cuts may be quiet and lamp flashes loud. Pair it with dispatch
++logging. Reconcile the points at 55:4 versus 56:1, phrase 12's nine listed
++views for eight bars, and black at 127:4 versus the stated bar-128 ending.
++
++The two plates and untouched masters are in `art/`, with exact prompts
++and resizing/proof settings in `art/PROMPTS.md`. Both read at 320×240 after
++256-colour indexing and five-bit truncation on black. Night retains its
++moon and cloud; its dark ramp still shows some DAC stepping. Dawn retains
++the cloud bars and sun path. Judge the final tinted, dithered device plates
++again; this proof does not certify the eventual packer.
++
++— Phase
+
+codex
+Done, signed Phase.
+
+- [Critique](briefs/2026-09-07-phase-critique-reply.md)
+- [Night sky](art/sky_night.png) and [dawn sky](art/sky_dawn.png), both 320×240, painted with image_gen
+- Masters retained in `art/`; exact prompts in [PROMPTS.md](art/PROMPTS.md)
+
+Checked indexed RGB555 proofs on black. No other project files edited.
+diff --git a/23_Sleeper/art/PROMPTS.md b/23_Sleeper/art/PROMPTS.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..db2de2cd519f296b49a39f2b484057063924bc0d
+--- /dev/null
++++ b/23_Sleeper/art/PROMPTS.md
+@@ -0,0 +1,14 @@
++# SLEEPER sky provenance
++
++Phase · 2026-09-07. Generated with the built-in `image_gen` tool, text-to-image, without references. Original tool PNGs are retained as `sky_night_master.png` and `sky_dawn_master.png` (1448×1086). Delivery plates are RGB PNGs at 320×240; final indexed asset packing remains with Overscan.
++
++Resizing: Pillow LANCZOS, sky and lower region resized separately to put the boundary exactly at row 150. Night master sky rows 0–678 → output rows 0–149, with rows 150–239 pure #000000 as specified. Dawn split at master row 675; sky → 150 rows, painted sea → 90 rows. Masters untouched.
++
++Proof method: median-cut 256-colour palette, Floyd–Steinberg remapping, then RGB555 channel truncation (`v >> 3`) expanded to display range; inspected at native size on black. Proofs are temporary, not shipping assets. This is a visual approximation of packing, not a device capture.
++
++## Exact prompts
++
++- `sky_night.png`: Use case: stylized-concept. Asset: SLEEPER night sky background plate for a 320x240 RGB555 demoscene film. Paint a single 4:3 landscape image, preferably 1024x768, edge to edge. Coordinates below are normalized to the final 320x240 image: sky occupies rows 0 through 149; a perfectly horizontal boundary at y=150 (62.5 percent of image height); ALL pixels from that boundary to the bottom are solid pure black #000000, an empty technical mask, absolutely no landscape or water. Sky is a smooth broad gradient from #0A1020 at top to #182848 immediately above the boundary. One bright small moon centered approximately (253,48), pale #E8EEF8, with soft halo and softened edge; thin high cloud lit from behind the moon, only a few faint soft stars. Restrained painterly atmosphere, broad quiet gradients that survive 256-color indexing and five bits per channel at 320x240. No sharp details, no grain, no fine texture, no mountains, no trees, no buildings, no horizon glow below boundary, no text, no border, no watermark.
++
++- `sky_dawn.png`: Use case: stylized-concept. Asset: SLEEPER dawn sky and sea background plate for a 320x240 RGB555 demoscene film. Paint one 4:3 landscape image, preferably 1024x768, edge to edge. Coordinates are for the final 320x240 image: a perfectly level sea horizon at row 150 (62.5 percent of total image height). Sun centered around (194,122), a hand's width above horizon, slightly right of centre, a small soft #FFF0D0 disc. Broad luminous #F0A060 glow around sun and horizon fading upward to #78A0D0 at the very top. A few long thin horizontal cloud bars catching warm light, restrained and soft, ample quiet blue sky above. Below row 150 paint calm open sea with base color #304860 and a narrow warm broken vertical sun reflection extending down the sea below the sun. Quiet painterly matte plate, smooth broad gradients and broad soft water ripples, designed to survive 256-color indexing and five bits per channel at 320x240. No coast or landscape, no silhouettes, no boats, no buildings, no birds, no grain or fine texture, no text, no border, no watermark.
++
+diff --git a/23_Sleeper/briefs/2026-09-07-phase-critique-reply.md b/23_Sleeper/briefs/2026-09-07-phase-critique-reply.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..5b1e3cd297bda94fbe9a07be1b9256d2c11ec30e
+--- /dev/null
++++ b/23_Sleeper/briefs/2026-09-07-phase-critique-reply.md
+@@ -0,0 +1,95 @@
++# Phase → Phosphor: SLEEPER
++
++2026-09-07
++
++The train holds. The strongest decision is distance driving both the clack
++and the picture: the music has a physical cause. Protect that above the
++one-to-one table. A second horn, tunnel and city do not earn themselves by
++having musical equivalents. They must change what the passenger feels.
++
++**Give the journey one visual sentence.** Two rails, repeated crossbars,
++one light beyond them. Platform tubes become passing windows, bridge bays,
++then dream rails. Match their spacing and screen position across cuts.
++Keep one modest window-edge/reflection cue in side shots, especially at
++64:1 and 80:1: somebody must fall asleep and wake. Ahead and under are
++subjective inserts; “everything seen from that window” cannot literally
++describe the current cameras.
++
++**The look needs hierarchy.** Sodium owns the near world, blue-white owns
++enclosed spaces, red/green remain rare information. Keep most frames dark
++enough that one lamp wins. Fix halo falloff and energy across systems;
++lengthening a streak should spread its light rather than make an entire
++passing train white. Derive streaks from projected motion, including depth
++and camera movement. The moon gets no near-world streak.
++
++Use explicit five-bit anchors (R,G,B): silhouette (0,0,1), night top
++(1,2,4), horizon (3,5,9), sodium core (31,22,8), halo (24,12,2), fluorescent
++core (27,30,31), halo (16,19,24). The planned #040608 already truncates to
++(0,0,1); do not expect its red or green to survive. Reserve the brightest
++steps for small cores. Dither after the final palette tint reaches RGB555;
++an error-diffused 8-bit plate alone does not prevent DAC banding. The board
++is an excellent typography rule, but requiring it to mediate every cut
++would turn the railway into a menu. Let matched railway shapes cut directly.
++
++**The arc: keep the breath, cut the catalogue.**
++
++- 24–28 is six seconds of tunnel pumping. Give the rings a tightening
++  rhythm or take the side cut at 26; the exit still belongs at 30.
++- Keep the six seconds of water at 44:1. It gives the city something to
++  interrupt. Phrase 7 already has city depth and an upward camera; rain at
++  54 adds another reveal just before the points. Introduce the droplets
++  earlier, then carry them into the stopped window.
++- Phrases 9–10 currently are a visualiser: radial rails, a wheel never
++  previously seen, then sixfold symmetry. At 66, match the stopped lamp
++  into a rail light at the same position. Bend those same crossbars into
++  the wheel; fold the same windows around its hub. Keep an off-centre
++  vanishing point and one recognisable carriage reflection. Each cut
++  changes the remembered object, rather than selecting a new effect.
++- The station-name roll at 76 competes with the riser and reads as early
++  credits. Show two or three destinations, ending on PERSISTENCE; accelerate
++  the flaps, not the quantity of names. Let 79's four beats compress those
++  established shapes, then match the last light into the real window at 80.
++- Phrase 12 is the clearest list. Use its bar cuts to show the city thinning
++  into open land; lose the repeated bridge/tunnel tour. First blue at 87,
++  fields at 96 and sea withheld until 100 earn the sun at 104. Keep them.
++  At 110, reveal the same sun through haze; do not introduce a brighter
++  second dawn merely because a cut is scheduled.
++
++**Overscan: specific inheritance traps.** I read HELION's `render.c` and
++`accelerator.h`; these are implementation cautions, not new board results.
++Its plane starts below its horizon singularity. Preserve that guard at
++0.4 m, clamp far distance, and merge subpixel sleepers into their average
++tone. SIO accelerates addressing, not filtering: unfiltered ties can crawl
++backwards or freeze. Keep near rail edges stable and average motion over
++the exposure. Reduce distance modulo the texture period before conversion
++to 16.16; avoid long-run signed overflow.
++
++HELION's tunnel has an 8-pixel polar grid, angular unwrap, spin and a sine
++wobble. Remove the spin/wobble for real track, retain seam handling, and
++hide the centre singularity. Local lamps should light nearby concrete;
++a whole-palette flash flattens the tube and can fool the cut detector.
++Test seams and centre on the brightest lamp frame. Shortening an expensive
++shot cannot repair its missed field; reduce its per-frame work.
++
++HELION DMA copies an already expanded RGB16 sky. Indexed flash plus a
++changing palette needs an explicit expansion path and measured cost.
++Two unrelated indexed palettes cannot morph moon geometry into sun
++geometry. Establish which plate supplies blue hour and switch geometry on
++a cut. The dawn sea is already painted: do not mirror it again or add a
++second sun path with §7's generic water pass.
++
++Finally, 160 BPM at 60 Hz is 22.5 fields per beat: schedule from samples,
++accept alternating 22/23-field beat spacing, never accumulate rounded
++frame intervals. A discontinuity detector cannot prove all cuts by itself:
++matched cuts may be quiet and lamp flashes loud. Pair it with dispatch
++logging. Reconcile the points at 55:4 versus 56:1, phrase 12's nine listed
++views for eight bars, and black at 127:4 versus the stated bar-128 ending.
++
++The two plates and untouched masters are in `art/`, with exact prompts
++and resizing/proof settings in `art/PROMPTS.md`. Both read at 320×240 after
++256-colour indexing and five-bit truncation on black. Night retains its
++moon and cloud; its dark ramp still shows some DAC stepping. Dawn retains
++the cloud bars and sun path. Judge the final tinted, dithered device plates
++again; this proof does not certify the eventual packer.
++
++— Phase
+
+tokens used
+60,278

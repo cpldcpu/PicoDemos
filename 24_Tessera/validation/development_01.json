@@ -1,0 +1,32 @@
+{
+  "passed": false,
+  "failures": [
+    "missing, extra or mismatching per-second PCM hashes",
+    "repeat=262",
+    "over=418",
+    "render exceeds 15 ms budget",
+    "frame-rate window below 59.5",
+    "unexpected whole-film frame count"
+  ],
+  "checked_hashes": 152,
+  "worst_render_ms": 20.46,
+  "counters": {
+    "repeat": 262,
+    "over": 418,
+    "under": 0,
+    "missed": 0
+  },
+  "frames": 8916,
+  "fps_min": 29.8,
+  "final_hash": "0da26109",
+  "done": [
+    "DONE frames 8916 | worst render 20.46 ms | repeat 262 | over 418 | fields 9183 firstrep 6125 boot 1 | under 0 | fill 986 | peak pump 95.72 us | synth 1490 cy/pump 890 cy/sample | audio 3686947"
+  ],
+  "final": [
+    "FINAL missed 0 bootmiss 0 | ENDHASH s=3686400 0da26109"
+  ],
+  "utc": "2026-09-11T14:36:39.315872+00:00",
+  "uf2_sha256": "66d126fa47f19fb023c0011b5f17e4e638ba0fdf1d2cb2d121535101850784e1",
+  "pcm_sha256": "e4dfa0e8442e0dfc701e12febedc0607141db1dbe266aea6dc238e969e9f4046",
+  "port": "COM10"
+}
