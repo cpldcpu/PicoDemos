@@ -1,0 +1,10 @@
+{
+  "shoulder_drop": 2.6,
+  "high_shoulder": 15.4,
+  "near_foot_turn_degrees": -24,
+  "near_foot_forward": -0.85,
+  "torso_width": 2.9,
+  "torso_depth": 3.8,
+  "hand_finger_pitch": 1.35,
+  "hand_finger_length": 2.65
+}

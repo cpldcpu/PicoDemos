@@ -1,0 +1,30 @@
+{
+  "tool": "sleeper/tools/pack_assets.py",
+  "quantiser": "PIL Image.quantize MEDIANCUT + Floyd-Steinberg",
+  "colors": 256,
+  "size": [
+    320,
+    240
+  ],
+  "note": "index plane + 8-bit RGB palette; the renderer tints the palette per frame and dithers 4x4 as it quantises to RGB555",
+  "plates": {
+    "sky_night": {
+      "source": "sky_night.png",
+      "note": "night plate: bars 0-103, tinted night -> first blue -> blue hour",
+      "source_sha256_16": "64566e37733637b0",
+      "rgb_sha256_16": "118d267b68d89426",
+      "plane_sha256_16": "40c61d712b444bee",
+      "plane_bytes": 76800,
+      "palette_bytes": 768
+    },
+    "sky_dawn": {
+      "source": "sky_dawn.png",
+      "note": "dawn plate: from the cut at 104:1, tint warming over 104-111",
+      "source_sha256_16": "5aa0b610d292db52",
+      "rgb_sha256_16": "d6894afd02f0a7cd",
+      "plane_sha256_16": "47398eda1e532e5e",
+      "plane_bytes": 76800,
+      "palette_bytes": 768
+    }
+  }
+}

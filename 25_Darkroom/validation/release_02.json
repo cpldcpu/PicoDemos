@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "complete": true,
+  "failures": [],
+  "checked_audio_hashes": 80,
+  "checked_visual_hashes": 9,
+  "frames": 4781,
+  "audio_position": 1920746,
+  "counters": {
+    "repeat": 0,
+    "over": 0,
+    "under": 0,
+    "missed": 0
+  },
+  "fps_windows": 79,
+  "fps_min": 59.7,
+  "worst_render_ms": 7.49,
+  "done": [
+    "DONE frames 4781 | worst render 7.49 ms | repeat 0 | over 0 | fields 4786 firstrep 0 boot 1 | under 0 | fill 987 | peak pump 19.86 us | synth 551 cy/pump 329 cy/sample | audio 1920746"
+  ],
+  "final": [
+    "FINAL missed 0 bootmiss 0 | ENDHASH s=1920000 1e1a9967"
+  ],
+  "utc": "2026-09-11T16:22:34.570342+00:00",
+  "uf2_sha256": "91bbf04832400fc66a9dccc4ab863691eeb07d7d7dd031aed1ef0f1984842706",
+  "programmed_snapshot": "D:\\Toyprojects\\PicoDemos\\25_Darkroom\\validation\\release_02_programmed.uf2",
+  "host_exe_sha256": "bd7f3ac19b64acbc6105b550f62f91dbf8b8007a227a5ebba8e1d4a9ec116308",
+  "host_pcm_sha256": "b1b3bae63e44eb2a89457f17c90f8c5a7e612ce8783bf2c0933481c9ec2baf7a",
+  "host_final_hash": "1e1a9967",
+  "port": "COM10"
+}

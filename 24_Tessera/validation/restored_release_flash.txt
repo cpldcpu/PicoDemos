@@ -1,0 +1,193 @@
+Tracking device serial number C0792B39607FED67 for reboot
+The device was asked to reboot into BOOTSEL mode so the command can be executed.
+
+Family ID 'rp2350-arm-s' can be downloaded in absolute space:
+  00000000->02000000
+Loading into Flash:   [                              ]  0%
+Loading into Flash:   [                              ]  1%
+Loading into Flash:   [                              ]  2%
+Loading into Flash:   [                              ]  3%
+Loading into Flash:   [=                             ]  4%
+Loading into Flash:   [=                             ]  5%
+Loading into Flash:   [=                             ]  6%
+Loading into Flash:   [==                            ]  7%
+Loading into Flash:   [==                            ]  8%
+Loading into Flash:   [===                           ]  10%
+Loading into Flash:   [===                           ]  11%
+Loading into Flash:   [===                           ]  12%
+Loading into Flash:   [===                           ]  13%
+Loading into Flash:   [====                          ]  14%
+Loading into Flash:   [====                          ]  15%
+Loading into Flash:   [====                          ]  16%
+Loading into Flash:   [=====                         ]  17%
+Loading into Flash:   [=====                         ]  19%
+Loading into Flash:   [======                        ]  20%
+Loading into Flash:   [======                        ]  21%
+Loading into Flash:   [======                        ]  22%
+Loading into Flash:   [======                        ]  23%
+Loading into Flash:   [=======                       ]  24%
+Loading into Flash:   [=======                       ]  25%
+Loading into Flash:   [=======                       ]  26%
+Loading into Flash:   [========                      ]  27%
+Loading into Flash:   [========                      ]  29%
+Loading into Flash:   [=========                     ]  30%
+Loading into Flash:   [=========                     ]  31%
+Loading into Flash:   [=========                     ]  32%
+Loading into Flash:   [=========                     ]  33%
+Loading into Flash:   [==========                    ]  34%
+Loading into Flash:   [==========                    ]  35%
+Loading into Flash:   [==========                    ]  36%
+Loading into Flash:   [===========                   ]  38%
+Loading into Flash:   [===========                   ]  39%
+Loading into Flash:   [============                  ]  40%
+Loading into Flash:   [============                  ]  41%
+Loading into Flash:   [============                  ]  42%
+Loading into Flash:   [============                  ]  43%
+Loading into Flash:   [=============                 ]  44%
+Loading into Flash:   [=============                 ]  45%
+Loading into Flash:   [=============                 ]  46%
+Loading into Flash:   [==============                ]  48%
+Loading into Flash:   [==============                ]  49%
+Loading into Flash:   [===============               ]  50%
+Loading into Flash:   [===============               ]  51%
+Loading into Flash:   [===============               ]  52%
+Loading into Flash:   [===============               ]  53%
+Loading into Flash:   [================              ]  54%
+Loading into Flash:   [================              ]  55%
+Loading into Flash:   [=================             ]  57%
+Loading into Flash:   [=================             ]  58%
+Loading into Flash:   [=================             ]  59%
+Loading into Flash:   [==================            ]  60%
+Loading into Flash:   [==================            ]  61%
+Loading into Flash:   [==================            ]  62%
+Loading into Flash:   [==================            ]  63%
+Loading into Flash:   [===================           ]  64%
+Loading into Flash:   [===================           ]  65%
+Loading into Flash:   [====================          ]  67%
+Loading into Flash:   [====================          ]  68%
+Loading into Flash:   [====================          ]  69%
+Loading into Flash:   [=====================         ]  70%
+Loading into Flash:   [=====================         ]  71%
+Loading into Flash:   [=====================         ]  72%
+Loading into Flash:   [=====================         ]  73%
+Loading into Flash:   [======================        ]  74%
+Loading into Flash:   [======================        ]  76%
+Loading into Flash:   [=======================       ]  77%
+Loading into Flash:   [=======================       ]  78%
+Loading into Flash:   [=======================       ]  79%
+Loading into Flash:   [========================      ]  80%
+Loading into Flash:   [========================      ]  81%
+Loading into Flash:   [========================      ]  82%
+Loading into Flash:   [========================      ]  83%
+Loading into Flash:   [=========================     ]  84%
+Loading into Flash:   [=========================     ]  86%
+Loading into Flash:   [==========================    ]  87%
+Loading into Flash:   [==========================    ]  88%
+Loading into Flash:   [==========================    ]  89%
+Loading into Flash:   [===========================   ]  90%
+Loading into Flash:   [===========================   ]  91%
+Loading into Flash:   [===========================   ]  92%
+Loading into Flash:   [===========================   ]  93%
+Loading into Flash:   [============================  ]  95%
+Loading into Flash:   [============================  ]  96%
+Loading into Flash:   [============================= ]  97%
+Loading into Flash:   [============================= ]  98%
+Loading into Flash:   [============================= ]  99%
+Loading into Flash:   [==============================]  100%
+
+Verifying Flash:      [                              ]  0%
+Verifying Flash:      [                              ]  1%
+Verifying Flash:      [                              ]  2%
+Verifying Flash:      [                              ]  3%
+Verifying Flash:      [=                             ]  4%
+Verifying Flash:      [=                             ]  5%
+Verifying Flash:      [=                             ]  6%
+Verifying Flash:      [==                            ]  7%
+Verifying Flash:      [==                            ]  8%
+Verifying Flash:      [===                           ]  10%
+Verifying Flash:      [===                           ]  11%
+Verifying Flash:      [===                           ]  12%
+Verifying Flash:      [===                           ]  13%
+Verifying Flash:      [====                          ]  14%
+Verifying Flash:      [====                          ]  15%
+Verifying Flash:      [====                          ]  16%
+Verifying Flash:      [=====                         ]  17%
+Verifying Flash:      [=====                         ]  19%
+Verifying Flash:      [======                        ]  20%
+Verifying Flash:      [======                        ]  21%
+Verifying Flash:      [======                        ]  22%
+Verifying Flash:      [======                        ]  23%
+Verifying Flash:      [=======                       ]  24%
+Verifying Flash:      [=======                       ]  25%
+Verifying Flash:      [=======                       ]  26%
+Verifying Flash:      [========                      ]  27%
+Verifying Flash:      [========                      ]  29%
+Verifying Flash:      [=========                     ]  30%
+Verifying Flash:      [=========                     ]  31%
+Verifying Flash:      [=========                     ]  32%
+Verifying Flash:      [=========                     ]  33%
+Verifying Flash:      [==========                    ]  34%
+Verifying Flash:      [==========                    ]  35%
+Verifying Flash:      [==========                    ]  36%
+Verifying Flash:      [===========                   ]  38%
+Verifying Flash:      [===========                   ]  39%
+Verifying Flash:      [============                  ]  40%
+Verifying Flash:      [============                  ]  41%
+Verifying Flash:      [============                  ]  42%
+Verifying Flash:      [============                  ]  43%
+Verifying Flash:      [=============                 ]  44%
+Verifying Flash:      [=============                 ]  45%
+Verifying Flash:      [=============                 ]  46%
+Verifying Flash:      [==============                ]  48%
+Verifying Flash:      [==============                ]  49%
+Verifying Flash:      [===============               ]  50%
+Verifying Flash:      [===============               ]  51%
+Verifying Flash:      [===============               ]  52%
+Verifying Flash:      [===============               ]  53%
+Verifying Flash:      [================              ]  54%
+Verifying Flash:      [================              ]  55%
+Verifying Flash:      [=================             ]  57%
+Verifying Flash:      [=================             ]  58%
+Verifying Flash:      [=================             ]  59%
+Verifying Flash:      [==================            ]  60%
+Verifying Flash:      [==================            ]  61%
+Verifying Flash:      [==================            ]  62%
+Verifying Flash:      [==================            ]  63%
+Verifying Flash:      [===================           ]  64%
+Verifying Flash:      [===================           ]  65%
+Verifying Flash:      [====================          ]  67%
+Verifying Flash:      [====================          ]  68%
+Verifying Flash:      [====================          ]  69%
+Verifying Flash:      [=====================         ]  70%
+Verifying Flash:      [=====================         ]  71%
+Verifying Flash:      [=====================         ]  72%
+Verifying Flash:      [=====================         ]  73%
+Verifying Flash:      [======================        ]  74%
+Verifying Flash:      [======================        ]  76%
+Verifying Flash:      [=======================       ]  77%
+Verifying Flash:      [=======================       ]  78%
+Verifying Flash:      [=======================       ]  79%
+Verifying Flash:      [========================      ]  80%
+Verifying Flash:      [========================      ]  81%
+Verifying Flash:      [========================      ]  82%
+Verifying Flash:      [========================      ]  83%
+Verifying Flash:      [=========================     ]  84%
+Verifying Flash:      [=========================     ]  86%
+Verifying Flash:      [==========================    ]  87%
+Verifying Flash:      [==========================    ]  88%
+Verifying Flash:      [==========================    ]  89%
+Verifying Flash:      [===========================   ]  90%
+Verifying Flash:      [===========================   ]  91%
+Verifying Flash:      [===========================   ]  92%
+Verifying Flash:      [===========================   ]  93%
+Verifying Flash:      [============================  ]  95%
+Verifying Flash:      [============================  ]  96%
+Verifying Flash:      [============================= ]  97%
+Verifying Flash:      [============================= ]  98%
+Verifying Flash:      [============================= ]  99%
+Verifying Flash:      [==============================]  100%
+
+  OK
+
+The device has been left accessible, but without the drive mounted; use 'picotool reboot' to reboot
+into regular BOOTSEL mode or application mode.

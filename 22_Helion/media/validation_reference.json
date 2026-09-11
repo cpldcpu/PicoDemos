@@ -1,0 +1,82 @@
+{
+  "production": "HELION / LATENT / 2026",
+  "credits": {
+    "scene_handle": "Phase",
+    "model": "GPT-6 Astra",
+    "critic": "Azure"
+  },
+  "score": "Phosphor's score: D minor at 120 BPM, 80 bars, D major from bar 56; integer synth, bit-identical on host and device",
+  "hardware_tested": true,
+  "flash_image_bytes": 239368,
+  "flash_remaining_bytes": 3954936,
+  "music_reserved_flash_bytes": 2097152,
+  "music_reserved_sram_bytes": 49152,
+  "uf2_bytes": 479744,
+  "uf2_sha256": "3911cc350ef4fb692cc2c5500ee53b82b9dd2bf599c6786b73a8e27e079c3201",
+  "main_sram_through_static_data_bytes": 476344,
+  "main_sram_remaining_for_heap_bytes": 47944,
+  "scanvideo_heap_allowance_bytes": 24576,
+  "stack_bytes_in_each_scratch_bank": 4096,
+  "audio": {
+    "frames": 3840000,
+    "sample_rate": 24000,
+    "channels": 2,
+    "peak": 23811,
+    "rms": 4764.09,
+    "dc": 1.35,
+    "stereo_difference_rms": 1730.2
+  },
+  "host_tests": [
+    "4801 guarded frames including endpoint",
+    "DAC pixel format",
+    "nonblank interior frames",
+    "black endpoint",
+    "visual seek independence",
+    "complete stereo block independence: 512 versus 1, 2, 8, 997 frames",
+    "silence after the score",
+    "per-second audio telemetry hashes",
+    "signed integer overflow trapping",
+    "SDL video and audio using dummy drivers"
+  ],
+  "host_check_output": [
+    "PASS 4801 guarded frames; deterministic seek; audio arbitrary blocks and endpoint",
+    "visual_hash=d4ae83393337aa2c audio_hash=e55096fd44ef812d max_triangles=1152 audio_peak=23811 (Phosphor score)"
+  ],
+  "capture": [
+    {
+      "codec_type": "video",
+      "width": 640,
+      "height": 480,
+      "r_frame_rate": "30/1",
+      "duration": "160.000000"
+    },
+    {
+      "codec_type": "audio",
+      "sample_rate": "24000",
+      "channels": 2,
+      "r_frame_rate": "0/0",
+      "duration": "160.000000"
+    }
+  ],
+  "device": {
+    "log": "briefs/logs/device-reference.log",
+    "board": "Raspberry Pi Pico 2 / RP2350 on Pimoroni VGA Demo Base, 300 MHz at 1.20 V",
+    "run_seconds": 160,
+    "fps_window_mean": 59.2,
+    "fps_window_min": 41.8,
+    "windows_below_58_fps": 7,
+    "render_mean_ms": 11.11,
+    "worst_render_frame_ms": 18.24,
+    "audio_underruns": 0,
+    "audio_pump_worst_us": 229.85,
+    "audio_pump_cycles_per_sample": 1680,
+    "per_second_audio_hashes_checked": 159,
+    "per_second_audio_hashes_wrong": 0,
+    "accelerator_selftest": "accelerator=0 (software model), printed at boot",
+    "note": "SIO and sky DMA disabled; the hardware paths are worth 1.13 ms of mean render, 1.09 ms of tunnel rasterization and 0.65 ms of the triangle loop"
+  },
+  "unverified": [
+    "analogue VGA and PWM signal quality on a monitor and a speaker (no instrument here reads the DAC output)",
+    "runtime heap high-water mark (the allowance is asserted from the map; scanvideo never failed to allocate over eight complete runs)"
+  ]
+}

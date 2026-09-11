@@ -1,0 +1,19 @@
+-- Configuring done
+-- Generating done
+-- Build files have been written to: D:/Toyprojects/PicoDemos/24_Tessera/tessera/build_host_reference
+Scanning dependencies of target tessera
+Scanning dependencies of target tessera_check
+[  6%] Building C object CMakeFiles/tessera.dir/render.c.obj
+[ 26%] Built target tessera_score
+[ 33%] Building C object CMakeFiles/tessera_check.dir/render.c.obj
+[ 40%] Linking C executable tessera_check.exe
+[ 46%] Linking C executable tessera.exe
+[ 73%] Built target tessera_check
+[100%] Built target tessera
+Test project D:/Toyprojects/PicoDemos/24_Tessera/tessera/build_host_reference
+    Start 1: whole_production
+1/1 Test #1: whole_production .................   Passed    5.63 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   5.63 sec

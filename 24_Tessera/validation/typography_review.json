@@ -1,0 +1,52 @@
+{
+  "card_bounds": [
+    53,
+    146,
+    266,
+    212
+  ],
+  "padding_x": 12,
+  "padding_y": 8,
+  "lines": [
+    {
+      "line": "PHASE",
+      "bounds": [
+        122,
+        154,
+        197,
+        167
+      ],
+      "center": 159.5
+    },
+    {
+      "line": "role",
+      "bounds": [
+        65,
+        174,
+        254,
+        180
+      ],
+      "center": 159.5
+    },
+    {
+      "line": "critic",
+      "bounds": [
+        105,
+        186,
+        214,
+        192
+      ],
+      "center": 159.5
+    },
+    {
+      "line": "group",
+      "bounds": [
+        117,
+        198,
+        202,
+        204
+      ],
+      "center": 159.5
+    }
+  ]
+}

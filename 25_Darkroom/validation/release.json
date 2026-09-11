@@ -1,0 +1,88 @@
+{
+  "uf2_sha256": "91bbf04832400fc66a9dccc4ab863691eeb07d7d7dd031aed1ef0f1984842706",
+  "flash_image_bytes": 109056,
+  "uf2_bytes": 218624,
+  "static_main_sram_bytes": 450840,
+  "heap_before_scanvideo_bytes": 73448,
+  "separate_stack_bytes": 8192,
+  "movie_bytes": 17119959,
+  "movie_sha256": "d81b733a0a258d69b1fcd177e29a9d248f2ffa2d29d9394fe6818b894827df8a",
+  "movie_frames": 4800,
+  "movie_duration_seconds": 80.0,
+  "host_exe_sha256": "bd7f3ac19b64acbc6105b550f62f91dbf8b8007a227a5ebba8e1d4a9ec116308",
+  "host_pcm_sha256": "b1b3bae63e44eb2a89457f17c90f8c5a7e612ce8783bf2c0933481c9ec2baf7a",
+  "host_final_hash": "1e1a9967",
+  "negative_controls_passed": 10,
+  "runs": [
+    {
+      "name": "release_01",
+      "passed": true,
+      "uf2_sha256": "91bbf04832400fc66a9dccc4ab863691eeb07d7d7dd031aed1ef0f1984842706",
+      "checked_audio_hashes": 80,
+      "checked_visual_hashes": 9,
+      "worst_render_ms": 7.49,
+      "fps_min": 59.7,
+      "frames": 4781,
+      "audio_position": 1920745,
+      "counters": {
+        "repeat": 0,
+        "over": 0,
+        "under": 0,
+        "missed": 0
+      },
+      "done": [
+        "DONE frames 4781 | worst render 7.49 ms | repeat 0 | over 0 | fields 4786 firstrep 0 boot 1 | under 0 | fill 986 | peak pump 17.24 us | synth 551 cy/pump 329 cy/sample | audio 1920745"
+      ],
+      "final": [
+        "FINAL missed 0 bootmiss 0 | ENDHASH s=1920000 1e1a9967"
+      ]
+    },
+    {
+      "name": "release_02",
+      "passed": true,
+      "uf2_sha256": "91bbf04832400fc66a9dccc4ab863691eeb07d7d7dd031aed1ef0f1984842706",
+      "checked_audio_hashes": 80,
+      "checked_visual_hashes": 9,
+      "worst_render_ms": 7.49,
+      "fps_min": 59.7,
+      "frames": 4781,
+      "audio_position": 1920746,
+      "counters": {
+        "repeat": 0,
+        "over": 0,
+        "under": 0,
+        "missed": 0
+      },
+      "done": [
+        "DONE frames 4781 | worst render 7.49 ms | repeat 0 | over 0 | fields 4786 firstrep 0 boot 1 | under 0 | fill 987 | peak pump 19.86 us | synth 551 cy/pump 329 cy/sample | audio 1920746"
+      ],
+      "final": [
+        "FINAL missed 0 bootmiss 0 | ENDHASH s=1920000 1e1a9967"
+      ]
+    }
+  ],
+  "source_sha256": {
+    "darkroom\\assets.c": "eddce6c6f7e6bece0710525c13373a1fa7c0c3d1da2ceb1cfd35728019ac6746",
+    "darkroom\\assets.h": "0d5f5a89f4c0e243645c8ce61d83854e36f0c0258a1a917e9242f4acf0fc0e76",
+    "darkroom\\audio_pwm.c": "df7d4ea2c0b3575c1f7ce1420694967d3948e8ccbc895cbf10f42078016456cc",
+    "darkroom\\CMakeLists.txt": "a68bd0a819073c1ad43d3ea9503a4c6e1ff2eb723548b705fc11e1dba33dab3b",
+    "darkroom\\darkroom.h": "df668586d07a2b2deecc3503a1bf234436a4adb2f543a0c5f47daed94ce7c555",
+    "darkroom\\device.h": "df76664c53a69fb66803edf4190dbd43d1ad8929ae4ff2068caecec89bb19ae8",
+    "darkroom\\host\\main.c": "046561903b1825223eecb2bd9d30b9ce8f3e8c8aa469b2b0577b197f77a7ac2b",
+    "darkroom\\main.c": "3608bd62836436042403480985cc00f9a68a40521f041efb6b7c429778d09405",
+    "darkroom\\periods.h": "9889baa1f0f64afea1d4f1bbc5deb5a234d1aa1d86886a4a0685bae06d319fd3",
+    "darkroom\\render.c": "4f3856c0929150d75474ed0a32afadc421a658db5f737fc2825745b8259ead41",
+    "darkroom\\synth.c": "3b416d3af1209453c6e89d730e0b50eb1b4e6cae865528e60c5b2cf8879fcac7",
+    "darkroom\\timing.h": "b8e27abb8d410a4a60775f1301a5945c9f069538ee0315f5d476ec752de4d000",
+    "darkroom\\tools\\board_run.py": "97a98e4ff55b8fc4e5ee4f8c9086f512894ad8e9f34c77bd586c2864eb744a26",
+    "darkroom\\tools\\capture.py": "16d0a4bb5346cf740be2da20f802f318fb2ebfc3bc096962f53652f390c67feb",
+    "darkroom\\tools\\check.c": "931ceb6a834ef4a838c39d74edda503043c677b8ed3cf2056a2952d530da3b7f",
+    "darkroom\\tools\\extract_original.py": "19f17c461c9a733f60ec0d3a7b01ed2735e212e44006bb14d48f865212b56890",
+    "darkroom\\tools\\gallery.py": "42ac1c9c2ed826316fe7493c66839c821c5be20ee4f3dcbf9757353715000633",
+    "darkroom\\tools\\music_audit.py": "d6ee2dac40955ab503edaeae3acdb269ad543306527cf08f6dab68652fae1fe9",
+    "darkroom\\tools\\release_audit.py": "185a636d10a0c7df65172ca351341c7aa9d7aa60ff0bf39d337a1bd17a6000fb",
+    "darkroom\\video.c": "ebd1644e000c817b630bc2f8a5e3e92b4abfc0a01a63b08a554372a1cfebdbc1",
+    "build.ps1": "4b21058466778975235416aa563fb1b510d50a8ec83eb3934583a3d57adfca1e",
+    "run_darkroom.bat": "4b98a08dc7e2cebdcce90d9c46816314b8731c05f4f05f18bd29c79c7eee299a"
+  }
+}

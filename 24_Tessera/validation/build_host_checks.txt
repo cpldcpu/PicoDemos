@@ -1,0 +1,2 @@
+PASS 9217 guarded frames; deterministic seek; audio arbitrary blocks and endpoint
+visual_hash=b8c46d0a05259168 audio_hash=55968b812a167544 max_triangles=1536 audio_peak=22845 (Phase score)

@@ -1,0 +1,18 @@
+[
+  {
+    "source": "ceramic_garden.png",
+    "source_sha256": "376fd7f473078218980246db5234939ce45192975bb1f48da5381e69219f045c",
+    "width": 320,
+    "height": 240,
+    "flash_bytes": 153600,
+    "format": "RGB555: R 0..4, G 6..10, B 11..15; bit 5 clear"
+  },
+  {
+    "source": "ceramic_garden_night.png",
+    "source_sha256": "c25b2e52cd38eb3777d68259434598bf69d35db8a60c0c777d5c32016fd6a00d",
+    "width": 320,
+    "height": 240,
+    "flash_bytes": 153600,
+    "format": "RGB555: R 0..4, G 6..10, B 11..15; bit 5 clear"
+  }
+]

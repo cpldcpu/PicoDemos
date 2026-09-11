@@ -1,0 +1,53 @@
+PICO_SDK_PATH is D:/Pico/pico-sdk
+Target board (PICO_BOARD) is 'pico2'.
+Using board configuration from D:/Pico/pico-sdk/src/boards/include/boards/pico2.h
+Pico Platform (PICO_PLATFORM) is 'rp2350-arm-s'.
+Build type is Release
+Using picotool from D:/msys64/ucrt64/bin/picotool.exe
+TinyUSB available at D:/Pico/pico-sdk/lib/tinyusb/hw/bsp/rp2040; enabling build support for USB.
+BTstack available at D:/Pico/pico-sdk/lib/btstack
+cyw43-driver available at D:/Pico/pico-sdk/lib/cyw43-driver
+mbedtls available at D:/Pico/pico-sdk/lib/mbedtls
+lwIP available at D:/Pico/pico-sdk/lib/lwip
+-- Configuring done
+-- Generating done
+-- Build files have been written to: D:/Toyprojects/PicoDemos/24_Tessera/tessera/build_rp2350
+[  1%] Built target bs2_default
+[  2%] Built target pico_scanvideo_dpi_timing_pio_h
+[  3%] Built target pico_scanvideo_scanvideo_pio_h
+[  6%] Built target bs2_default_library
+Scanning dependencies of target tessera
+[  7%] Building C object CMakeFiles/tessera.dir/render.c.obj
+[  8%] Building C object CMakeFiles/tessera.dir/scanvideo_measured.c.obj
+D:\Toyprojects\PicoDemos\24_Tessera\tessera\build_rp2350\scanvideo_measured.c: In function 'scanline_id_after':
+D:\Toyprojects\PicoDemos\24_Tessera\tessera\build_rp2350\scanvideo_measured.c:425:13: warning: comparison of integer expressions of different signedness: 'uint32_t' {aka 'long unsigned int'} and 'int' [-Wsign-compare]
+  425 |     if (tmp < video_mode.height - 1) {
+      |             ^
+D:\Toyprojects\PicoDemos\24_Tessera\tessera\build_rp2350\scanvideo_measured.c: In function 'prepare_for_active_scanline_irqs_enabled':
+D:\Toyprojects\PicoDemos\24_Tessera\tessera\build_rp2350\scanvideo_measured.c:757:64: warning: comparison of integer expressions of different signedness: 'io_ro_32' {aka 'long unsigned int'} and 'int' [-Wsign-compare]
+  757 |             if (video_pio->sm[PICO_SCANVIDEO_SCANLINE_SM].addr != shared_state.scanline_program_wait_index + 1) {
+      |                                                                ^~
+D:\Toyprojects\PicoDemos\24_Tessera\tessera\build_rp2350\scanvideo_measured.c: In function 'default_scanvideo_scanline_repeat_count_fn':
+D:\Toyprojects\PicoDemos\24_Tessera\tessera\build_rp2350\scanvideo_measured.c:1083:96: warning: unused parameter 'scanline_id' [-Wunused-parameter]
+ 1083 | static uint __no_inline_not_in_flash_func(default_scanvideo_scanline_repeat_count_fn)(uint32_t scanline_id) {
+      |                                                                                       ~~~~~~~~~^~~~~~~~~~~
+D:\Toyprojects\PicoDemos\24_Tessera\tessera\build_rp2350\scanvideo_measured.c: In function 'video_24mhz_composable_adapt_for_mode':
+D:\Toyprojects\PicoDemos\24_Tessera\tessera\build_rp2350\scanvideo_measured.c:1645:75: warning: unused parameter 'program' [-Wunused-parameter]
+ 1645 | bool video_24mhz_composable_adapt_for_mode(const scanvideo_pio_program_t *program, const scanvideo_mode_t *mode,
+      |                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+D:\Toyprojects\PicoDemos\24_Tessera\tessera\build_rp2350\scanvideo_measured.c: In function 'video_default_adapt_for_mode':
+D:\Toyprojects\PicoDemos\24_Tessera\tessera\build_rp2350\scanvideo_measured.c:1701:66: warning: unused parameter 'program' [-Wunused-parameter]
+ 1701 | bool video_default_adapt_for_mode(const scanvideo_pio_program_t *program, const scanvideo_mode_t *mode,
+      |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+D:\Toyprojects\PicoDemos\24_Tessera\tessera\build_rp2350\scanvideo_measured.c:1701:99: warning: unused parameter 'mode' [-Wunused-parameter]
+ 1701 | bool video_default_adapt_for_mode(const scanvideo_pio_program_t *program, const scanvideo_mode_t *mode,
+      |                                                                           ~~~~~~~~~~~~~~~~~~~~~~~~^~~~
+D:\Toyprojects\PicoDemos\24_Tessera\tessera\build_rp2350\scanvideo_measured.c:1702:45: warning: unused parameter 'modifiable_instructions' [-Wunused-parameter]
+ 1702 |                                   uint16_t *modifiable_instructions) {
+      |                                   ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+D:\Toyprojects\PicoDemos\24_Tessera\tessera\build_rp2350\scanvideo_measured.c: In function 'scanvideo_default_configure_pio':
+D:\Toyprojects\PicoDemos\24_Tessera\tessera\build_rp2350\scanvideo_measured.c:1706:67: warning: unused parameter 'offset' [-Wunused-parameter]
+ 1706 | void scanvideo_default_configure_pio(pio_hw_t *pio, uint sm, uint offset, pio_sm_config *config, bool overlay) {
+      |                                                              ~~~~~^~~~~~
+[  9%] Linking CXX executable tessera.elf
+[100%] Built target tessera

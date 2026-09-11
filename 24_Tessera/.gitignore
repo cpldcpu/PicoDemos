@@ -1,0 +1,3 @@
+tessera/build*/
+*.wav
+!/*_vga_rp2350.uf2

@@ -1,0 +1,70 @@
+﻿cmake_minimum_required(VERSION 3.13)
+option(DARKROOM_HOST "Build the SDL2 desktop player" OFF)
+# Measurement only, never a release build: audio_pump() keeps the ring, the
+# DMA polling and the chunking but renders silence instead of calling the
+# synth, which prices the transport machinery on its own.
+option(DARKROOM_SILENT_PUMP "Run audio_pump() with no DSP, for timing only" OFF)
+add_compile_definitions(DARKROOM_SILENT_PUMP=$<BOOL:${DARKROOM_SILENT_PUMP}>)
+if(DARKROOM_HOST)
+    project(darkroom C)
+    set(CMAKE_C_STANDARD 11)
+    find_package(SDL2 CONFIG REQUIRED)
+    add_executable(darkroom host/main.c render.c assets.c synth.c)
+    target_include_directories(darkroom PRIVATE .)
+    target_compile_options(darkroom PRIVATE -O2 -ffp-contract=off -Wall -Wextra -Wno-misleading-indentation)
+    target_link_libraries(darkroom PRIVATE SDL2::SDL2 m)
+    add_executable(darkroom_check tools/check.c render.c assets.c synth.c)
+    target_include_directories(darkroom_check PRIVATE .)
+    target_compile_options(darkroom_check PRIVATE -O2 -ffp-contract=off -Wall -Wextra -Wno-misleading-indentation -ftrapv)
+    target_link_libraries(darkroom_check PRIVATE m)
+    enable_testing()
+    add_test(NAME whole_production COMMAND darkroom_check)
+else()
+    set(PICO_BOARD pico2 CACHE STRING "RP2350 board")
+    set(PICO_PLATFORM rp2350-arm-s CACHE STRING "Cortex-M33 with FPU")
+    if(NOT PICO_SDK_PATH)
+        set(PICO_SDK_PATH "$ENV{PICO_SDK_PATH}")
+    endif()
+    if(NOT PICO_EXTRAS_PATH)
+        set(PICO_EXTRAS_PATH "$ENV{PICO_EXTRAS_PATH}")
+    endif()
+    include(${PICO_SDK_PATH}/external/pico_sdk_import.cmake)
+    include(${PICO_EXTRAS_PATH}/external/pico_extras_import.cmake)
+    project(darkroom C CXX ASM)
+    set(CMAKE_C_STANDARD 11)
+    pico_sdk_init()
+    # Instrument a build-local copy of the SDK, leaving the installed SDK
+    # untouched. Count the fallback actually selected by the scanout IRQ.
+    set(scanvideo_source "${PICO_EXTRAS_PATH}/src/rp2_common/pico_scanvideo_dpi/scanvideo.c")
+    file(READ "${scanvideo_source}" scanvideo_code)
+    set(scanvideo_needle "bool was_correct_scanline = (fsb != &_missing_scanline_buffer);")
+    string(FIND "${scanvideo_code}" "${scanvideo_needle}" scanvideo_hook)
+    if(scanvideo_hook EQUAL -1)
+        message(FATAL_ERROR "Scanvideo changed: review the missing-line instrumentation")
+    endif()
+    string(REPLACE "${scanvideo_needle}" "${scanvideo_needle}\n    extern void darkroom_scanline_missed(void);\n    if (!was_correct_scanline) darkroom_scanline_missed();" scanvideo_code "${scanvideo_code}")
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/scanvideo_measured.c" "${scanvideo_code}")
+    get_target_property(scanvideo_sources pico_scanvideo_dpi INTERFACE_SOURCES)
+    list(REMOVE_ITEM scanvideo_sources "${scanvideo_source}")
+    list(APPEND scanvideo_sources "${CMAKE_CURRENT_BINARY_DIR}/scanvideo_measured.c")
+    set_property(TARGET pico_scanvideo_dpi PROPERTY INTERFACE_SOURCES "${scanvideo_sources}")
+    if(NOT PICO_PLATFORM STREQUAL "rp2350-arm-s")
+        message(FATAL_ERROR "DARKROOM requires RP2350 Cortex-M33 (rp2350-arm-s)")
+    endif()
+    add_executable(darkroom main.c video.c audio_pwm.c render.c assets.c synth.c)
+    target_include_directories(darkroom PRIVATE .)
+    target_compile_definitions(darkroom PRIVATE PICO_BUILD=1
+        PICO_SCANVIDEO_MAX_SCANLINE_BUFFER_WORDS=324
+        PICO_SCANVIDEO_SCANLINE_BUFFER_COUNT=12
+        PICO_STACK_SIZE=0x1000 PICO_CORE1_STACK_SIZE=0x1000
+        # A panic that keeps USB alive (main.c): the stock one ends in a
+        # breakpoint, which without a debugger becomes a HardFault with every
+        # interrupt masked, and the board then needs a hand on the cable.
+        PICO_PANIC_FUNCTION=darkroom_panic)
+    target_compile_options(darkroom PRIVATE -O2 -ffp-contract=off -Wall -Wextra -Wno-misleading-indentation)
+    target_link_libraries(darkroom pico_stdlib pico_multicore pico_scanvideo_dpi hardware_pwm hardware_dma m)
+    pico_enable_stdio_usb(darkroom 1)
+    # UART defaults collide with VGA. USB CDC is the sole telemetry channel.
+    pico_enable_stdio_uart(darkroom 0)
+    pico_add_extra_outputs(darkroom)
+endif()

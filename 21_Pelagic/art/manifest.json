@@ -1,0 +1,45 @@
+{
+  "reef": {
+    "shape": [
+      320,
+      480
+    ],
+    "bytes": 307200
+  },
+  "abyss": {
+    "shape": [
+      320,
+      480
+    ],
+    "bytes": 307200
+  },
+  "surface": {
+    "shape": [
+      320,
+      480
+    ],
+    "bytes": 307200
+  },
+  "ray_color": {
+    "shape": [
+      256,
+      384
+    ],
+    "bytes": 196608
+  },
+  "ray_alpha": {
+    "shape": [
+      256,
+      384
+    ],
+    "bytes": 98304
+  },
+  "title_alpha": {
+    "shape": [
+      48,
+      280
+    ],
+    "bytes": 13440
+  },
+  "total_bytes": 1229952
+}

@@ -1,0 +1,43 @@
+{
+  "units": "body_layout: sole y=0, crown y=20.4; +Y up, +Z eye front",
+  "body_parameters": {
+    "shoulder_drop": 2.6,
+    "high_shoulder": 15.4,
+    "near_foot_turn_degrees": -24,
+    "near_foot_forward": -0.85,
+    "torso_width": 2.9,
+    "torso_depth": 3.8,
+    "hand_finger_pitch": 1.35,
+    "hand_finger_length": 2.65
+  },
+  "poses": {
+    "112": {
+      "position": [
+        6,
+        16.0,
+        12
+      ],
+      "target": [
+        0,
+        18.35,
+        0
+      ],
+      "focal_pixels": 510,
+      "vertical_fov_degrees": 26.48103983037441
+    },
+    "124": {
+      "position": [
+        6.8,
+        16.6,
+        11.8
+      ],
+      "target": [
+        0,
+        18.45,
+        0
+      ],
+      "focal_pixels": 510,
+      "vertical_fov_degrees": 26.48103983037441
+    }
+  }
+}

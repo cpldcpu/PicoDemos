@@ -22,6 +22,8 @@
 !15_Quicksilver/*.uf2
 !16_Sustain/*.uf2
 !17_Hysteresis/*.uf2
+!18_Vesper/*.uf2
+!19_Persistence/*.uf2
 **/*.bin
 !10_TheDemo/thedemo/assets/_packed/*.bin
 !11_FlashDemo/thedemo/assets/_packed/*.bin
@@ -52,8 +54,21 @@
 **/GLCache/
 
 # Host desktop simulator preview artifacts & screenshots
+# Anything image- or audio-shaped under a host/ directory is a preview the
+# tools just rendered; the media that belongs to a production lives in that
+# production's media/ directory. Naming individual scratch directories here
+# did not work -- a screenshot run into a NEW subdirectory got committed --
+# so this matches by what the file is, at any depth.
 **/host/screenshots/
 **/host/_shots/
+**/host/**/*.bmp
+**/host/**/*.png
+**/host/**/*.ppm
+**/host/**/*.wav
+**/host/*.bmp
+**/host/*.png
+**/host/*.ppm
+**/host/*.wav
 **/host/*.mp4
 **/host/*.log
 **/host/err.txt
@@ -101,3 +116,21 @@ Session.vim
 # Azure's asset scratch: endcard font/threshold variants. The two that mattered
 # are kept as assets/latent_endcard_*_rejected.png; the rest is working material.
 17_Hysteresis/tmp/
+20_Colossus/media/*.wav
+**/tools/_song_check/
+20_Colossus/**/*.ppm
+20_Colossus/colossus/assets/_host/
+20_Colossus/colossus/assets/phase_capture
+20_Colossus/colossus/assets/phase_checks
+20_Colossus/briefs/.*
+20_Colossus/briefs/sketches/round3/bar-*.png
+20_Colossus/media/*_small.mp4
+20_Colossus/media/colossus_wip*.mp4
+20_Colossus/media/phrases/
+20_Colossus/media/hashes.txt
+20_Colossus/media/*.log
+20_Colossus/colossus/assets/_*/
+20_Colossus/colossus/tools/_*/
+20_Colossus/colossus_stub*.uf2
+20_Colossus/colossus_mat_rp2350.uf2
+**/__pycache__/
