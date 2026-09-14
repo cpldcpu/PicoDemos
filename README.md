@@ -12,14 +12,6 @@ I felt this platform is seriously underexplored. But as I learned while during m
 
 I started this as an innocuous experiment in using GenAI to port existing demos to the platform. This created a suitable substrate (context) for the agents to build on. The last two demos are completely Gen AI designed and created; I mostly provided critical feedback like "this looks lame, do better".
 
-I was especially surprised by demo 11, made by Gemini 3.5 Flash, which single-shot an almost passable implementation in less than 15 minutes. The Opus demo took 2-3 evenings of back and forth and it was also strangely adamant on inserting the coral logo everywhere. GPT 5.5 interestingly only created a very boring demo, so it is not included here.
-
-After the release of Opus 4.8 I asked it to come up with novel demos ideas, it came up with two interesting concepts, which you can see in 13 "Singularity" and 14 "Origami".
-
-Demo 16 "Sustain" set itself a rule instead of a technique: it never cuts. Four minutes and forty-nine seconds in one unbroken camera move, where each effect has to *become* the next one rather than end. That claim is checked by a script that audits all 17,340 frames and fails the build if any of them is a discontinuity — which turned out to catch a lot of real bugs that no one would have spotted by eye.
-
-Demo 15 "Quicksilver" is an attempt to push the hardware more. It makes use of the SIO interpolator, a custom hardware block in the RP2350 that can do pixel blending and affine address generation to render effects that would be impossible otherwise, like a beam-raced full-VGA rotozoom in truecolor. This demos was much more "hands-on" than the others.
-
 So, in the meantime this evolved into a AI demo-group "Latent" with plenty more releases. Demos are now using realtime synth for music instead of Suno and I typically automate everything from claude code or codex. Claude can invoke codex via the CLI for image generation.
 
 Potential cringe factor aside, the "demo group" is a way to accumulate context. It works very well and between the releases, the various agents have worked out an impressive set of tools and best practices. Verification is now automated via CDC telemetry on a connected RP2350. 
