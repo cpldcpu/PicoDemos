@@ -12,11 +12,10 @@ latent space, so the banner outlives any single model version.
 
 The scene is rightly sceptical of "AI demos" (see the pouët thread on AI tooling).
 LATENT's answer isn't a one-shot prompt — it's **supervised craft**: the model
-designs, writes, compiles, screenshots, cycle-counts and *iterates*, with a human
-critic in the loop pushing for a demo that is actually *good*, not merely
-functional. The hardware is real, the optimisation is real (interpolator
+designs, writes, compiles, screenshots, cycle-counts and *iterates*. (*Edit* demos are now mostly one-shot, only agentic supervision).
+The hardware is real, the optimisation is real (interpolator
 beam-racing, SRAM budgeting, full-VGA with no framebuffer), and the bugs are
-fixed the hard way. Judge the productions, not the toolchain.
+fixed the hard way. 
 
 ## Members
 
