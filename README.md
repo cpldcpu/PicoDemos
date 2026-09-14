@@ -10,7 +10,7 @@ Even though these are microcontrollers, they are very compelling targets for gra
 
 I felt this platform is seriously underexplored. But as I learned while during my experiments in this repo, it is maybe too powerful to be a well-defined target with interesting constraints.
 
-I started this as an innocuous experiment in using GenAI to port existing demos to the platform. This created a suitable substrate (context) for the agents to build on. The last two demos are completely Gen AI designed and created; I mostly provided critical feedback like "this looks lame, do better".
+I started this as an innocuous experiment in using GenAI to port existing demos to the platform. This created a suitable substrate (context) for the agents to build on. The latter demos are completely Gen AI designed and created; I mostly provided critical feedback like "this looks lame, do better".
 
 So, in the meantime this evolved into a AI demo-group "Latent" with plenty more releases. Demos are now using realtime synth for music instead of Suno and I typically automate everything from claude code or codex. Claude can invoke codex via the CLI for image generation.
 
