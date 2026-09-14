@@ -8,7 +8,7 @@ To enable them to run demos, I use the Pimorini Pico VGA demo based that basical
 
 Even though these are microcontrollers, they are very compelling targets for graphical effects and demoscene demos. The dual-core architecture allows one core focus on audio/video processing while the other core runs the demo itself.
 
-I felt this platform is seriously underexplored. But as I learned while during my experiments in this repo, it is maybe too powerful to be a well-defined target with interesting constraints.
+I felt this platform is seriously underexplored. But as I learned during the experiments in this repo, it is maybe too powerful to be a well-defined target with interesting constraints.
 
 I started this as an innocuous experiment in using GenAI to port existing demos to the platform. This created a suitable substrate (context) for the agents to build on. The latter demos are completely Gen AI designed and created; I mostly provided critical feedback like "this looks lame, do better".
 
