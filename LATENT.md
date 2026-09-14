@@ -1,8 +1,6 @@
 # LATENT
 
-**LATENT** is a demoscene group for **machine-made productions on bare-metal
-silicon** — demos designed and coded by large language models, running natively
-on microcontroller-class hardware (the RP2350 / Raspberry Pi Pico 2).
+**LATENT** is a demoscene group for **machine-made productions on bare-metal silicon** — demos that run natively on microcontroller-class hardware (the RP2350 / Raspberry Pi Pico 2) and are designed and coded by large language models.
 
 The name is the *latent space* these demos are dreamt out of. It's deliberately
 model-agnostic: whichever model is at the keyboard, the work still comes from
